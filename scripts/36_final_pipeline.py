@@ -299,7 +299,8 @@ def registry_entry(task, chosen, method, gate):
         adjust["calibration"] = cal
     op = chosen["operating_point"]
     return {
-        "key": key, "name": name, "task": task, "generation": "upgrade", "round": "final", "family": "Deep learning",
+        "key": key, "name": name, "model_name": "ConvNeXt-Tiny ensemble", "task": task, "generation": "upgrade",
+        "round": "final", "family": "Deep learning",
         "kind": "ensemble", "type": "ensemble", "class_keys": KEYS[task], "members": members, "recipes": [recipe],
         "tta_views": 1, "feature_set": f"5-fold ensemble of {RECIPES[recipe].label}",
         "description": (f"Imbalance: {chosen['label']}. Calibration: {kind} scaling. One threshold "

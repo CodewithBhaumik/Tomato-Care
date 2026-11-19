@@ -12,7 +12,8 @@ def _photos(key: str) -> list:
 
 def _scores(key: str) -> pd.DataFrame:
     rows = []
-    for label, m in (("Deep learning", core.task_defaults()[0]), ("Classical ML", core.classical_result())):
+    for m in (core.task_defaults()[0], core.classical_result()):
+        label = core.display_name(core.model_entry(m["key"])) if m else ""
         c = next((c for c in (m or {}).get("per_class", []) if c["key"] == key), None)
         if c:
             rows.append({"Model": label, "Precision": c["precision"], "Recall": c["recall"], "F1": c["f1"],

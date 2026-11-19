@@ -4,7 +4,7 @@ import { ArrowLeft, ExternalLink, Eye, GitCompareArrows, ListChecks, ScanSearch,
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
 import { Badge, ButtonLink, Callout, Card, CardHeader, EmptyState, Meter, Skeleton } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
-import { TASK, classicalModel, defaultModel, taskClasses } from "../lib/analytics.js";
+import { TASK, classicalModel, defaultModel, servedName, taskClasses } from "../lib/analytics.js";
 import { classMeta } from "../lib/classes.js";
 import { cx, pct } from "../lib/format.js";
 
@@ -135,8 +135,8 @@ export default function DiseasePage() {
             <CardHeader icon={ScanSearch} title="How well the models recognise it" subtitle="Held-out test photos" />
             <div className="space-y-5 p-5">
               {[
-                ["Deep learning", dl, perfDl],
-                ["Classical ML", ml, perfMl],
+                [servedName(dl), dl, perfDl],
+                [servedName(ml), ml, perfMl],
               ].map(([label, m, p]) =>
                 p ? (
                   <div key={label}>

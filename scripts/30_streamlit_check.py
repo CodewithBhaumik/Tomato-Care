@@ -132,10 +132,11 @@ def main():
         report["diagnose"]["compare"] = "shown"
         # classical ML model
         deep = page.locator(".tc-status").first.inner_text()
-        segment(page, "Classical ML").click()
         dep = json.loads((ROOT / "experiments" / "deployment.json").read_text(encoding="utf-8"))
         ml = next(e for e in dep["models"] if e.get("type") == "sklearn")
-        page.wait_for_selector(f"text=Classical ML · {ml['pipeline']['classifier']}", timeout=300000)
+        dl = next(e for e in dep["models"] if e["key"] == dep["default_model"])
+        segment(page, ml["model_name"]).click()
+        page.wait_for_selector(f"text={ml['model_name']} · classical ML", timeout=300000)
         for _ in range(60):  # a slow server may still show the previous answer for a moment
             text = page.locator(".tc-status").first.inner_text() if page.locator(".tc-status").count() else ""
             if text and text != deep:
@@ -143,7 +144,7 @@ def main():
             page.wait_for_timeout(2000)
         report["diagnose"]["example_classical"] = text
         print("classical ->", report["diagnose"]["example_classical"].replace("\n", " | "))
-        segment(page, "Deep learning").click()
+        segment(page, dl["model_name"]).click()
         settle(page)
         # upload a phone-size photo
         segment(page, "Upload").click()

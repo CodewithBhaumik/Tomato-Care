@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { BrainCircuit, Cpu, Layers3, ShieldCheck, Sparkles } from "lucide-react";
 import { useData } from "../../context/DataContext.jsx";
+import { modelBenefit, servedName } from "../../lib/analytics.js";
 import { cx, ms, pct } from "../../lib/format.js";
 import { Badge } from "../ui/primitives.jsx";
 
@@ -51,8 +52,11 @@ export default function ModelPicker({ model, onModel, disabled }) {
               >
                 <Icon className={cx("mt-0.5 size-4 shrink-0", on ? "text-leaf-600 dark:text-leaf-400" : "text-muted")} aria-hidden />
                 <span className="min-w-0">
-                  <span className="block text-sm font-medium text-ink">{familyLabel(m)}</span>
-                  <span className="block text-xs text-muted">{m.key === models?.default_model ? "Recommended · most accurate" : "No neural network"}</span>
+                  <span className="block text-sm font-medium text-ink">{servedName(m)}</span>
+                  <span className="block text-xs text-muted">
+                    {familyLabel(m)}
+                    {m.key === models?.default_model ? " · recommended" : ""}
+                  </span>
                 </span>
               </button>
             );
@@ -61,7 +65,12 @@ export default function ModelPicker({ model, onModel, disabled }) {
       ) : (
         <p className="rounded-xl border border-dashed border-line-strong px-3.5 py-2.5 text-sm text-muted">Models load when the server is online</p>
       )}
-      {selected?.description && <p className="mt-1 text-xs leading-relaxed text-muted" data-testid="model-card">{selected.description}</p>}
+      {selected && (
+        <p className="mt-1 text-sm font-medium leading-relaxed text-ink-2" data-testid="model-benefit">
+          {modelBenefit(selected, list.find((m) => m.key !== selected.key))}
+        </p>
+      )}
+      {selected?.description && <p className="text-xs leading-relaxed text-muted" data-testid="model-card">{selected.description}</p>}
       {selected && <ModelBadges m={selected} />}
     </div>
   );

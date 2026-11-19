@@ -77,6 +77,8 @@ MODEL_PATH = "ml/classical_5class.joblib"
 CACHE = DATA_DIR / "features_classical.npz"
 OOF_DIR = EXPERIMENTS_DIR / "cv" / "classical"
 SETS = ["Color", "Color + Texture", "HOG + Color + Texture"]
+DISPLAY = {"Logistic regression": "Logistic Regression", "SVM (RBF)": "SVM (RBF kernel)", "Random forest": "Random Forest",
+           "Gradient boosting": "Gradient Boosting"}  # model names shown in the apps
 GATE_SET = "Color + Texture"
 SCORE = {"knn": "knn", "maha": "mahalanobis"}  # gate method -> FeatureDensity score
 HOG_COMPONENTS = 64
@@ -297,7 +299,8 @@ def main():
     if kind == "vector":
         adjust["calibration"] = cal["fitted_on_all_folds"]
     entry = {
-        "key": KEY, "name": NAME, "task": "5class", "generation": "upgrade", "round": "final",
+        "key": KEY, "name": NAME, "model_name": DISPLAY[chosen["classifier"]], "task": "5class", "generation": "upgrade",
+        "round": "final",
         "family": "Machine learning", "kind": "classical", "type": "sklearn", "path": MODEL_PATH,
         "class_keys": FIVE, "feature_set": chosen["feature_set"],
         "temperature": cal["fitted_on_all_folds"]["T"] if kind == "temperature" else 1.0,

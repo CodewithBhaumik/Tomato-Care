@@ -5,7 +5,7 @@ import { ClassDistribution } from "../components/charts/charts.jsx";
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
 import { Badge, Button, ButtonLink, Card, CardHeader, EmptyState, ErrorState, PageHeader, Skeleton, Stat } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
-import { TASK, classicalModel, comparisonsFor, defaultModel, isClassicalModel, previousDefault, ranked, taskClasses, taskInfo } from "../lib/analytics.js";
+import { TASK, classicalModel, comparisonsFor, defaultModel, isClassicalModel, previousDefault, ranked, servedName, taskClasses, taskInfo } from "../lib/analytics.js";
 import { STATUS_STYLE, classMeta } from "../lib/classes.js";
 import { ci, ms, pct, signedPct, timeAgo } from "../lib/format.js";
 import { clearHistory, loadHistory } from "../lib/history.js";
@@ -145,16 +145,16 @@ export default function DashboardPage() {
             <Stat
               icon={Layers3}
               tone="violet"
-              label="Classical ML · test accuracy"
+              label={`${servedName(cm)} · test accuracy`}
               value={pct(cm?.test?.accuracy)}
               hint={cm ? `No neural network · macro-F1 ${pct(cm.test?.f1_macro)} · 95% CI ${ci(cm.test?.accuracy_ci)}` : "Not in this results file"}
             />
             <Stat
               icon={Cpu}
               tone="sun"
-              label="Deep learning · CPU time"
+              label={`${servedName(d5)} · CPU time`}
               value={ms(d5?.latency_ms)}
-              hint={`Median per photo, including test-time augmentation${cm?.latency_ms != null ? ` · classical ML ${ms(cm.latency_ms)}` : ""}`}
+              hint={`Median per photo on a laptop CPU${cm?.latency_ms != null ? ` · ${servedName(cm)} ${ms(cm.latency_ms)}` : ""}`}
             />
           </>
         )}

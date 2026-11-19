@@ -13,7 +13,7 @@
   "models": [
     {
       "key": "cv5_convnext_t_in1k_base",
-      "name": "ConvNeXt-T IN-1k \u00b7 original recipe (5-fold)",
+      "name": "ConvNeXt-T IN-1k · original recipe (5-fold)",
       "task": "5class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -29,35 +29,35 @@
       "members": [
         {
           "key": "convnext_t_in1k_base_fold0",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 0",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 0",
           "path": "../cv/5class/convnext_t_in1k_base/fold0.pt",
           "temperature": 0.7707447883673711,
           "tta_views": 8
         },
         {
           "key": "convnext_t_in1k_base_fold1",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 1",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 1",
           "path": "../cv/5class/convnext_t_in1k_base/fold1.pt",
           "temperature": 0.7707447883673711,
           "tta_views": 8
         },
         {
           "key": "convnext_t_in1k_base_fold2",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 2",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 2",
           "path": "../cv/5class/convnext_t_in1k_base/fold2.pt",
           "temperature": 0.7707447883673711,
           "tta_views": 8
         },
         {
           "key": "convnext_t_in1k_base_fold3",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 3",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 3",
           "path": "../cv/5class/convnext_t_in1k_base/fold3.pt",
           "temperature": 0.7707447883673711,
           "tta_views": 8
         },
         {
           "key": "convnext_t_in1k_base_fold4",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 4",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 4",
           "path": "../cv/5class/convnext_t_in1k_base/fold4.pt",
           "temperature": 0.7707447883673711,
           "tta_views": 8
@@ -67,12 +67,12 @@
         "convnext_t_in1k_base"
       ],
       "tta_views": 8,
-      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 original recipe (8-view TTA)",
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k · original recipe (8-view TTA)",
       "description": null
     },
     {
       "key": "cv5_convnext_t_in1k_robust",
-      "name": "ConvNeXt-T IN-1k \u00b7 robust (5-fold)",
+      "name": "ConvNeXt-T IN-1k · robust (5-fold)",
       "task": "5class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -88,35 +88,35 @@
       "members": [
         {
           "key": "convnext_t_in1k_robust_fold0",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 0",
+          "name": "ConvNeXt-T IN-1k · robust · fold 0",
           "path": "../cv/5class/convnext_t_in1k_robust/fold0.pt",
           "temperature": 0.8452376205805563,
           "tta_views": 8
         },
         {
           "key": "convnext_t_in1k_robust_fold1",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 1",
+          "name": "ConvNeXt-T IN-1k · robust · fold 1",
           "path": "../cv/5class/convnext_t_in1k_robust/fold1.pt",
           "temperature": 0.8452376205805563,
           "tta_views": 8
         },
         {
           "key": "convnext_t_in1k_robust_fold2",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 2",
+          "name": "ConvNeXt-T IN-1k · robust · fold 2",
           "path": "../cv/5class/convnext_t_in1k_robust/fold2.pt",
           "temperature": 0.8452376205805563,
           "tta_views": 8
         },
         {
           "key": "convnext_t_in1k_robust_fold3",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 3",
+          "name": "ConvNeXt-T IN-1k · robust · fold 3",
           "path": "../cv/5class/convnext_t_in1k_robust/fold3.pt",
           "temperature": 0.8452376205805563,
           "tta_views": 8
         },
         {
           "key": "convnext_t_in1k_robust_fold4",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 4",
+          "name": "ConvNeXt-T IN-1k · robust · fold 4",
           "path": "../cv/5class/convnext_t_in1k_robust/fold4.pt",
           "temperature": 0.8452376205805563,
           "tta_views": 8
@@ -126,12 +126,12 @@
         "convnext_t_in1k_robust"
       ],
       "tta_views": 8,
-      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust (8-view TTA)",
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k · robust (8-view TTA)",
       "description": null
     },
     {
       "key": "upgrade_5class",
-      "name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+      "name": "ConvNeXt-T IN-1k · robust fold ensemble (upgrade default)",
       "task": "5class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -147,7 +147,7 @@
       "members": [
         {
           "key": "convnext_t_in1k_robust_fold0",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 0",
+          "name": "ConvNeXt-T IN-1k · robust · fold 0",
           "path": "deploy/5class/convnext_t_in1k_robust/fold0.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -156,7 +156,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold1",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 1",
+          "name": "ConvNeXt-T IN-1k · robust · fold 1",
           "path": "deploy/5class/convnext_t_in1k_robust/fold1.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -165,7 +165,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold2",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 2",
+          "name": "ConvNeXt-T IN-1k · robust · fold 2",
           "path": "deploy/5class/convnext_t_in1k_robust/fold2.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -174,7 +174,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold3",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 3",
+          "name": "ConvNeXt-T IN-1k · robust · fold 3",
           "path": "deploy/5class/convnext_t_in1k_robust/fold3.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -183,7 +183,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold4",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 4",
+          "name": "ConvNeXt-T IN-1k · robust · fold 4",
           "path": "deploy/5class/convnext_t_in1k_robust/fold4.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -195,7 +195,7 @@
         "convnext_t_in1k_robust"
       ],
       "tta_views": 1,
-      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust",
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k · robust",
       "description": "Chosen by cross-validation: Highest pooled out-of-fold macro-F1 among candidates (single recipes with/without 8-view TTA, and probability ensembles of 2-3 recipes) whose estimated CPU time for the whole fold ensemble is <= 1000 ms per photo; ties within 0.001 go to higher out-of-fold accuracy, then lower latency. Decided on out-of-fold data only; the test set is scored once afterwards.",
       "confidence_threshold": 0.9,
       "operating_point": {
@@ -216,7 +216,7 @@
     },
     {
       "key": "cv8_convnext_t_in1k_base",
-      "name": "ConvNeXt-T IN-1k \u00b7 original recipe (5-fold)",
+      "name": "ConvNeXt-T IN-1k · original recipe (5-fold)",
       "task": "8class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -235,35 +235,35 @@
       "members": [
         {
           "key": "convnext_t_in1k_base_fold0",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 0",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 0",
           "path": "../cv/8class/convnext_t_in1k_base/fold0.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1
         },
         {
           "key": "convnext_t_in1k_base_fold1",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 1",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 1",
           "path": "../cv/8class/convnext_t_in1k_base/fold1.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1
         },
         {
           "key": "convnext_t_in1k_base_fold2",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 2",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 2",
           "path": "../cv/8class/convnext_t_in1k_base/fold2.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1
         },
         {
           "key": "convnext_t_in1k_base_fold3",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 3",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 3",
           "path": "../cv/8class/convnext_t_in1k_base/fold3.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1
         },
         {
           "key": "convnext_t_in1k_base_fold4",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 4",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 4",
           "path": "../cv/8class/convnext_t_in1k_base/fold4.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1
@@ -273,12 +273,12 @@
         "convnext_t_in1k_base"
       ],
       "tta_views": 1,
-      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 original recipe",
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k · original recipe",
       "description": null
     },
     {
       "key": "cv8_convnext_t_in1k_robust",
-      "name": "ConvNeXt-T IN-1k \u00b7 robust (5-fold)",
+      "name": "ConvNeXt-T IN-1k · robust (5-fold)",
       "task": "8class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -297,35 +297,35 @@
       "members": [
         {
           "key": "convnext_t_in1k_robust_fold0",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 0",
+          "name": "ConvNeXt-T IN-1k · robust · fold 0",
           "path": "../cv/8class/convnext_t_in1k_robust/fold0.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1
         },
         {
           "key": "convnext_t_in1k_robust_fold1",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 1",
+          "name": "ConvNeXt-T IN-1k · robust · fold 1",
           "path": "../cv/8class/convnext_t_in1k_robust/fold1.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1
         },
         {
           "key": "convnext_t_in1k_robust_fold2",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 2",
+          "name": "ConvNeXt-T IN-1k · robust · fold 2",
           "path": "../cv/8class/convnext_t_in1k_robust/fold2.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1
         },
         {
           "key": "convnext_t_in1k_robust_fold3",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 3",
+          "name": "ConvNeXt-T IN-1k · robust · fold 3",
           "path": "../cv/8class/convnext_t_in1k_robust/fold3.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1
         },
         {
           "key": "convnext_t_in1k_robust_fold4",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 4",
+          "name": "ConvNeXt-T IN-1k · robust · fold 4",
           "path": "../cv/8class/convnext_t_in1k_robust/fold4.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1
@@ -335,12 +335,12 @@
         "convnext_t_in1k_robust"
       ],
       "tta_views": 1,
-      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust",
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k · robust",
       "description": null
     },
     {
       "key": "cv8_dinov2_s_robust",
-      "name": "ViT-S/14 DINOv2 \u00b7 robust (5-fold)",
+      "name": "ViT-S/14 DINOv2 · robust (5-fold)",
       "task": "8class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -359,35 +359,35 @@
       "members": [
         {
           "key": "dinov2_s_robust_fold0",
-          "name": "ViT-S/14 DINOv2 \u00b7 robust \u00b7 fold 0",
+          "name": "ViT-S/14 DINOv2 · robust · fold 0",
           "path": "../cv/8class/dinov2_s_robust/fold0.pt",
           "temperature": 0.8951911335337718,
           "tta_views": 8
         },
         {
           "key": "dinov2_s_robust_fold1",
-          "name": "ViT-S/14 DINOv2 \u00b7 robust \u00b7 fold 1",
+          "name": "ViT-S/14 DINOv2 · robust · fold 1",
           "path": "../cv/8class/dinov2_s_robust/fold1.pt",
           "temperature": 0.8951911335337718,
           "tta_views": 8
         },
         {
           "key": "dinov2_s_robust_fold2",
-          "name": "ViT-S/14 DINOv2 \u00b7 robust \u00b7 fold 2",
+          "name": "ViT-S/14 DINOv2 · robust · fold 2",
           "path": "../cv/8class/dinov2_s_robust/fold2.pt",
           "temperature": 0.8951911335337718,
           "tta_views": 8
         },
         {
           "key": "dinov2_s_robust_fold3",
-          "name": "ViT-S/14 DINOv2 \u00b7 robust \u00b7 fold 3",
+          "name": "ViT-S/14 DINOv2 · robust · fold 3",
           "path": "../cv/8class/dinov2_s_robust/fold3.pt",
           "temperature": 0.8951911335337718,
           "tta_views": 8
         },
         {
           "key": "dinov2_s_robust_fold4",
-          "name": "ViT-S/14 DINOv2 \u00b7 robust \u00b7 fold 4",
+          "name": "ViT-S/14 DINOv2 · robust · fold 4",
           "path": "../cv/8class/dinov2_s_robust/fold4.pt",
           "temperature": 0.8951911335337718,
           "tta_views": 8
@@ -397,12 +397,12 @@
         "dinov2_s_robust"
       ],
       "tta_views": 8,
-      "feature_set": "5-fold ensemble of ViT-S/14 DINOv2 \u00b7 robust (8-view TTA)",
+      "feature_set": "5-fold ensemble of ViT-S/14 DINOv2 · robust (8-view TTA)",
       "description": null
     },
     {
       "key": "upgrade_8class",
-      "name": "ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+      "name": "ConvNeXt-T IN-1k · original recipe + ConvNeXt-T IN-1k · robust fold ensemble (upgrade default)",
       "task": "8class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -421,7 +421,7 @@
       "members": [
         {
           "key": "convnext_t_in1k_base_fold0",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 0",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 0",
           "path": "deploy/8class/convnext_t_in1k_base/fold0.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1,
@@ -430,7 +430,7 @@
         },
         {
           "key": "convnext_t_in1k_base_fold1",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 1",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 1",
           "path": "deploy/8class/convnext_t_in1k_base/fold1.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1,
@@ -439,7 +439,7 @@
         },
         {
           "key": "convnext_t_in1k_base_fold2",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 2",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 2",
           "path": "deploy/8class/convnext_t_in1k_base/fold2.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1,
@@ -448,7 +448,7 @@
         },
         {
           "key": "convnext_t_in1k_base_fold3",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 3",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 3",
           "path": "deploy/8class/convnext_t_in1k_base/fold3.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1,
@@ -457,7 +457,7 @@
         },
         {
           "key": "convnext_t_in1k_base_fold4",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 4",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 4",
           "path": "deploy/8class/convnext_t_in1k_base/fold4.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1,
@@ -466,7 +466,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold0",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 0",
+          "name": "ConvNeXt-T IN-1k · robust · fold 0",
           "path": "deploy/8class/convnext_t_in1k_robust/fold0.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1,
@@ -475,7 +475,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold1",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 1",
+          "name": "ConvNeXt-T IN-1k · robust · fold 1",
           "path": "deploy/8class/convnext_t_in1k_robust/fold1.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1,
@@ -484,7 +484,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold2",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 2",
+          "name": "ConvNeXt-T IN-1k · robust · fold 2",
           "path": "deploy/8class/convnext_t_in1k_robust/fold2.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1,
@@ -493,7 +493,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold3",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 3",
+          "name": "ConvNeXt-T IN-1k · robust · fold 3",
           "path": "deploy/8class/convnext_t_in1k_robust/fold3.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1,
@@ -502,7 +502,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold4",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 4",
+          "name": "ConvNeXt-T IN-1k · robust · fold 4",
           "path": "deploy/8class/convnext_t_in1k_robust/fold4.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1,
@@ -515,7 +515,7 @@
         "convnext_t_in1k_robust"
       ],
       "tta_views": 1,
-      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust",
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k · original recipe + ConvNeXt-T IN-1k · robust",
       "description": "Chosen by cross-validation: Highest pooled out-of-fold macro-F1 among candidates (single recipes with/without 8-view TTA, and probability ensembles of 2-3 recipes) whose estimated CPU time for the whole fold ensemble is <= 1000 ms per photo; ties within 0.001 go to higher out-of-fold accuracy, then lower latency. Decided on out-of-fold data only; the test set is scored once afterwards.",
       "confidence_threshold": 0.65,
       "operating_point": {
@@ -950,7 +950,7 @@
     },
     {
       "key": "calibrated_5class",
-      "name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
+      "name": "Tomato Care v2 · focused · calibrated",
       "task": "5class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -966,7 +966,7 @@
       "members": [
         {
           "key": "convnext_t_in1k_robust_fold0",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 0",
+          "name": "ConvNeXt-T IN-1k · robust · fold 0",
           "path": "deploy/5class/convnext_t_in1k_robust/fold0.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -975,7 +975,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold1",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 1",
+          "name": "ConvNeXt-T IN-1k · robust · fold 1",
           "path": "deploy/5class/convnext_t_in1k_robust/fold1.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -984,7 +984,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold2",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 2",
+          "name": "ConvNeXt-T IN-1k · robust · fold 2",
           "path": "deploy/5class/convnext_t_in1k_robust/fold2.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -993,7 +993,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold3",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 3",
+          "name": "ConvNeXt-T IN-1k · robust · fold 3",
           "path": "deploy/5class/convnext_t_in1k_robust/fold3.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -1002,7 +1002,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold4",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 4",
+          "name": "ConvNeXt-T IN-1k · robust · fold 4",
           "path": "deploy/5class/convnext_t_in1k_robust/fold4.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -1014,7 +1014,7 @@
         "convnext_t_in1k_robust"
       ],
       "tta_views": 1,
-      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust",
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k · robust",
       "description": "Same networks; per-class calibration so every condition's confidence matches its own accuracy.",
       "confidence_threshold": 0.89,
       "operating_point": {
@@ -1063,7 +1063,7 @@
     },
     {
       "key": "balanced_5class",
-      "name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+      "name": "Tomato Care v2 · focused · balanced",
       "task": "5class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -1079,7 +1079,7 @@
       "members": [
         {
           "key": "convnext_t_in1k_robust_fold0",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 0",
+          "name": "ConvNeXt-T IN-1k · robust · fold 0",
           "path": "deploy/5class/convnext_t_in1k_robust/fold0.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -1088,7 +1088,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold1",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 1",
+          "name": "ConvNeXt-T IN-1k · robust · fold 1",
           "path": "deploy/5class/convnext_t_in1k_robust/fold1.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -1097,7 +1097,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold2",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 2",
+          "name": "ConvNeXt-T IN-1k · robust · fold 2",
           "path": "deploy/5class/convnext_t_in1k_robust/fold2.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -1106,7 +1106,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold3",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 3",
+          "name": "ConvNeXt-T IN-1k · robust · fold 3",
           "path": "deploy/5class/convnext_t_in1k_robust/fold3.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -1115,7 +1115,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold4",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 4",
+          "name": "ConvNeXt-T IN-1k · robust · fold 4",
           "path": "deploy/5class/convnext_t_in1k_robust/fold4.pt",
           "temperature": 0.8850030226081058,
           "tta_views": 1,
@@ -1127,7 +1127,7 @@
         "convnext_t_in1k_robust"
       ],
       "tta_views": 1,
-      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust",
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k · robust",
       "description": "Same networks; per-class calibration, and a class-prior correction so rare conditions are not out-voted by frequent ones (confidence stays calibrated).",
       "confidence_threshold": 0.89,
       "operating_point": {
@@ -1176,7 +1176,7 @@
     },
     {
       "key": "balanced_8class",
-      "name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+      "name": "Tomato Care v2 · full · balanced",
       "task": "8class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -1195,7 +1195,7 @@
       "members": [
         {
           "key": "convnext_t_in1k_base_fold0",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 0",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 0",
           "path": "deploy/8class/convnext_t_in1k_base/fold0.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1,
@@ -1204,7 +1204,7 @@
         },
         {
           "key": "convnext_t_in1k_base_fold1",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 1",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 1",
           "path": "deploy/8class/convnext_t_in1k_base/fold1.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1,
@@ -1213,7 +1213,7 @@
         },
         {
           "key": "convnext_t_in1k_base_fold2",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 2",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 2",
           "path": "deploy/8class/convnext_t_in1k_base/fold2.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1,
@@ -1222,7 +1222,7 @@
         },
         {
           "key": "convnext_t_in1k_base_fold3",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 3",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 3",
           "path": "deploy/8class/convnext_t_in1k_base/fold3.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1,
@@ -1231,7 +1231,7 @@
         },
         {
           "key": "convnext_t_in1k_base_fold4",
-          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 4",
+          "name": "ConvNeXt-T IN-1k · original recipe · fold 4",
           "path": "deploy/8class/convnext_t_in1k_base/fold4.pt",
           "temperature": 0.8818965164263328,
           "tta_views": 1,
@@ -1240,7 +1240,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold0",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 0",
+          "name": "ConvNeXt-T IN-1k · robust · fold 0",
           "path": "deploy/8class/convnext_t_in1k_robust/fold0.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1,
@@ -1249,7 +1249,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold1",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 1",
+          "name": "ConvNeXt-T IN-1k · robust · fold 1",
           "path": "deploy/8class/convnext_t_in1k_robust/fold1.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1,
@@ -1258,7 +1258,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold2",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 2",
+          "name": "ConvNeXt-T IN-1k · robust · fold 2",
           "path": "deploy/8class/convnext_t_in1k_robust/fold2.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1,
@@ -1267,7 +1267,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold3",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 3",
+          "name": "ConvNeXt-T IN-1k · robust · fold 3",
           "path": "deploy/8class/convnext_t_in1k_robust/fold3.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1,
@@ -1276,7 +1276,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_fold4",
-          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 4",
+          "name": "ConvNeXt-T IN-1k · robust · fold 4",
           "path": "deploy/8class/convnext_t_in1k_robust/fold4.pt",
           "temperature": 0.9293462680040425,
           "tta_views": 1,
@@ -1289,7 +1289,7 @@
         "convnext_t_in1k_robust"
       ],
       "tta_views": 1,
-      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust",
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k · original recipe + ConvNeXt-T IN-1k · robust",
       "description": "Same networks; per-class calibration, and a class-prior correction so rare conditions are not out-voted by frequent ones (confidence stays calibrated).",
       "confidence_threshold": 0.67,
       "operating_point": {
@@ -1357,7 +1357,7 @@
     },
     {
       "key": "focused_5class_r1",
-      "name": "Tomato Care \u00b7 Deep learning (5 conditions) (round 1)",
+      "name": "Tomato Care · Deep learning (5 conditions) (round 1)",
       "task": "5class",
       "generation": "upgrade",
       "round": "final-1",
@@ -1374,7 +1374,7 @@
       "members": [
         {
           "key": "convnext_t_in1k_robust_oe_fold0",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 0",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 0",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold0.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1383,7 +1383,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold1",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 1",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 1",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold1.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1392,7 +1392,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold2",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 2",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 2",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold2.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1401,7 +1401,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold3",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 3",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 3",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold3.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1410,7 +1410,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold4",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 4",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 4",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold4.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1499,7 +1499,7 @@
     },
     {
       "key": "full_8class_r1",
-      "name": "Tomato Care \u00b7 Full (8 conditions) (round 1)",
+      "name": "Tomato Care · Full (8 conditions) (round 1)",
       "task": "8class",
       "generation": "upgrade",
       "round": "final-1",
@@ -1519,7 +1519,7 @@
       "members": [
         {
           "key": "convnext_t_in1k_sampler_fold0",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 0",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 0",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold0.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1528,7 +1528,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold1",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 1",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 1",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold1.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1537,7 +1537,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold2",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 2",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 2",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold2.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1546,7 +1546,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold3",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 3",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 3",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold3.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1555,7 +1555,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold4",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 4",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 4",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold4.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1653,7 +1653,7 @@
     },
     {
       "key": "focused_5class",
-      "name": "Tomato Care \u00b7 Deep learning (5 conditions)",
+      "name": "Tomato Care · Deep learning (5 conditions)",
       "task": "5class",
       "generation": "upgrade",
       "round": "final",
@@ -1670,7 +1670,7 @@
       "members": [
         {
           "key": "convnext_t_in1k_robust_oe_fold0",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 0",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 0",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold0.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1679,7 +1679,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold1",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 1",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 1",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold1.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1688,7 +1688,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold2",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 2",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 2",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold2.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1697,7 +1697,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold3",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 3",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 3",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold3.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1706,7 +1706,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold4",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 4",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 4",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold4.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1791,11 +1791,12 @@
           0.9095848862078081
         ]
       },
-      "latency_ms": 137.19604999641888
+      "latency_ms": 137.19604999641888,
+      "model_name": "ConvNeXt-Tiny ensemble"
     },
     {
       "key": "full_8class",
-      "name": "Tomato Care \u00b7 Full (8 conditions)",
+      "name": "Tomato Care · Full (8 conditions)",
       "task": "8class",
       "generation": "upgrade",
       "round": "final",
@@ -1815,7 +1816,7 @@
       "members": [
         {
           "key": "convnext_t_in1k_sampler_fold0",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 0",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 0",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold0.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1824,7 +1825,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold1",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 1",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 1",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold1.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1833,7 +1834,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold2",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 2",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 2",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold2.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1842,7 +1843,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold3",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 3",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 3",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold3.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1851,7 +1852,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold4",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 4",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 4",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold4.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -1949,7 +1950,7 @@
     },
     {
       "key": "classical_5class",
-      "name": "Tomato Care \u00b7 Classical ML (5 conditions)",
+      "name": "Tomato Care · Classical ML (5 conditions)",
       "task": "5class",
       "generation": "upgrade",
       "round": "final",
@@ -2025,7 +2026,8 @@
           0.7312721243659968
         ]
       },
-      "latency_ms": 48.97984999115579
+      "latency_ms": 48.97984999115579,
+      "model_name": "Gradient Boosting"
     }
   ]
 }

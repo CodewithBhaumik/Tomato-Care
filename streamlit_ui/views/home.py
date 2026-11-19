@@ -28,6 +28,8 @@ def render() -> None:
     data = core.platform()
     new5, _ = core.task_defaults()
     ml = core.classical_result()
+    dl_name = core.display_name(core.served_models()[0])
+    ml_name = core.display_name(next((e for e in core.served_models() if core.is_classical(e)), None))
 
     with st.container(key="hero"):
         left, right = st.columns([1.25, 1], gap="large", vertical_alignment="center")
@@ -55,19 +57,19 @@ def render() -> None:
                   kicker="Results")
     c1, c2, c3, c4 = st.columns(4)
     ci5 = new5["test"]["accuracy_ci"]
-    c1.metric("Deep learning · accuracy", core.pct(new5["test"]["accuracy"]),
+    c1.metric(f"{dl_name} · accuracy", core.pct(new5["test"]["accuracy"]),
               delta=f"[{core.pct(ci5[0])} – {core.pct(ci5[1])}]", delta_color="off", border=True,
-              help=f"{core.scope_text()} Macro-F1 {new5['test']['f1_macro']:.3f}.")
+              help=f"Deep learning. {core.scope_text()} Macro-F1 {new5['test']['f1_macro']:.3f}.")
     sel = new5["selective"]
-    c2.metric("Deep learning · when it answers", core.pct(sel["accuracy_kept"]),
+    c2.metric(f"{dl_name} · when it answers", core.pct(sel["accuracy_kept"]),
               delta=f"answers {core.pct(sel['coverage'], 0)} of photos", delta_color="off", border=True,
               help="Below its confidence threshold, or for an unusual photo, the app says 'not sure' instead of "
                    "guessing; this is its accuracy on the photos it does answer.")
     if ml:
         ci = ml["test"]["accuracy_ci"]
-        c3.metric("Classical ML · accuracy", core.pct(ml["test"]["accuracy"]),
+        c3.metric(f"{ml_name} · accuracy", core.pct(ml["test"]["accuracy"]),
                   delta=f"[{core.pct(ci[0])} – {core.pct(ci[1])}]", delta_color="off", border=True,
-                  help=f"{ml['name']}: handcrafted colour / texture features, no deep learning; macro-F1 "
+                  help=f"Classical ML: handcrafted colour / texture features, no neural network; macro-F1 "
                        f"{ml['test']['f1_macro']:.3f}. Same photos, same rules.")
     fr5 = ((data.get("final_round") or {}).get("tasks") or {}).get("5class") or {}
     od = (fr5.get("out_of_dataset") or {}).get(new5["key"]) or {}
@@ -85,7 +87,7 @@ def render() -> None:
                   help="Held-out non-leaf probe images (photos, textures, drawings) answered with 'Unusual image' "
                        "instead of a diagnosis — and the price: normal leaf photos sent there as well.")
     bal = new5["test"].get("balanced_accuracy")
-    st.caption((f"Deep-learning model: balanced accuracy {core.pct(bal)} — the mean of the per-condition "
+    st.caption((f"{dl_name}: balanced accuracy {core.pct(bal)} — the mean of the per-condition "
                 "recalls, so rare conditions count as much as common ones. " if bal else "")
                + "How these models were chosen, how they compare with the original study's models and where they fail: "
                  "see the Model lab and How it works.")

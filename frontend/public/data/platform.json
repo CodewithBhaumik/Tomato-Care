@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generated_at": "2026-11-20T00:13:54",
+  "generated_at": "2026-11-20T00:25:28",
   "project": {
     "name": "Tomato Care"
   },
@@ -181,6 +181,7 @@
     {
       "key": "cv5_convnext_t_in1k_base",
       "name": "ConvNeXt-T IN-1k \u00b7 original recipe (5-fold)",
+      "model_name": null,
       "task": "5class",
       "family": "Deep learning",
       "generation": "upgrade",
@@ -375,6 +376,7 @@
     {
       "key": "cv5_convnext_t_in1k_robust",
       "name": "ConvNeXt-T IN-1k \u00b7 robust (5-fold)",
+      "model_name": null,
       "task": "5class",
       "family": "Deep learning",
       "generation": "upgrade",
@@ -562,6 +564,7 @@
     {
       "key": "upgrade_5class",
       "name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+      "model_name": null,
       "task": "5class",
       "family": "Deep learning",
       "generation": "upgrade",
@@ -810,6 +813,7 @@
     {
       "key": "logreg_5class",
       "name": "Logistic Regression",
+      "model_name": null,
       "task": "5class",
       "family": "Classical ML",
       "generation": "original",
@@ -1002,6 +1006,7 @@
     {
       "key": "svm_5class",
       "name": "SVM (RBF kernel)",
+      "model_name": null,
       "task": "5class",
       "family": "Classical ML",
       "generation": "original",
@@ -1194,6 +1199,7 @@
     {
       "key": "rf_5class",
       "name": "Random Forest",
+      "model_name": null,
       "task": "5class",
       "family": "Classical ML",
       "generation": "original",
@@ -1386,6 +1392,7 @@
     {
       "key": "convnext_tiny_5class",
       "name": "ConvNeXt-Tiny",
+      "model_name": null,
       "task": "5class",
       "family": "Deep learning",
       "generation": "original",
@@ -1578,6 +1585,7 @@
     {
       "key": "convnext_tiny_5class_tta",
       "name": "ConvNeXt-Tiny + TTA",
+      "model_name": null,
       "task": "5class",
       "family": "Deep learning",
       "generation": "original",
@@ -1763,6 +1771,7 @@
     {
       "key": "efficientnet_b0_5class",
       "name": "EfficientNet-B0",
+      "model_name": null,
       "task": "5class",
       "family": "Deep learning",
       "generation": "original",
@@ -1955,6 +1964,7 @@
     {
       "key": "efficientnet_b0_5class_tta",
       "name": "EfficientNet-B0 + TTA",
+      "model_name": null,
       "task": "5class",
       "family": "Deep learning",
       "generation": "original",
@@ -2140,6 +2150,7 @@
     {
       "key": "ensemble_5class",
       "name": "Ensemble ConvNeXt-T + EfficientNet-B0 (original 5-class default)",
+      "model_name": null,
       "task": "5class",
       "family": "Deep learning",
       "generation": "original",
@@ -2334,6 +2345,7 @@
     {
       "key": "calibrated_5class",
       "name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
+      "model_name": null,
       "task": "5class",
       "family": "Deep learning",
       "generation": "upgrade",
@@ -2523,6 +2535,7 @@
     {
       "key": "balanced_5class",
       "name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+      "model_name": null,
       "task": "5class",
       "family": "Deep learning",
       "generation": "upgrade",
@@ -2740,6 +2753,7 @@
     {
       "key": "focused_5class",
       "name": "Tomato Care \u00b7 Deep learning (5 conditions)",
+      "model_name": "ConvNeXt-Tiny ensemble",
       "task": "5class",
       "family": "Deep learning",
       "generation": "upgrade",
@@ -3016,6 +3030,7 @@
     {
       "key": "classical_5class",
       "name": "Tomato Care \u00b7 Classical ML (5 conditions)",
+      "model_name": "Gradient Boosting",
       "task": "5class",
       "family": "Classical ML",
       "generation": "upgrade",
@@ -4975,6 +4990,7 @@
           {
             "key": "focused_5class",
             "name": "Tomato Care \u00b7 Deep learning (5 conditions)",
+            "model_name": "ConvNeXt-Tiny ensemble",
             "final": true,
             "classical": false,
             "accuracy": 0.909433962264151,
@@ -5100,6 +5116,7 @@
           {
             "key": "classical_5class",
             "name": "Tomato Care \u00b7 Classical ML (5 conditions)",
+            "model_name": "Gradient Boosting",
             "final": false,
             "classical": true,
             "accuracy": 0.7811320754716982,
@@ -5225,6 +5242,7 @@
           {
             "key": "focused_5class_r1",
             "name": "Tomato Care \u00b7 Deep learning (5 conditions) (round 1)",
+            "model_name": null,
             "final": false,
             "classical": false,
             "accuracy": 0.909433962264151,
@@ -5350,6 +5368,7 @@
           {
             "key": "balanced_5class",
             "name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+            "model_name": null,
             "final": false,
             "classical": false,
             "accuracy": 0.9056603773584906,
@@ -5475,6 +5494,7 @@
           {
             "key": "calibrated_5class",
             "name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
+            "model_name": null,
             "final": false,
             "classical": false,
             "accuracy": 0.9207547169811321,
@@ -5600,6 +5620,7 @@
           {
             "key": "ensemble_5class",
             "name": "Ensemble ConvNeXt-T + EfficientNet-B0 (original 5-class default)",
+            "model_name": null,
             "final": false,
             "classical": false,
             "accuracy": 0.909433962264151,

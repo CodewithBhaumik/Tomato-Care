@@ -36,7 +36,7 @@ def _offline(monkeypatch):
     monkeypatch.setenv("TOMATO_DOWNLOAD_WEIGHTS", "0")
 
 
-@pytest.mark.parametrize("view, metric", [("home", "Deep learning · accuracy"), ("lab", "Served model · accuracy"),
+@pytest.mark.parametrize("view, metric", [("home", "ConvNeXt-Tiny ensemble · accuracy"), ("lab", "Served model · accuracy"),
                                           ("library", None), ("method", "Non-leaf images flagged"),
                                           ("diagnose", None)])
 def test_page_renders_without_exception(view, metric):
@@ -47,11 +47,12 @@ def test_page_renders_without_exception(view, metric):
 
 
 def test_numbers_on_the_home_page_come_from_the_benchmark():
+    """Both served models' test accuracy, labelled with their model names."""
     platform = json.loads((ROOT / "experiments" / "platform.json").read_text(encoding="utf-8"))
-    new5 = next(m for m in platform["models"] if m["key"] == platform["tasks"]["5class"]["default_model"])
     at = AppTest.from_function(_run_view, kwargs={"view": "home"}, default_timeout=120).run()
-    shown = next(m for m in at.metric if m.label == "Deep learning · accuracy").value
-    assert shown == f"{100 * new5['test']['accuracy']:.1f}%"
+    shown = {m.label: m.value for m in at.metric}
+    for m in (m for m in platform["models"] if m["deployed"]):
+        assert shown[f"{m['model_name']} · accuracy"] == f"{100 * m['test']['accuracy']:.1f}%"
 
 
 def _weights_present() -> bool:

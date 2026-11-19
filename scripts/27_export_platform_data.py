@@ -101,7 +101,7 @@ def build_gallery(defaults, bench_models):
     return {"items": items, "models": models, "summary": summary, "on_leaf_share": shares}, hero
 
 
-def final_round_block(final_pipe, final_round, final_keys, classical):
+def final_round_block(final_pipe, final_round, final_keys, classical, model_names):
     """What the apps show about the final round: the compared arms (out-of-fold), the chosen pipeline, and the
     before/after comparison on the test photos (with the served classical model) and stress / out-of-dataset checks."""
     if not final_pipe:
@@ -129,7 +129,8 @@ def final_round_block(final_pipe, final_round, final_keys, classical):
                 r = final_round["models"].get(key)
                 if r is None:
                     continue
-                rows.append({"key": key, "name": r["name"], "final": key == final_keys[t], "classical": key == classical,
+                rows.append({"key": key, "name": r["name"], "model_name": model_names.get(key),
+                             "final": key == final_keys[t], "classical": key == classical,
                              **{k: r["test"][k] for k in keep if k in r["test"]},
                              "accuracy_ci": r["test"].get("accuracy_ci"), "threshold": r["threshold"],
                              "coverage": r["selective"]["coverage"], "accuracy_kept": r["selective"]["accuracy_kept"],
@@ -244,7 +245,8 @@ def main():
         temps = sorted({mm.get("temperature") for mm in m.get("members", []) if mm.get("temperature")}) or (
             [m["temperature"]] if m.get("temperature") else [])
         models.append({
-            "key": r["key"], "name": r["name"], "task": r["task"], "family": r["family"], "generation": r["generation"],
+            "key": r["key"], "name": r["name"], "model_name": m.get("model_name"), "task": r["task"], "family": r["family"],
+            "generation": r["generation"],
             "params": m.get("params"), "tta_views": m.get("tta_views") or max([mm.get("tta_views", 1) for mm in m.get("members", [])] or [1]),
             "recipe": recipes[0] if recipes and len(recipes) == 1 else None, "recipes": recipes,
             "deployed": r["key"] in {e["key"] for e in deployment["models"]},
@@ -389,7 +391,8 @@ def main():
                   "chosen": {t: sel[t]["chosen"]["key"] for t in sel}},
            "audit": {"preprocessing": pre, "robustness": robustness, "dihedral": {k: v.get("dihedral_views") for k, v in audit["models"].items() if v.get("dihedral_views")}},
            "selective": selective, "ood": ood, "gradcam": gallery, "hero": hero, "limitations": limitations,
-           "final_round": final_round_block(final_pipe, final_round, FINAL_KEYS, CLASSICAL),
+           "final_round": final_round_block(final_pipe, final_round, FINAL_KEYS, CLASSICAL,
+                                            {m["key"]: m.get("model_name") for m in bench_models}),
            "classical": {"rules": "scripts/43_classical_model.py docstring (fixed before training)",
                          "arms": [{"arm": a["arm"], "classifier": a["classifier"], "feature_set": a["feature_set"],
                                    "oof": {k: a["oof"][k] for k in ("accuracy", "f1_macro", "balanced_accuracy", "nll",

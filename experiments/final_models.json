@@ -2,7 +2,7 @@
   "models": [
     {
       "key": "focused_5class",
-      "name": "Tomato Care \u00b7 Deep learning (5 conditions)",
+      "name": "Tomato Care · Deep learning (5 conditions)",
       "task": "5class",
       "generation": "upgrade",
       "round": "final",
@@ -19,7 +19,7 @@
       "members": [
         {
           "key": "convnext_t_in1k_robust_oe_fold0",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 0",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 0",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold0.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -28,7 +28,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold1",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 1",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 1",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold1.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -37,7 +37,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold2",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 2",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 2",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold2.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -46,7 +46,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold3",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 3",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 3",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold3.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -55,7 +55,7 @@
         },
         {
           "key": "convnext_t_in1k_robust_oe_fold4",
-          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure \u00b7 fold 4",
+          "name": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure · fold 4",
           "path": "deploy/5class/convnext_t_in1k_robust_oe/fold4.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -118,11 +118,12 @@
         "threshold": 0.81,
         "unusual_gate": "knn",
         "outlier_exposure": true
-      }
+      },
+      "model_name": "ConvNeXt-Tiny ensemble"
     },
     {
       "key": "full_8class",
-      "name": "Tomato Care \u00b7 Full (8 conditions)",
+      "name": "Tomato Care · Full (8 conditions)",
       "task": "8class",
       "generation": "upgrade",
       "round": "final",
@@ -142,7 +143,7 @@
       "members": [
         {
           "key": "convnext_t_in1k_sampler_fold0",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 0",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 0",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold0.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -151,7 +152,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold1",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 1",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 1",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold1.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -160,7 +161,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold2",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 2",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 2",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold2.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -169,7 +170,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold3",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 3",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 3",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold3.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -178,7 +179,7 @@
         },
         {
           "key": "convnext_t_in1k_sampler_fold4",
-          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling \u00b7 fold 4",
+          "name": "ConvNeXt-Tiny, robust recipe, class-balanced sampling · fold 4",
           "path": "deploy/8class/convnext_t_in1k_sampler/fold4.pt",
           "temperature": 1.0,
           "tta_views": 1,
@@ -254,7 +255,7 @@
     },
     {
       "key": "classical_5class",
-      "name": "Tomato Care \u00b7 Classical ML (5 conditions)",
+      "name": "Tomato Care · Classical ML (5 conditions)",
       "task": "5class",
       "generation": "upgrade",
       "round": "final",
@@ -308,7 +309,8 @@
         "calibration": "temperature",
         "threshold": 0.84,
         "unusual_gate": "maha"
-      }
+      },
+      "model_name": "Gradient Boosting"
     }
   ]
 }

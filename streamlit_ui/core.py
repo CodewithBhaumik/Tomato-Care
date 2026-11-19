@@ -186,10 +186,50 @@ def family_label(entry: dict) -> str:
     return "Classical ML" if is_classical(entry) else "Deep learning"
 
 
+def display_name(entry: dict | None) -> str:
+    """The model's name in the apps (e.g. ConvNeXt-Tiny ensemble, Gradient Boosting)."""
+    if not entry:
+        return "—"
+    return entry.get("model_name") or family_label(entry)
+
+
 def short_name(entry: dict) -> str:
     if is_classical(entry):
-        return f"Classical ML · {(entry.get('pipeline') or {}).get('classifier', 'handcrafted features')}"
-    return f"Deep learning · {len(entry.get('members') or [1])} ConvNeXt-T networks"
+        return f"{display_name(entry)} · classical ML"
+    return f"{display_name(entry)} · {len(entry.get('members') or [1])} networks"
+
+
+def weights_mb(entry: dict) -> float | None:
+    try:
+        return sum(f["bytes"] for f in weights.files_for([entry["key"]])) / 2**20 or None
+    except (OSError, KeyError, ValueError):
+        return None
+
+
+def benefit(entry: dict) -> str:
+    """What this served model does better than the other one, from the measured test numbers."""
+    other = next((e for e in served_models() if e["key"] != entry["key"]), None)
+    family = family_label(entry)
+    if other is None:
+        return family
+    acc, o_acc = (entry.get("test_metrics") or {}).get("accuracy"), (other.get("test_metrics") or {}).get("accuracy")
+    cov = lambda e: ((e.get("operating_point") or {}).get("test") or {}).get("coverage")  # noqa: E731
+    parts = []
+    if acc and o_acc and acc > o_acc:
+        parts.append(f"more accurate ({pct(acc)} vs {pct(o_acc)} on test photos)")
+    if cov(entry) and cov(other) and cov(entry) > cov(other):
+        parts.append(f"answers more photos ({pct(cov(entry), 0)} vs {pct(cov(other), 0)})")
+    if not is_classical(entry):
+        parts.append("shows where it looked (Grad-CAM)")
+    lat, o_lat = entry.get("latency_ms"), other.get("latency_ms")
+    if lat and o_lat and lat < o_lat:
+        parts.append(f"{o_lat / lat:.1f}× faster ({lat:.0f} vs {o_lat:.0f} ms per photo on CPU)")
+    mb, o_mb = weights_mb(entry), weights_mb(other)
+    if mb and o_mb and mb < o_mb:
+        parts.append(f"{o_mb / mb:.0f}× smaller ({mb:.1f} MB vs {o_mb:.0f} MB)")
+    if is_classical(entry):
+        parts.append("no neural network")
+    return f"{family}: " + ", ".join(parts) + "." if parts else family
 
 
 def model_help(entry: dict) -> str:

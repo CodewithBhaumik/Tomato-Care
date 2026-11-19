@@ -5,7 +5,7 @@ import ConfusionMatrix from "../components/charts/ConfusionMatrix.jsx";
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
 import { Badge, Callout, Card, CardHeader, ErrorState, Meter, PageHeader, Segmented, Skeleton, Stat } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
-import { TASK, classicalModel, defaultModel, isClassicalModel, modelByKey, modelsFor, recipesFor, taskClasses, taskInfo } from "../lib/analytics.js";
+import { TASK, classicalModel, defaultModel, isClassicalModel, modelByKey, modelsFor, recipesFor, servedName, taskClasses, taskInfo } from "../lib/analytics.js";
 import { classMeta } from "../lib/classes.js";
 import { ci, cx, num, pct } from "../lib/format.js";
 
@@ -113,7 +113,7 @@ export default function PerformancePage() {
   const info = taskInfo(analytics, task);
   const def = defaultModel(analytics, task);
   const cm = classicalModel(analytics, task);
-  const servedOptions = [def && { value: def.key, label: "Deep learning" }, cm && { value: cm.key, label: "Classical ML" }].filter(Boolean);
+  const servedOptions = [def && { value: def.key, label: servedName(def) }, cm && { value: cm.key, label: servedName(cm) }].filter(Boolean);
   const model = modelByKey(analytics, key);
   const classical = isClassicalModel(model);
   const classes = taskClasses(analytics, task);

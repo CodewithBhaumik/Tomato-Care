@@ -176,16 +176,18 @@ def _final_round(task: str):
     ml_key = next((r["key"] for r in fr["test"] if r.get("classical")), None)
     s_ml = fr["stress"].get(ml_key) or {}
     o_ml = fr["out_of_dataset"].get(ml_key) or {}
+    dl_name = core.display_name(core.model_entry(final_key))
+    ml_name = core.display_name(core.model_entry(ml_key)) if ml_key else "Classical ML"
     a, b = st.columns(2, gap="large")
     with a:
         st.markdown("**3 · Stress tests** — test photos changed on purpose")
         s_f, s_b = fr["stress"][final_key], fr["stress"][before_key]
         rows = [{"Condition": STRESS_LABEL.get(n, n),
                  "Before: wrong answer": s_b[n].get("answered_wrong", s_b[n]["answered"]),
-                 "Deep learning: right answer": s_f[n].get("answered_correct"),
-                 "Deep learning: wrong answer": s_f[n].get("answered_wrong", s_f[n]["answered"]),
-                 "Deep learning: refused": s_f[n]["refused"],
-                 **({"Classical ML: wrong answer": s_ml[n].get("answered_wrong", s_ml[n]["answered"])}
+                 f"{dl_name}: right answer": s_f[n].get("answered_correct"),
+                 f"{dl_name}: wrong answer": s_f[n].get("answered_wrong", s_f[n]["answered"]),
+                 f"{dl_name}: refused": s_f[n]["refused"],
+                 **({f"{ml_name}: wrong answer": s_ml[n].get("answered_wrong", s_ml[n]["answered"])}
                     if n in s_ml else {})} for n in s_f]
         st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
                      column_config={k: PCT for k in rows[0] if k != "Condition"})
@@ -194,10 +196,10 @@ def _final_round(task: str):
         st.markdown("**4 · Out-of-dataset images** — share refused (higher is better)")
         o_f, o_b = fr["out_of_dataset"][final_key], fr["out_of_dataset"][before_key]
         rows = [{"Images": OOD_LABEL[n], "Photos": o_f[n]["photos"], "Before": o_b[n]["refused"],
-                 "Deep learning": o_f[n]["refused"], **({"Classical ML": o_ml[n]["refused"]} if n in o_ml else {})}
+                 dl_name: o_f[n]["refused"], **({ml_name: o_ml[n]["refused"]} if n in o_ml else {})}
                 for n in OOD_LABEL if n in o_f]
         st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
-                     column_config={"Before": PCT, "Deep learning": PCT, "Classical ML": PCT})
+                     column_config={"Before": PCT, dl_name: PCT, ml_name: PCT})
     if (core.platform().get("final_round") or {}).get("note"):
         st.caption(core.platform()["final_round"]["note"])
 
@@ -266,8 +268,9 @@ def render() -> None:
               delta=f"{new['test']['f1_macro'] - old['test']['f1_macro']:+.3f} vs baseline", border=True)
     ml = core.classical_result()
     if ml:
-        c3.metric("Classical ML · accuracy", core.pct(ml["test"]["accuracy"]),
-                  delta=f"{core.pts(ml['test']['accuracy'] - new['test']['accuracy'])} vs deep learning",
+        c3.metric(f"{core.display_name(core.model_entry(ml['key']))} · accuracy", core.pct(ml["test"]["accuracy"]),
+                  delta=f"{core.pts(ml['test']['accuracy'] - new['test']['accuracy'])} vs "
+                        f"{core.display_name(core.model_entry(new['key']))}",
                   border=True, help=f"{ml['name']}: handcrafted colour and texture features, no neural network.")
     else:
         c3.metric("Baseline · accuracy", core.pct(old["test"]["accuracy"]), delta=old["name"].split(" (original")[0],
@@ -280,7 +283,9 @@ def render() -> None:
                 icon=":material/balance:")
     mlc = next((c for c in data["comparisons"] if c.get("ml_vs_dl")), None)
     if mlc:
-        st.info(f"**Classical ML − deep learning (same photos, bootstrap over leaf groups):** accuracy "
+        st.info(f"**{core.display_name(core.model_entry(mlc['a']))} (classical ML) − "
+                f"{core.display_name(core.model_entry(mlc['b']))} (deep learning), same photos, bootstrap over leaf "
+                f"groups:** accuracy "
                 f"{core.pts(mlc['accuracy_diff'])} [95% CI {core.pts(mlc['accuracy_ci'][0])}, "
                 f"{core.pts(mlc['accuracy_ci'][1])}], macro-F1 {mlc['f1_diff']:+.3f} [{mlc['f1_ci'][0]:+.3f}, "
                 f"{mlc['f1_ci'][1]:+.3f}]. {_verdict(mlc, 'The classical model')}", icon=":material/compare_arrows:")

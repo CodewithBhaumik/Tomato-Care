@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { CheckCircle2, CircleHelp, ShieldAlert, Sparkles, TriangleAlert } from "lucide-react";
-import { isClassicalModel } from "../../lib/analytics.js";
+import { isClassicalModel, servedName } from "../../lib/analytics.js";
 import { classMeta } from "../../lib/classes.js";
 import { cx, ms, pct } from "../../lib/format.js";
 import { Badge } from "../ui/primitives.jsx";
@@ -53,7 +53,9 @@ export default function CompareTable({ results, trueKey, models }) {
                       <span className="font-medium text-ink">{r.model.name}</span>
                       {m?.generation === "upgrade" && <Sparkles className="size-3.5 text-leaf-600" aria-label="upgraded model" />}
                     </div>
-                    <p className="text-xs text-muted">{isClassicalModel(m) || isClassicalModel(r.model) ? "Classical ML" : "Deep learning"}</p>
+                    <p className="text-xs text-muted">
+                      {servedName(m || r.model)} · {isClassicalModel(m) || isClassicalModel(r.model) ? "classical ML" : "deep learning"}
+                    </p>
                   </td>
                   <td className="px-4 py-2.5">
                     <span className={cx("inline-flex items-center gap-1.5", right === false && "text-tomato-600")}>

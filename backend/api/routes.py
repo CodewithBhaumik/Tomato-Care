@@ -25,6 +25,16 @@ def health(request: Request):
             "version": request.app.version, "load_errors": registry.errors}
 
 
+def _weights_mb(key: str) -> float | None:
+    """Download size of a model's weight files (release manifest), or None if the manifest is missing."""
+    from tomatoleaf import weights
+
+    try:
+        return sum(f["bytes"] for f in weights.files_for([key])) / 2**20 or None
+    except (OSError, KeyError, ValueError):
+        return None
+
+
 @router.get("/models")
 def models(request: Request):
     registry = request.app.state.registry
@@ -41,7 +51,8 @@ def models(request: Request):
                         "confidence_threshold", registry.threshold),
                     "operating_point": entry.get("operating_point"), "ood": entry.get("ood"),
                     "selected": entry["key"] == registry.default_key, "test_metrics": entry.get("test_metrics"),
-                    "latency_ms": entry.get("latency_ms"), "description": entry.get("description")})
+                    "latency_ms": entry.get("latency_ms"), "description": entry.get("description"),
+                    "model_name": entry.get("model_name"), "weights_mb": _weights_mb(entry["key"])})
     return {"default_model": registry.default_key, "defaults_by_task": registry.meta.get("defaults_by_task"),
             "models": out}
 

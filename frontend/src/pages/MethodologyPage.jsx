@@ -3,7 +3,7 @@ import { AlertTriangle, BookMarked, Brain, Camera, CheckCircle2, Crop, Database,
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
 import { Badge, Callout, Card, CardHeader, PageHeader, Skeleton } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
-import { TASK, classicalModel, comparisonsFor, defaultModel, modelName, recipesFor, taskClasses, taskPhotos } from "../lib/analytics.js";
+import { TASK, classicalModel, comparisonsFor, defaultModel, modelName, recipesFor, servedName, taskClasses, taskPhotos } from "../lib/analytics.js";
 import { pct, signedPct } from "../lib/format.js";
 
 const TOC = [
@@ -247,8 +247,8 @@ export default function MethodologyPage() {
             {dl && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {[
-                  [dl, "Deep learning · default", "leaf"],
-                  [ml, "Classical ML · no neural network", "sun"],
+                  [dl, `${servedName(dl)} · deep learning`, "leaf"],
+                  [ml, `${servedName(ml)} · classical ML`, "sun"],
                 ]
                   .filter(([m]) => m?.test)
                   .map(([m, label, tone]) => (

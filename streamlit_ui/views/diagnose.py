@@ -79,9 +79,10 @@ def _model_panel():
         st.markdown("**2 · Model**")
         entries = core.served_models()
         key = st.segmented_control("Model", [e["key"] for e in entries], default=entries[0]["key"], key="model",
-                                   format_func=lambda k: core.family_label(core.model_entry(k)), required=True,
+                                   format_func=lambda k: core.display_name(core.model_entry(k)), required=True,
                                    label_visibility="collapsed")
         entry = core.model_entry(key)
+        st.markdown(f"**{core.benefit(entry)}**")
         st.caption(core.scope_text())
         st.caption(core.model_help(entry))
         acc = (entry.get("test_metrics") or {}).get("accuracy")
@@ -189,8 +190,8 @@ def _compare(data: bytes):
     })
     agree = df["Top class"].nunique() == 1
     st.caption("Both models agree on the condition." if agree else
-               "The models disagree — a hint that this photo is hard. The deep-learning model is the more accurate "
-               "one on the test photos (see Model lab).")
+               f"The models disagree — a hint that this photo is hard. {core.display_name(core.served_models()[0])} "
+               "is the more accurate one on the test photos (see Model lab).")
 
 
 def _history_add(r: dict, label: str):
@@ -254,7 +255,8 @@ def _result(data: bytes, label: str, key: str, explain: bool):
     _history_add(r, label)
     st.space("small")
     if st.toggle("Ask the other model too", key="compare_on",
-                 help="Runs both Tomato Care models — deep learning and classical ML — on this photo."):
+                 help="Runs both Tomato Care models — " + " and ".join(core.display_name(e) for e in
+                                                                        core.served_models()) + " — on this photo."):
         _compare(data)
 
 

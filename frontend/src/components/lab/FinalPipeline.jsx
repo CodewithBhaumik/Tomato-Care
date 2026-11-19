@@ -81,8 +81,8 @@ export default function FinalPipeline({ final, classical, mlGate }) {
   const oodNames = Object.keys(OOD_LABEL).filter((k) => t.out_of_dataset?.[finalRow?.key]?.[k]);
   const columns = [
     before && { key: before.key, label: "Before" },
-    finalRow && { key: finalRow.key, label: "Final" },
-    mlRow && { key: mlRow.key, label: "Classical ML" },
+    finalRow && { key: finalRow.key, label: finalRow.model_name || "Final" },
+    mlRow && { key: mlRow.key, label: mlRow.model_name || "Classical ML" },
   ].filter(Boolean);
   const stressCols = columns.filter((c) => t.stress?.[c.key]);
   const oodCols = columns.filter((c) => t.out_of_dataset?.[c.key]);
