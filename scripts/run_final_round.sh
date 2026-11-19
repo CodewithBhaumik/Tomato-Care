@@ -15,7 +15,7 @@ step 36; "$PY" scripts/36_final_pipeline.py
 step 38; "$PY" scripts/38_final_test.py
 step 34; CUDA_VISIBLE_DEVICES="" "$PY" scripts/34_audit_examples.py
 step 35; "$PY" scripts/35_audit_behaviour.py cuda
-step 39; CUDA_VISIBLE_DEVICES="" "$PY" scripts/39_final_report.py
+step 39; CUDA_VISIBLE_DEVICES="" TOMATO_RUNTIME=torch "$PY" scripts/39_final_report.py
 step 27; "$PY" scripts/27_export_platform_data.py
 step 29; "$PY" scripts/29_results_report.py
 step 26; if [ -n "$OUT" ]; then "$PY" scripts/26_package_release.py --copy-to "$OUT"; else "$PY" scripts/26_package_release.py; fi
