@@ -82,7 +82,7 @@ def build_gallery(defaults, previous, bench_models):
         for key in models:
             pred = reg.load(key)
             probs, _ = pred.analyse(rgb)
-            top = int(np.argmax(probs))
+            top = pred.decide(probs)
             heat = gradcam_for(pred, rgb, top)
             heat256 = np.asarray(Image.fromarray((heat * 255).astype(np.uint8)).resize((256, 256), Image.BILINEAR)) / 255.0
             pred_key = pred.class_keys[top]
@@ -129,8 +129,15 @@ def main():
     bench = load_json(RESULTS_DIR / bench_file)
     bench_models = load_json(EXPERIMENTS_DIR / "benchmark_models.json")["models"]
     meta = {m["key"]: m for m in bench_models}
-    defaults, previous = bench["defaults"], bench["previous_defaults"]
+    defaults, previous = bench["defaults"], bench["previous_defaults"]  # defaults: the version-2 networks
+    deployment = load_json(EXPERIMENTS_DIR / "deployment.json")
+    served = deployment["defaults_by_task"]  # what the apps answer with (calibrated / bias-corrected variants)
     sel = {t: load_json(RESULTS_DIR / f"selection_{t}.json") for t in ("5class", "8class")}
+    variant_oof = {}
+    for t in ("5class", "8class"):
+        bal = RESULTS_DIR / f"balance_{t}.json"
+        if bal.exists():
+            variant_oof.update({k: v["oof"] for k, v in load_json(bal)["variants"].items()})
     old = load_json(EXPERIMENTS_DIR / "analytics.json")
     final8 = load_json(RESULTS_DIR / "final_results.json")
     five = load_json(RESULTS_DIR / "five_class_results.json")
@@ -173,6 +180,8 @@ def main():
         cv = None
         if r["key"].startswith("upgrade_"):
             cv = sel[r["task"]]["chosen"]["oof"]
+        elif r["key"] in variant_oof:
+            cv = variant_oof[r["key"]]
         elif recipes and len(recipes) == 1:
             view = str(m.get("tta_views", 1))
             cv = rec_oof.get((r["task"], recipes[0], view))
@@ -183,8 +192,9 @@ def main():
             "key": r["key"], "name": r["name"], "task": r["task"], "family": r["family"], "generation": r["generation"],
             "params": m.get("params"), "tta_views": m.get("tta_views") or max([mm.get("tta_views", 1) for mm in m.get("members", [])] or [1]),
             "recipe": recipes[0] if recipes and len(recipes) == 1 else None, "recipes": recipes,
-            "deployed": r["key"] in {e["key"] for e in load_json(EXPERIMENTS_DIR / "deployment.json")["models"]},
-            "is_default": r["key"] in defaults.values(), "description": m.get("feature_set"),
+            "deployed": r["key"] in {e["key"] for e in deployment["models"]},
+            "is_default": r["key"] in served.values(), "description": m.get("description") or m.get("feature_set"),
+            "variant": m.get("variant"), "base_model": m.get("base_model"),
             "cv": {k: cv[k] for k in ("f1_macro", "accuracy")} if cv else None,
             "val": {k: legacy_val[r["key"]][k] for k in ("f1_macro", "accuracy")} if r["key"] in legacy_val else None,
             "test": r["test"], "per_class": r["per_class"], "confusion": r["confusion"],
@@ -242,18 +252,18 @@ def main():
         names = list(PERTURBATION_LABEL)
         robustness[t] = {"rows": [{"label": PERTURBATION_LABEL[n], **{key: rb[key][n]["flip_rate"] for key in rb}} for n in names
                                   if all(n in rb[key] for key in rb)],
-                         "series": [{"key": defaults[t], "label": "Upgrade default", "color": "#15834e"},
+                         "series": [{"key": defaults[t], "label": "Version-2 networks", "color": "#15834e"},
                                     {"key": previous[t], "label": "Original default", "color": "#0891b2"}]}
 
     if "dryrun" in bench_file:  # pipeline check only: never score test photos (the gallery uses held-out samples)
         gallery, hero = {"items": [], "models": [], "summary": "dry run", "on_leaf_share": {}}, None
     else:
-        gallery, hero = build_gallery(defaults, previous, bench_models)
+        gallery, hero = build_gallery(served, previous, bench_models)
 
     selective = {}
     for t in ("5class", "8class"):
-        rc = bench["risk_coverage"][t]
-        d = next(m for m in models if m["key"] == defaults[t])
+        rc = bench.get("risk_coverage_variants", {}).get(served[t]) or bench["risk_coverage"][t]
+        d = next(m for m in models if m["key"] == rc["model"])
         selective[t] = {"model": rc["model"], "curve": rc["curve"], "rule": sel[t]["selective"]["rule"],
                         "chosen": {"threshold": d["selective"]["threshold"], "coverage": d["selective"]["coverage"],
                                    "accuracy_kept": d["selective"]["accuracy_kept"]}}
@@ -281,7 +291,9 @@ def main():
            "project": {"name": "Tomato Care"}, "dataset": dataset,
            "tasks": {t: {"label": TASK_LABEL[t], "classes": FIVE if t == "5class" else list(CLASS_KEYS),
                          "test_photos": bench["test_photos_5class"] if t == "5class" else bench["test_photos"],
-                         "default_model": defaults[t], "previous_default": previous[t]} for t in ("5class", "8class")},
+                         "default_model": served[t], "network_model": defaults[t], "previous_default": previous[t],
+                         "served_models": [e["key"] for e in deployment["models"] if e["task"] == t]}
+                     for t in ("5class", "8class")},
            "models": models, "comparisons": bench["comparisons"],
            "cv": {"selection_rule": sel["8class"]["selection_rule"], "recipes": recipes_out, "screening": screening,
                   "chosen": {t: sel[t]["chosen"]["key"] for t in sel}},

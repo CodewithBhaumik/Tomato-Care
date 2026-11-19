@@ -132,6 +132,21 @@ original study on validation F1 (the four conditions recognised best, plus Healt
   three out-of-scope conditions (focused task) and half of a fixed set of 30 non-leaf probe images (scikit-image
   photographs and synthetic images); the other half is used only for reporting.
 
+## 6b. Class bias and per-class confidence
+
+Training already weights each class by its rarity. The served models add two post-hoc corrections, fitted on
+cross-fitted out-of-fold predictions (`src/tomatoleaf/balance.py`, `scripts/31_balance_models.py`):
+
+* **Per-class calibration** (vector scaling, penalised NLL): each condition's confidence matches its own accuracy.
+* **Class-prior correction** (logit adjustment): the answered class is the argmax of p / prior^τ, so frequent
+  conditions cannot out-vote rare ones. The confidence shown stays the calibrated probability of that answer. τ is the
+  value with the highest out-of-fold balanced accuracy whose accuracy is within 2 points of the uncorrected model
+  (focused 1.2, full 0.65).
+
+The variants were scored once on the test set (`scripts/32_evaluate_variants.py`); RESULTS.md and the README list
+them next to the uncorrected networks and the original study. A GAN was not used for minority-class augmentation: with
+9 Potassium and 45 Nitrogen photographs it cannot learn new variation, only reproduce the few training leaves.
+
 ## 7. Final evaluation
 
 All models — classical ML, the original networks and the upgrade — are scored by the **same predictor code that the

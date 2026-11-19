@@ -65,8 +65,12 @@ def main():
                 ctx = browser.new_context(viewport=viewport, device_scale_factor=1 if label == "desktop" else 2)
                 page = ctx.new_page()
                 errors = []
-                page.on("console", lambda m, errors=errors: m.type == "error" and errors.append(m.text))
-                page.on("requestfailed", lambda r, errors=errors: errors.append(f"request failed: {r.url}"))
+                # third-party web fonts (Google Fonts) can fail on some networks; the site falls back to system fonts
+                cdn = ("fonts.gstatic.com", "fonts.googleapis.com")
+                page.on("console", lambda m, errors=errors: m.type == "error" and not any(
+                    c in (m.location or {}).get("url", "") or "QUIC" in m.text for c in cdn) and errors.append(m.text))
+                page.on("requestfailed", lambda r, errors=errors: not any(c in r.url for c in cdn)
+                        and errors.append(f"request failed: {r.url}"))
                 for path in PAGES:
                     page.goto(BASE + path, wait_until="networkidle")
                     for _ in range(12):  # scroll through the page so lazy images load before the full-page shot
@@ -101,12 +105,13 @@ def main():
             if shown.strip() != expected:
                 problems.append(f"UI shows '{shown}', API says '{expected}'")
             expect(page.get_by_alt_text("Grad-CAM heat map").first).to_be_visible()
-            page.get_by_role("button", name="Ask both models").click()
+            page.get_by_role("button", name="Ask all models").click()
             expect(page.get_by_text("Votes:")).to_be_visible(timeout=180000)
             page.screenshot(path=str(SHOTS / "desktop_diagnose_result.png"), full_page=True)
             checks["compare_rows"] = page.locator("table tbody tr").count()
-            if checks["compare_rows"] != 2:  # the two served (version-2) models
-                problems.append(f"comparison shows {checks['compare_rows']} rows, expected 2")
+            served = len(httpx.get(BASE + "/api/models", timeout=30).json()["models"])
+            if checks["compare_rows"] != served:  # every served (version-2) model
+                problems.append(f"comparison shows {checks['compare_rows']} rows, expected {served}")
 
             # ---- invalid upload is rejected with a message
             page.goto(BASE + "/diagnose", wait_until="networkidle")

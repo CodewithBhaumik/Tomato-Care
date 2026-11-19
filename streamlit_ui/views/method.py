@@ -86,6 +86,16 @@ def render() -> None:
             "at which out-of-fold accuracy on answered photos reaches the target — 95% for the focused task, 90% for "
             "all eight conditions. Below it, the app says **“not sure”**.")
 
+    theme.section("4b · Class bias and even confidence", kicker="Fairness to rare conditions")
+    st.markdown(
+        "Leaf Miner makes up over half of the photographs, Potassium Deficiency 0.4%. Training already weights each "
+        "class by its rarity; on top of that the served models apply two corrections fitted on out-of-fold data: "
+        "**per-class calibration** (vector scaling), so a stated 90% means about 90% right for every condition, and "
+        "a **class-prior correction** (logit adjustment, Menon et al. 2021), so frequent conditions cannot out-vote "
+        "rare ones. The confidence shown stays the calibrated probability of the answer. Numbers: Model lab → "
+        "Calibration. A GAN was not used: from 9 Potassium photographs it would reproduce those photos, not add "
+        "information.")
+
     theme.section("5 · Recognising unusual photos", kicker="Out-of-distribution")
     ood = data["ood"]["test"]
     st.markdown(

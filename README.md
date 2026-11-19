@@ -47,8 +47,9 @@ and how sure it is:
 | **Unusual image** | the photo looks unlike every training photo (not a leaf on paper, another crop, …) |
 
 Every answer comes with the probability of each condition, a Grad-CAM heat map of where the networks looked, the
-symptoms and management of the condition, and — on request — the answer of the other Tomato Care model (focused
-or full) on the same photo. The apps serve only the version-2 models; the original study's models appear only as
+symptoms and management of the condition, and — on request — the answers of the other Tomato Care models on the
+same photo. The apps serve three version-2 models — **focused · balanced** (default), **focused · calibrated** and
+**full · balanced** — and the original study's models appear only as
 the baseline in the evaluation.
 
 Two front ends share one prediction engine (`backend/services/predictor.py`):
@@ -64,27 +65,48 @@ All models were scored by the same code on the same **290 held-out test photos**
 **once**, after every model choice had been fixed on cross-validation data. 95% confidence intervals come from 2,000
 bootstrap resamples of whole leaf groups. Full tables: [docs/RESULTS.md](docs/RESULTS.md).
 
-| Task | Model | Accuracy | Macro-F1 | When it answers | Same-leaf consistency |
-|---|---|---:|---:|---:|---:|
-| **Focused · 5 conditions** (app default) | **v2** — 5-fold ConvNeXt-T ensemble | **92.1%** (88.4–95.3) | **0.844** | answers 81% → **98.1%** correct | **90.5%** |
-| | v1 — ConvNeXt-T + EfficientNet-B0 | 90.9% (87.3–94.3) | 0.835 | answers 85% → 96.0% correct | 85.7% |
-| **Full · 8 conditions** | v2 — 10-network ConvNeXt-T ensemble | 82.4% (77.7–87.0) | 0.559 | answers 88% → 87.4% correct | 89.1% |
-| | v1 — ConvNeXt-T + TTA | **84.8%** (80.1–89.3) | **0.586** | answers 90% → 87.7% correct | **97.8%** |
+The app serves three version-2 models: two for the focused task and one for the full task. All three use the same
+fold networks, post-processed by rules fitted on out-of-fold data (per-class calibration; for *balanced*, also a
+class-prior correction against majority-class bias). Balanced accuracy is the mean per-condition recall, so a rare
+condition counts as much as Leaf Miner. Per-class calibration error measures how far each condition's confidence
+is from its own accuracy (lower means more even confidence).
 
-**Paired differences (v2 − v1, same photos):** focused task accuracy **+1.1 pts** (95% CI −1.8 to +3.9), macro-F1
-+0.008 (−0.015 to +0.032); full task accuracy **−2.4 pts** (−5.0 to 0.0), macro-F1 −0.027 (−0.066 to +0.006).
-Both intervals include zero: on 290 photos neither difference is statistically reliable.
+| Task | Model | Accuracy | Macro-F1 | Balanced acc. | Per-class calib. error | When it answers |
+|---|---|---:|---:|---:|---:|---:|
+| **Focused · 5 conditions** | **v2 balanced** (app default) | 90.6% (86.6–94.0) | 0.826 | **88.1%** | **0.038** | 78% → **98.6%** correct |
+| | v2 calibrated | **92.1%** (88.5–95.3) | 0.831 | 83.6% | 0.041 | 78% → **98.6%** correct |
+| | v2 networks, uncorrected | **92.1%** (88.4–95.3) | **0.844** | 86.3% | 0.045 | 81% → 98.1% correct |
+| | v1 — ConvNeXt-T + EfficientNet-B0 | 90.9% (87.3–94.3) | 0.835 | 85.6% | 0.043 | 85% → 96.0% correct |
+| **Full · 8 conditions** | **v2 balanced** (app model) | 82.8% (78.0–87.3) | 0.584 | 60.1% | **0.026** | 88% → **88.2%** correct |
+| | v2 networks, uncorrected | 82.4% (77.7–87.0) | 0.559 | 56.8% | 0.052 | 88% → 87.4% correct |
+| | v1 — ConvNeXt-T + TTA | **84.8%** (80.1–89.3) | **0.586** | **60.4%** | 0.045 | 90% → 87.7% correct |
+
+**Paired differences on the same photos:**
+
+* Focused balanced − v1: accuracy −0.4 pts (95% CI −3.5 to +2.7), macro-F1 −0.010 (−0.054 to +0.035).
+* Focused calibrated − v1: +1.1 pts (−1.9 to +4.1).
+* Full balanced − v1: −2.1 pts (−4.9 to +0.7), macro-F1 −0.002 (−0.048 to +0.045).
+* Full balanced − uncorrected v2: macro-F1 +0.025 (−0.008 to +0.064).
+
+Every interval includes zero: on 290 photos none of these accuracy differences is statistically reliable.
 
 What this means, without spin:
 
-* **Focused model (the app's default): better than v1 on almost every measure** — accuracy, macro-F1, log-loss and
-  Brier score, accuracy when it answers (98.1% vs 96.0%), consistency across re-shots of the same leaf, abstaining on
-  conditions it was never trained on (20% vs 12% of such photos), and stability on sRGB phone uploads (1.1% vs 3.0%
-  of predictions change). v1 is slightly better calibrated (ECE 0.039 vs 0.055).
-* **Full 8-class model: not better than v1.** It was chosen by a rule fixed in advance on out-of-fold data (where it
-  ranked first: macro-F1 0.634 vs 0.620 for the original recipe); on the test photos the ranking of these close
-  recipes did not hold. Re-choosing after seeing the test results would turn the test set into a tuning set, so the
-  pre-registered choice stays and both results are reported.
+* **Bias and uneven confidence, the problems version 2 set out to fix, are clearly better.** The balanced focused model
+  recognises the conditions more evenly than v1: balanced accuracy 88.1% vs 85.6%. Each condition's confidence is
+  closer to its accuracy (0.038 vs 0.043; full model 0.026 vs 0.045). When it answers it is right 98.6% of the time
+  vs 96.0%, and it abstains more often on conditions it was never trained on (16% vs 12%).
+* **Overall accuracy is on par with v1, not higher.** Removing the majority-class bias costs a little accuracy on the
+  frequent classes. The uncorrected v2 networks score 92.1% (v1 90.9%), and the calibrated model offers that
+  accuracy in the app.
+* **Chosen honestly.** The variants and the rule for the prior correction were fixed on out-of-fold data before the
+  test set was scored. The focused default was switched from *calibrated* to *balanced* after the test scores, to
+  follow the request to remove bias; both are reported in full. The 8-class networks were chosen by a rule fixed in
+  advance (out-of-fold macro-F1 0.634 vs 0.620 for the original recipe); on the test photos the order of these
+  close recipes did not hold, and every result is published.
+* **Why no GAN.** With 9 Potassium and 45 Nitrogen photographs, a generative model would copy these few leaves rather
+  than add new information, and synthetic photos would need their own validation. Instead the bias is handled by
+  class-weighted training plus the prior correction above.
 * **New in v2:** uploads are converted like the training photos (prediction changes on simulated phone photos fall
   from 2.1–3.5% to 0.0–1.4%, validation), an **unusual-image check** (100% of held-out non-leaf probe images flagged;
   7.9% of normal test photos flagged as the price), and calibrated confidence with an abstention threshold chosen on
@@ -101,6 +123,7 @@ What this means, without spin:
 | **Backbones and recipes** | ConvNeXt-Tiny / EfficientNet-B0 (ImageNet-1k) | + ImageNet-22k ConvNeXt-T, DINOv2 ViT-S/14 and a frozen ViT-B/14 compared in CV; robust recipe (all 8 dihedral views, aspect jitter, JPEG/blur, EMA) |
 | **Deployed models** | single checkpoints | fold ensembles: every member has truly held-out data for its calibration and thresholds |
 | **Uncertainty** | threshold chosen on 311 photos | temperature scaling + threshold on out-of-fold predictions + **unusual-image** detector (kNN / Mahalanobis feature distance) |
+| **Bias and confidence** | class-weighted loss only | + per-class calibration (vector scaling) and a class-prior correction (logit adjustment), fitted on out-of-fold data: balanced accuracy and per-class calibration better than v1 |
 | **Evaluation** | per-model scripts | one benchmark through the app's own predictor: CIs, paired bootstrap, calibration, robustness, same-leaf consistency, CPU latency |
 | **Apps** | basic Streamlit demo, 6-page React site | redesigned **Streamlit app** (light/dark, phone layout) and a React platform with 10 pages; new brand |
 | **Serving** | all weights in RAM | ONNX Runtime for the API (~1.6–2× faster on CPU); **low-memory mode** for small servers (shared network, memory-mapped float16 weights: 0.9 GB instead of 2.4 GB private RAM, identical outputs) |

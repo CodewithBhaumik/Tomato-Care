@@ -60,7 +60,16 @@ def _model_panel():
         task = st.segmented_control("Task", ["5class", "8class"], format_func=lambda t: core.TASK_LABEL[t],
                                     default="5class", key="task", required=True, label_visibility="collapsed")
         st.caption(core.TASK_HELP[task])
-        entry = core.task_model(task)
+        options = core.task_models(task)
+        if len(options) > 1:
+            pick = st.segmented_control(
+                "Model", [e["key"] for e in options], default=options[0]["key"], key=f"variant_{task}", required=True,
+                format_func=lambda k: core.VARIANT_LABEL.get(core.model_entry(k).get("variant"), k)
+                + (" (recommended)" if k == options[0]["key"] else ""))
+            entry = core.model_entry(pick)
+        else:
+            entry = options[0]
+        st.caption(core.VARIANT_HELP.get(entry.get("variant"), ""))
         acc = (entry.get("test_metrics") or {}).get("accuracy")
         st.html(theme.chip(core.short_name(entry), "g")
                 + (theme.chip(f"{100 * acc:.1f}% on held-out test photos", "c") if acc is not None else ""))
@@ -145,14 +154,14 @@ def _details(r: dict, label: str):
 
 
 def _compare(data: bytes):
-    keys = tuple(core.deployment()["defaults_by_task"][t] for t in ("5class", "8class"))
-    with st.spinner("Asking both models…"):
+    keys = tuple(e["key"] for e in core.deployment()["models"])
+    with st.spinner(f"Asking all {len(keys)} models…"):
         rows = core.compare(data, keys)
     table = []
     for r in rows:
         e = core.model_entry(r["model"]["key"])
         p = r["prediction"]
-        table.append({"Model": core.TASK_LABEL[e["task"]], "Networks": len(e.get("members") or [1]),
+        table.append({"Model": core.short_name(e).rsplit(" · ", 1)[0], "Networks": len(e.get("members") or [1]),
                       "Answer": p["name"] if p["status"] in ("Healthy", "Diseased") else p["status"],
                       "Top class": p["name"], "Confidence": p["confidence"], "Status": p["status"],
                       "Time (ms)": round(r["total_ms"])})
@@ -162,9 +171,9 @@ def _compare(data: bytes):
         "Answer": st.column_config.TextColumn(help="What the app would show: the condition, or Uncertain / Unusual image"),
     })
     agree = df["Top class"].nunique() == 1
-    st.caption("Both models agree on the top class." if agree else
-               "The models disagree — a hint that this photo is hard. The focused model is the more reliable one "
-               "for its five conditions; the full model also knows Early Blight, Late Blight and Potassium "
+    st.caption("All models agree on the condition." if agree else
+               "The models disagree — a hint that this photo is hard. The focused models are the more reliable ones "
+               "for their five conditions; the full model also knows Early Blight, Late Blight and Potassium "
                "Deficiency, but recognises them poorly.")
 
 
@@ -226,8 +235,8 @@ def _result(data: bytes, label: str, task: str, key: str, explain: bool):
         _details(r, label)
     _history_add(r, label)
     st.space("small")
-    if st.toggle("Ask the other model too", key="compare_on",
-                 help="Runs both Tomato Care models — focused (5 conditions) and full (8 conditions) — on this photo."):
+    if st.toggle("Ask the other models too", key="compare_on",
+                 help="Runs every Tomato Care model — focused balanced, focused calibrated and full — on this photo."):
         _compare(data)
 
 

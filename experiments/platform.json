@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generated_at": "2026-11-19T09:29:02",
+  "generated_at": "2026-11-19T11:11:12",
   "project": {
     "name": "Tomato Care"
   },
@@ -167,8 +167,13 @@
         "spotted_wilt_virus"
       ],
       "test_photos": 265,
-      "default_model": "upgrade_5class",
-      "previous_default": "ensemble_5class"
+      "default_model": "balanced_5class",
+      "network_model": "upgrade_5class",
+      "previous_default": "ensemble_5class",
+      "served_models": [
+        "balanced_5class",
+        "calibrated_5class"
+      ]
     },
     "8class": {
       "label": "Full \u00b7 8 classes",
@@ -183,8 +188,12 @@
         "spotted_wilt_virus"
       ],
       "test_photos": 290,
-      "default_model": "upgrade_8class",
-      "previous_default": "convnext_tiny_v2_tta"
+      "default_model": "balanced_8class",
+      "network_model": "upgrade_8class",
+      "previous_default": "convnext_tiny_v2_tta",
+      "served_models": [
+        "balanced_8class"
+      ]
     }
   },
   "models": [
@@ -203,6 +212,8 @@
       "deployed": false,
       "is_default": false,
       "description": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 original recipe (8-view TTA)",
+      "variant": null,
+      "base_model": null,
       "cv": {
         "f1_macro": 0.8695661003863531,
         "accuracy": 0.9105199516324063
@@ -394,6 +405,8 @@
       "deployed": false,
       "is_default": false,
       "description": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust (8-view TTA)",
+      "variant": null,
+      "base_model": null,
       "cv": {
         "f1_macro": 0.8861925102847751,
         "accuracy": 0.9171704957678356
@@ -575,9 +588,11 @@
       "recipes": [
         "convnext_t_in1k_robust"
       ],
-      "deployed": true,
-      "is_default": true,
-      "description": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust",
+      "deployed": false,
+      "is_default": false,
+      "description": "Chosen by cross-validation: Highest pooled out-of-fold macro-F1 among candidates (single recipes with/without 8-view TTA, and probability ensembles of 2-3 recipes) whose estimated CPU time for the whole fold ensemble is <= 1000 ms per photo; ties within 0.001 go to higher out-of-fold accuracy, then lower latency. Decided on out-of-fold data only; the test set is scored once afterwards.",
+      "variant": null,
+      "base_model": null,
       "cv": {
         "f1_macro": 0.8851326519286067,
         "accuracy": 0.9141475211608222
@@ -599,7 +614,9 @@
         ],
         "ece": 0.055365664975080775,
         "nll": 0.2531543712327302,
-        "brier": 0.12148711936143318
+        "brier": 0.12148711936143318,
+        "balanced_accuracy": 0.862888883032768,
+        "classwise_ece": 0.04494782622169556
       },
       "per_class": [
         {
@@ -821,6 +838,8 @@
       "deployed": false,
       "is_default": false,
       "description": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 original recipe",
+      "variant": null,
+      "base_model": null,
       "cv": {
         "f1_macro": 0.6200728945928876,
         "accuracy": 0.8477661334804192
@@ -1076,6 +1095,8 @@
       "deployed": false,
       "is_default": false,
       "description": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust",
+      "variant": null,
+      "base_model": null,
       "cv": {
         "f1_macro": 0.6157312519263284,
         "accuracy": 0.8532818532818532
@@ -1338,6 +1359,8 @@
       "deployed": false,
       "is_default": false,
       "description": "5-fold ensemble of ViT-S/14 DINOv2 \u00b7 robust (8-view TTA)",
+      "variant": null,
+      "base_model": null,
       "cv": {
         "f1_macro": 0.6311192546803929,
         "accuracy": 0.8389409817981247
@@ -1598,9 +1621,11 @@
         "convnext_t_in1k_base",
         "convnext_t_in1k_robust"
       ],
-      "deployed": true,
-      "is_default": true,
-      "description": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust",
+      "deployed": false,
+      "is_default": false,
+      "description": "Chosen by cross-validation: Highest pooled out-of-fold macro-F1 among candidates (single recipes with/without 8-view TTA, and probability ensembles of 2-3 recipes) whose estimated CPU time for the whole fold ensemble is <= 1000 ms per photo; ties within 0.001 go to higher out-of-fold accuracy, then lower latency. Decided on out-of-fold data only; the test set is scored once afterwards.",
+      "variant": null,
+      "base_model": null,
       "cv": {
         "f1_macro": 0.6341314386966606,
         "accuracy": 0.8599007170435742
@@ -1622,7 +1647,9 @@
         ],
         "ece": 0.07576448694633954,
         "nll": 0.5075770261819418,
-        "brier": 0.24428538748046166
+        "brier": 0.24428538748046166,
+        "balanced_accuracy": 0.5679670915282427,
+        "classwise_ece": 0.051607408949563116
       },
       "per_class": [
         {
@@ -1920,6 +1947,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Color",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.35515539894935,
@@ -2173,6 +2202,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Color",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.36119110068039373,
@@ -2426,6 +2457,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Color",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.3681398411484268,
@@ -2679,6 +2712,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Learned features (end-to-end CNN)",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.4177641610200834,
@@ -2932,6 +2967,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Learned features (ImageNet-pretrained MobileNetV2, 224px)",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.5251407136514452,
@@ -3192,6 +3229,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Learned features (ImageNet-pretrained MobileNetV2, 224px)",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.6201998587386075,
@@ -3452,6 +3491,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Learned features (ImageNet-pretrained EfficientNet-B0, 256px)",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.599819602649198,
@@ -3712,6 +3753,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Learned features (ImageNet-pretrained ConvNeXt-Tiny, 256px)",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.718488191823432,
@@ -3972,6 +4015,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Learned features; averaged over 8 test-time views",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.7219887554793216,
@@ -3993,7 +4038,9 @@
         ],
         "ece": 0.07370543861985442,
         "nll": 0.504332094658128,
-        "brier": 0.23557402897673085
+        "brier": 0.23557402897673085,
+        "balanced_accuracy": 0.6036215350064271,
+        "classwise_ece": 0.04518376241783905
       },
       "per_class": [
         {
@@ -4232,6 +4279,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Color",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.5936622762471482,
@@ -4421,6 +4470,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Color",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.5481787836821393,
@@ -4610,6 +4661,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Color",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.5954418933166294,
@@ -4799,6 +4852,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Learned features (ImageNet-pretrained ConvNeXt-Tiny, 256px)",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.901279213636092,
@@ -4988,6 +5043,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Learned features (ImageNet-pretrained ConvNeXt-Tiny, 256px); averaged over 8 test-time views",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.8923293126475501,
@@ -5170,6 +5227,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Learned features (ImageNet-pretrained EfficientNet-B0, 256px)",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.8499969063379315,
@@ -5359,6 +5418,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Learned features (ImageNet-pretrained EfficientNet-B0, 256px); averaged over 8 test-time views",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.8559377454130077,
@@ -5541,6 +5602,8 @@
       "deployed": false,
       "is_default": false,
       "description": "Average of calibrated probabilities: ConvNeXt-Tiny (single view) + EfficientNet-B0 (8-view TTA)",
+      "variant": null,
+      "base_model": null,
       "cv": null,
       "val": {
         "f1_macro": 0.9118918918918919,
@@ -5562,7 +5625,9 @@
         ],
         "ece": 0.039140529028896115,
         "nll": 0.2762290862239016,
-        "brier": 0.13999838760716132
+        "brier": 0.13999838760716132,
+        "balanced_accuracy": 0.8559795387133515,
+        "classwise_ece": 0.043113375165735525
       },
       "per_class": [
         {
@@ -5716,6 +5781,684 @@
         "share_uncertain_or_unusual": 0.12,
         "share_flagged_unusual": null
       }
+    },
+    {
+      "key": "calibrated_5class",
+      "name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
+      "task": "5class",
+      "family": "Deep learning",
+      "generation": "upgrade",
+      "params": null,
+      "tta_views": 1,
+      "recipe": "convnext_t_in1k_robust",
+      "recipes": [
+        "convnext_t_in1k_robust"
+      ],
+      "deployed": true,
+      "is_default": false,
+      "description": "Same networks; per-class calibration so every condition's confidence matches its own accuracy.",
+      "variant": "calibrated",
+      "base_model": "upgrade_5class",
+      "cv": {
+        "f1_macro": 0.8856083257705578,
+        "accuracy": 0.9141475211608222
+      },
+      "val": null,
+      "test": {
+        "accuracy": 0.9207547169811321,
+        "precision_macro": 0.827699244018393,
+        "recall_macro": 0.8357563033822026,
+        "f1_macro": 0.8307896896132189,
+        "f1_weighted": 0.9212338810119055,
+        "accuracy_ci": [
+          0.8847583643122676,
+          0.9528996163682865
+        ],
+        "f1_macro_ci": [
+          0.7212733421550894,
+          0.9057972033306633
+        ],
+        "balanced_accuracy": 0.8357563033822026,
+        "ece": 0.06327238455505813,
+        "classwise_ece": 0.04108905782699766,
+        "nll": 0.24315042920042618,
+        "brier": 0.12404179995282424
+      },
+      "per_class": [
+        {
+          "key": "healthy",
+          "name": "Healthy",
+          "precision": 0.8214285714285714,
+          "recall": 0.8518518518518519,
+          "f1": 0.8363636363636363,
+          "support": 27
+        },
+        {
+          "key": "leaf_miner",
+          "name": "Leaf Miner",
+          "precision": 0.9361702127659575,
+          "recall": 0.9496402877697842,
+          "f1": 0.9428571428571428,
+          "support": 139
+        },
+        {
+          "key": "magnesium_deficiency",
+          "name": "Magnesium Deficiency",
+          "precision": 0.7692307692307693,
+          "recall": 0.7142857142857143,
+          "f1": 0.7407407407407407,
+          "support": 14
+        },
+        {
+          "key": "nitrogen_deficiency",
+          "name": "Nitrogen Deficiency",
+          "precision": 0.625,
+          "recall": 0.7142857142857143,
+          "f1": 0.6666666666666666,
+          "support": 7
+        },
+        {
+          "key": "spotted_wilt_virus",
+          "name": "Spotted Wilt Virus",
+          "precision": 0.9866666666666667,
+          "recall": 0.9487179487179487,
+          "f1": 0.9673202614379085,
+          "support": 78
+        }
+      ],
+      "confusion": [
+        [
+          23,
+          4,
+          0,
+          0,
+          0
+        ],
+        [
+          4,
+          132,
+          2,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          10,
+          2,
+          1
+        ],
+        [
+          0,
+          1,
+          1,
+          5,
+          0
+        ],
+        [
+          1,
+          3,
+          0,
+          0,
+          74
+        ]
+      ],
+      "selective": {
+        "threshold": 0.89,
+        "coverage": 0.7811320754716982,
+        "accuracy_kept": 0.9855072463768116,
+        "test": {
+          "coverage": 0.7811320754716982,
+          "accuracy_kept": 0.9855072463768116
+        }
+      },
+      "calibration": {
+        "temperature": 0.8850030226081058,
+        "ece_after": 0.06327238455505813,
+        "reliability_after": [
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 3,
+            "confidence": 0.43861423296976976,
+            "accuracy": 0.0
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6000000000000001,
+            "count": 7,
+            "confidence": 0.5580201220515464,
+            "accuracy": 0.8571428571428571
+          },
+          {
+            "lo": 0.6000000000000001,
+            "hi": 0.7000000000000001,
+            "count": 14,
+            "confidence": 0.6556137294072182,
+            "accuracy": 0.7857142857142857
+          },
+          {
+            "lo": 0.7000000000000001,
+            "hi": 0.8,
+            "count": 11,
+            "confidence": 0.7598038649842599,
+            "accuracy": 0.45454545454545453
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 24,
+            "confidence": 0.8604175542275486,
+            "accuracy": 0.75
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 206,
+            "confidence": 0.9506796939277047,
+            "accuracy": 0.9902912621359223
+          }
+        ],
+        "fitted_on": "out-of-fold predictions"
+      },
+      "latency_ms": 209.71599999757018,
+      "flagged_unusual": 0.07924528301886792,
+      "out_of_scope": {
+        "photos": 25,
+        "confidence_mean": 0.8963854136710577,
+        "share_uncertain_or_unusual": 0.16,
+        "share_flagged_unusual": 0.04
+      }
+    },
+    {
+      "key": "balanced_5class",
+      "name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+      "task": "5class",
+      "family": "Deep learning",
+      "generation": "upgrade",
+      "params": null,
+      "tta_views": 1,
+      "recipe": "convnext_t_in1k_robust",
+      "recipes": [
+        "convnext_t_in1k_robust"
+      ],
+      "deployed": true,
+      "is_default": true,
+      "description": "Same networks; per-class calibration, and a class-prior correction so rare conditions are not out-voted by frequent ones (confidence stays calibrated).",
+      "variant": "balanced",
+      "base_model": "upgrade_5class",
+      "cv": {
+        "f1_macro": 0.8703348869500858,
+        "accuracy": 0.907496977025393
+      },
+      "val": null,
+      "test": {
+        "accuracy": 0.9056603773584906,
+        "precision_macro": 0.7897907582613465,
+        "recall_macro": 0.8807922160440146,
+        "f1_macro": 0.8257151766444457,
+        "f1_weighted": 0.909554839794986,
+        "accuracy_ci": [
+          0.8661710037174721,
+          0.940001872659176
+        ],
+        "f1_macro_ci": [
+          0.7272847920756138,
+          0.9007318477930402
+        ],
+        "balanced_accuracy": 0.8807922160440146,
+        "ece": 0.06711748114276003,
+        "classwise_ece": 0.03838664828521992,
+        "nll": 0.24315042920042618,
+        "brier": 0.12404179995282424
+      },
+      "per_class": [
+        {
+          "key": "healthy",
+          "name": "Healthy",
+          "precision": 0.7352941176470589,
+          "recall": 0.9259259259259259,
+          "f1": 0.819672131147541,
+          "support": 27
+        },
+        {
+          "key": "leaf_miner",
+          "name": "Leaf Miner",
+          "precision": 0.9615384615384616,
+          "recall": 0.8992805755395683,
+          "f1": 0.929368029739777,
+          "support": 139
+        },
+        {
+          "key": "magnesium_deficiency",
+          "name": "Magnesium Deficiency",
+          "precision": 0.7333333333333333,
+          "recall": 0.7857142857142857,
+          "f1": 0.7586206896551724,
+          "support": 14
+        },
+        {
+          "key": "nitrogen_deficiency",
+          "name": "Nitrogen Deficiency",
+          "precision": 0.5454545454545454,
+          "recall": 0.8571428571428571,
+          "f1": 0.6666666666666666,
+          "support": 7
+        },
+        {
+          "key": "spotted_wilt_virus",
+          "name": "Spotted Wilt Virus",
+          "precision": 0.9733333333333334,
+          "recall": 0.9358974358974359,
+          "f1": 0.954248366013072,
+          "support": 78
+        }
+      ],
+      "confusion": [
+        [
+          25,
+          2,
+          0,
+          0,
+          0
+        ],
+        [
+          7,
+          125,
+          3,
+          2,
+          2
+        ],
+        [
+          0,
+          0,
+          11,
+          3,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          6,
+          0
+        ],
+        [
+          2,
+          3,
+          0,
+          0,
+          73
+        ]
+      ],
+      "selective": {
+        "threshold": 0.89,
+        "coverage": 0.7811320754716982,
+        "accuracy_kept": 0.9855072463768116,
+        "test": {
+          "coverage": 0.7811320754716982,
+          "accuracy_kept": 0.9855072463768116
+        }
+      },
+      "calibration": {
+        "temperature": 0.8850030226081058,
+        "ece_after": 0.06711748114276003,
+        "reliability_after": [
+          {
+            "lo": 0.0,
+            "hi": 0.1,
+            "count": 2,
+            "confidence": 0.04506804329193542,
+            "accuracy": 0.0
+          },
+          {
+            "lo": 0.1,
+            "hi": 0.2,
+            "count": 3,
+            "confidence": 0.1430178994397092,
+            "accuracy": 0.3333333333333333
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.30000000000000004,
+            "count": 3,
+            "confidence": 0.2447489572986199,
+            "accuracy": 0.3333333333333333
+          },
+          {
+            "lo": 0.30000000000000004,
+            "hi": 0.4,
+            "count": 4,
+            "confidence": 0.3448475962038401,
+            "accuracy": 0.5
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 1,
+            "confidence": 0.43893983012519466,
+            "accuracy": 0.0
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6000000000000001,
+            "count": 5,
+            "confidence": 0.5615233936519762,
+            "accuracy": 0.8
+          },
+          {
+            "lo": 0.6000000000000001,
+            "hi": 0.7000000000000001,
+            "count": 12,
+            "confidence": 0.6556466631088853,
+            "accuracy": 0.75
+          },
+          {
+            "lo": 0.7000000000000001,
+            "hi": 0.8,
+            "count": 8,
+            "confidence": 0.7641280417721992,
+            "accuracy": 0.5
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 21,
+            "confidence": 0.8621075593125179,
+            "accuracy": 0.7142857142857143
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 206,
+            "confidence": 0.9506796939277047,
+            "accuracy": 0.9902912621359223
+          }
+        ],
+        "fitted_on": "out-of-fold predictions"
+      },
+      "latency_ms": 209.71599999757018,
+      "flagged_unusual": 0.07924528301886792,
+      "out_of_scope": {
+        "photos": 25,
+        "confidence_mean": 0.8866355305259761,
+        "share_uncertain_or_unusual": 0.16,
+        "share_flagged_unusual": 0.04
+      }
+    },
+    {
+      "key": "balanced_8class",
+      "name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+      "task": "8class",
+      "family": "Deep learning",
+      "generation": "upgrade",
+      "params": null,
+      "tta_views": 1,
+      "recipe": null,
+      "recipes": [
+        "convnext_t_in1k_base",
+        "convnext_t_in1k_robust"
+      ],
+      "deployed": true,
+      "is_default": true,
+      "description": "Same networks; per-class calibration, and a class-prior correction so rare conditions are not out-voted by frequent ones (confidence stays calibrated).",
+      "variant": "balanced",
+      "base_model": "upgrade_8class",
+      "cv": {
+        "f1_macro": 0.633293821521628,
+        "accuracy": 0.8483177054605626
+      },
+      "val": null,
+      "test": {
+        "accuracy": 0.8275862068965517,
+        "precision_macro": 0.570634821889384,
+        "recall_macro": 0.6013525717887228,
+        "f1_macro": 0.5841119191312039,
+        "f1_weighted": 0.8269184432710331,
+        "accuracy_ci": [
+          0.7801418439716312,
+          0.8725565999595715
+        ],
+        "f1_macro_ci": [
+          0.5058812164635957,
+          0.643554783335393
+        ],
+        "balanced_accuracy": 0.6013525717887228,
+        "ece": 0.06541281950681088,
+        "classwise_ece": 0.02580964945027572,
+        "nll": 0.4960067589334488,
+        "brier": 0.2455779315726889
+      },
+      "per_class": [
+        {
+          "key": "early_blight",
+          "name": "Early Blight",
+          "precision": 0.125,
+          "recall": 0.125,
+          "f1": 0.125,
+          "support": 8
+        },
+        {
+          "key": "healthy",
+          "name": "Healthy",
+          "precision": 0.7777777777777778,
+          "recall": 0.7777777777777778,
+          "f1": 0.7777777777777778,
+          "support": 27
+        },
+        {
+          "key": "late_blight",
+          "name": "Late Blight",
+          "precision": 0.5555555555555556,
+          "recall": 0.6666666666666666,
+          "f1": 0.6060606060606061,
+          "support": 15
+        },
+        {
+          "key": "leaf_miner",
+          "name": "Leaf Miner",
+          "precision": 0.9343065693430657,
+          "recall": 0.920863309352518,
+          "f1": 0.927536231884058,
+          "support": 139
+        },
+        {
+          "key": "magnesium_deficiency",
+          "name": "Magnesium Deficiency",
+          "precision": 0.7857142857142857,
+          "recall": 0.7857142857142857,
+          "f1": 0.7857142857142857,
+          "support": 14
+        },
+        {
+          "key": "nitrogen_deficiency",
+          "name": "Nitrogen Deficiency",
+          "precision": 0.5555555555555556,
+          "recall": 0.7142857142857143,
+          "f1": 0.625,
+          "support": 7
+        },
+        {
+          "key": "potassium_deficiency",
+          "name": "Potassium Deficiency",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        {
+          "key": "spotted_wilt_virus",
+          "name": "Spotted Wilt Virus",
+          "precision": 0.8311688311688312,
+          "recall": 0.8205128205128205,
+          "f1": 0.8258064516129032,
+          "support": 78
+        }
+      ],
+      "confusion": [
+        [
+          1,
+          0,
+          1,
+          1,
+          0,
+          0,
+          0,
+          5
+        ],
+        [
+          1,
+          21,
+          0,
+          5,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          10,
+          0,
+          0,
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          4,
+          1,
+          128,
+          2,
+          1,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          11,
+          2,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          1,
+          5,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          6,
+          2,
+          4,
+          2,
+          0,
+          0,
+          0,
+          64
+        ]
+      ],
+      "selective": {
+        "threshold": 0.67,
+        "coverage": 0.8758620689655172,
+        "accuracy_kept": 0.8818897637795275,
+        "test": {
+          "coverage": 0.8758620689655172,
+          "accuracy_kept": 0.8818897637795275
+        }
+      },
+      "calibration": {
+        "temperature": 0.9056213922151877,
+        "ece_after": 0.06541281950681088,
+        "reliability_after": [
+          {
+            "lo": 0.1,
+            "hi": 0.2,
+            "count": 3,
+            "confidence": 0.1521044913611164,
+            "accuracy": 0.0
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.30000000000000004,
+            "count": 4,
+            "confidence": 0.25222253914307297,
+            "accuracy": 0.5
+          },
+          {
+            "lo": 0.30000000000000004,
+            "hi": 0.4,
+            "count": 7,
+            "confidence": 0.3632999755317905,
+            "accuracy": 0.5714285714285714
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 8,
+            "confidence": 0.44789271930699426,
+            "accuracy": 0.25
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6000000000000001,
+            "count": 4,
+            "confidence": 0.5563304949409464,
+            "accuracy": 0.75
+          },
+          {
+            "lo": 0.6000000000000001,
+            "hi": 0.7000000000000001,
+            "count": 16,
+            "confidence": 0.6633334483468822,
+            "accuracy": 0.5
+          },
+          {
+            "lo": 0.7000000000000001,
+            "hi": 0.8,
+            "count": 34,
+            "confidence": 0.7516197665711815,
+            "accuracy": 0.6764705882352942
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 45,
+            "confidence": 0.854201636134033,
+            "accuracy": 0.7777777777777778
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 169,
+            "confidence": 0.9500122520355665,
+            "accuracy": 0.9644970414201184
+          }
+        ],
+        "fitted_on": "out-of-fold predictions"
+      },
+      "latency_ms": 385.0234999990789,
+      "flagged_unusual": 0.04827586206896552,
+      "out_of_scope": null
     }
   ],
   "comparisons": [
@@ -5794,6 +6537,126 @@
         0.18310590184706851
       ],
       "share_a_not_better_f1": 0.0
+    },
+    {
+      "task": "5class",
+      "a": "calibrated_5class",
+      "b": "upgrade_5class",
+      "a_name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
+      "b_name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+      "headline": false,
+      "variant": true,
+      "f1_diff": -0.013021640118688338,
+      "f1_ci": [
+        -0.05929561057804419,
+        0.010460753091681537
+      ],
+      "accuracy_diff": 0.0,
+      "accuracy_ci": [
+        -0.011406844106463865,
+        0.011152416356877252
+      ],
+      "share_a_not_better_f1": 0.668
+    },
+    {
+      "task": "5class",
+      "a": "calibrated_5class",
+      "b": "ensemble_5class",
+      "a_name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
+      "b_name": "Ensemble ConvNeXt-T + EfficientNet-B0 (original 5-class default)",
+      "headline": false,
+      "variant": true,
+      "f1_diff": -0.0046406661396140025,
+      "f1_ci": [
+        -0.054791517465844534,
+        0.031954580055724394
+      ],
+      "accuracy_diff": 0.01132075471698113,
+      "accuracy_ci": [
+        -0.018867924528301883,
+        0.04104477611940294
+      ],
+      "share_a_not_better_f1": 0.546
+    },
+    {
+      "task": "5class",
+      "a": "balanced_5class",
+      "b": "upgrade_5class",
+      "a_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+      "b_name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+      "headline": false,
+      "variant": true,
+      "f1_diff": -0.018096153087461486,
+      "f1_ci": [
+        -0.06366788729424194,
+        0.023073442311704037
+      ],
+      "accuracy_diff": -0.015094339622641506,
+      "accuracy_ci": [
+        -0.04014966177374937,
+        0.0076635720601237346
+      ],
+      "share_a_not_better_f1": 0.8055
+    },
+    {
+      "task": "5class",
+      "a": "balanced_5class",
+      "b": "ensemble_5class",
+      "a_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+      "b_name": "Ensemble ConvNeXt-T + EfficientNet-B0 (original 5-class default)",
+      "headline": false,
+      "variant": true,
+      "f1_diff": -0.00971517910838715,
+      "f1_ci": [
+        -0.05448783405396698,
+        0.03515780724457586
+      ],
+      "accuracy_diff": -0.0037735849056603765,
+      "accuracy_ci": [
+        -0.03531537916371377,
+        0.026517671966816418
+      ],
+      "share_a_not_better_f1": 0.6695
+    },
+    {
+      "task": "8class",
+      "a": "balanced_8class",
+      "b": "upgrade_8class",
+      "a_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+      "b_name": "ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+      "headline": false,
+      "variant": true,
+      "f1_diff": 0.025215295541038074,
+      "f1_ci": [
+        -0.007624538547135818,
+        0.06367894598758617
+      ],
+      "accuracy_diff": 0.0034482758620689724,
+      "accuracy_ci": [
+        -0.014035087719298182,
+        0.021126760563380254
+      ],
+      "share_a_not_better_f1": 0.098
+    },
+    {
+      "task": "8class",
+      "a": "balanced_8class",
+      "b": "convnext_tiny_v2_tta",
+      "a_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+      "b_name": "ConvNeXt-Tiny + TTA (original 8-class default)",
+      "headline": false,
+      "variant": true,
+      "f1_diff": -0.0017512218854736084,
+      "f1_ci": [
+        -0.04768382988881133,
+        0.045392937911796605
+      ],
+      "accuracy_diff": -0.020689655172413834,
+      "accuracy_ci": [
+        -0.04947435029947625,
+        0.007042253521126751
+      ],
+      "share_a_not_better_f1": 0.567
     }
   ],
   "cv": {
@@ -7317,7 +8180,7 @@
         "series": [
           {
             "key": "upgrade_5class",
-            "label": "Upgrade default",
+            "label": "Version-2 networks",
             "color": "#15834e"
           },
           {
@@ -7383,7 +8246,7 @@
         "series": [
           {
             "key": "upgrade_8class",
-            "label": "Upgrade default",
+            "label": "Version-2 networks",
             "color": "#15834e"
           },
           {
@@ -7427,745 +8290,625 @@
   },
   "selective": {
     "5class": {
-      "model": "upgrade_5class",
+      "model": "balanced_5class",
       "curve": [
         {
           "threshold": 0.4,
-          "coverage": 0.9962264150943396,
-          "accuracy_kept": 0.9242424242424242,
-          "accuracy_rejected": 0.0
+          "coverage": 0.9547169811320755,
+          "accuracy_kept": 0.932806324110672
         },
         {
-          "threshold": 0.41000000000000003,
-          "coverage": 0.9962264150943396,
-          "accuracy_kept": 0.9242424242424242,
-          "accuracy_rejected": 0.0
+          "threshold": 0.41,
+          "coverage": 0.9547169811320755,
+          "accuracy_kept": 0.932806324110672
         },
         {
-          "threshold": 0.42000000000000004,
-          "coverage": 0.9962264150943396,
-          "accuracy_kept": 0.9242424242424242,
-          "accuracy_rejected": 0.0
+          "threshold": 0.42,
+          "coverage": 0.9547169811320755,
+          "accuracy_kept": 0.932806324110672
         },
         {
-          "threshold": 0.43000000000000005,
-          "coverage": 0.9962264150943396,
-          "accuracy_kept": 0.9242424242424242,
-          "accuracy_rejected": 0.0
+          "threshold": 0.43,
+          "coverage": 0.9547169811320755,
+          "accuracy_kept": 0.932806324110672
         },
         {
-          "threshold": 0.44000000000000006,
-          "coverage": 0.9962264150943396,
-          "accuracy_kept": 0.9242424242424242,
-          "accuracy_rejected": 0.0
-        },
-        {
-          "threshold": 0.45000000000000007,
-          "coverage": 0.9962264150943396,
-          "accuracy_kept": 0.9242424242424242,
-          "accuracy_rejected": 0.0
-        },
-        {
-          "threshold": 0.4600000000000001,
-          "coverage": 0.9924528301886792,
-          "accuracy_kept": 0.9239543726235742,
-          "accuracy_rejected": 0.5
-        },
-        {
-          "threshold": 0.4700000000000001,
-          "coverage": 0.9886792452830189,
-          "accuracy_kept": 0.9274809160305344,
-          "accuracy_rejected": 0.3333333333333333
-        },
-        {
-          "threshold": 0.4800000000000001,
-          "coverage": 0.9886792452830189,
-          "accuracy_kept": 0.9274809160305344,
-          "accuracy_rejected": 0.3333333333333333
-        },
-        {
-          "threshold": 0.4900000000000001,
-          "coverage": 0.9886792452830189,
-          "accuracy_kept": 0.9274809160305344,
-          "accuracy_rejected": 0.3333333333333333
-        },
-        {
-          "threshold": 0.5000000000000001,
-          "coverage": 0.9886792452830189,
-          "accuracy_kept": 0.9274809160305344,
-          "accuracy_rejected": 0.3333333333333333
-        },
-        {
-          "threshold": 0.5100000000000001,
-          "coverage": 0.9886792452830189,
-          "accuracy_kept": 0.9274809160305344,
-          "accuracy_rejected": 0.3333333333333333
-        },
-        {
-          "threshold": 0.5200000000000001,
-          "coverage": 0.9849056603773585,
-          "accuracy_kept": 0.9310344827586207,
-          "accuracy_rejected": 0.25
-        },
-        {
-          "threshold": 0.5300000000000001,
-          "coverage": 0.9849056603773585,
-          "accuracy_kept": 0.9310344827586207,
-          "accuracy_rejected": 0.25
-        },
-        {
-          "threshold": 0.5400000000000001,
-          "coverage": 0.9849056603773585,
-          "accuracy_kept": 0.9310344827586207,
-          "accuracy_rejected": 0.25
-        },
-        {
-          "threshold": 0.5500000000000002,
-          "coverage": 0.9849056603773585,
-          "accuracy_kept": 0.9310344827586207,
-          "accuracy_rejected": 0.25
-        },
-        {
-          "threshold": 0.5600000000000002,
-          "coverage": 0.9849056603773585,
-          "accuracy_kept": 0.9310344827586207,
-          "accuracy_rejected": 0.25
-        },
-        {
-          "threshold": 0.5700000000000002,
-          "coverage": 0.9849056603773585,
-          "accuracy_kept": 0.9310344827586207,
-          "accuracy_rejected": 0.25
-        },
-        {
-          "threshold": 0.5800000000000002,
-          "coverage": 0.9811320754716981,
-          "accuracy_kept": 0.9307692307692308,
-          "accuracy_rejected": 0.4
-        },
-        {
-          "threshold": 0.5900000000000002,
-          "coverage": 0.9773584905660377,
-          "accuracy_kept": 0.9305019305019305,
-          "accuracy_rejected": 0.5
-        },
-        {
-          "threshold": 0.6000000000000002,
-          "coverage": 0.9773584905660377,
-          "accuracy_kept": 0.9305019305019305,
-          "accuracy_rejected": 0.5
-        },
-        {
-          "threshold": 0.6100000000000002,
-          "coverage": 0.9735849056603774,
-          "accuracy_kept": 0.9341085271317829,
-          "accuracy_rejected": 0.42857142857142855
-        },
-        {
-          "threshold": 0.6200000000000002,
-          "coverage": 0.9735849056603774,
-          "accuracy_kept": 0.9341085271317829,
-          "accuracy_rejected": 0.42857142857142855
-        },
-        {
-          "threshold": 0.6300000000000002,
-          "coverage": 0.969811320754717,
-          "accuracy_kept": 0.9377431906614786,
-          "accuracy_rejected": 0.375
-        },
-        {
-          "threshold": 0.6400000000000002,
-          "coverage": 0.9622641509433962,
-          "accuracy_kept": 0.9372549019607843,
-          "accuracy_rejected": 0.5
-        },
-        {
-          "threshold": 0.6500000000000002,
+          "threshold": 0.44,
           "coverage": 0.9509433962264151,
-          "accuracy_kept": 0.9365079365079365,
-          "accuracy_rejected": 0.6153846153846154
+          "accuracy_kept": 0.9365079365079365
         },
         {
-          "threshold": 0.6600000000000003,
+          "threshold": 0.45,
+          "coverage": 0.9509433962264151,
+          "accuracy_kept": 0.9365079365079365
+        },
+        {
+          "threshold": 0.46,
+          "coverage": 0.9509433962264151,
+          "accuracy_kept": 0.9365079365079365
+        },
+        {
+          "threshold": 0.47,
+          "coverage": 0.9509433962264151,
+          "accuracy_kept": 0.9365079365079365
+        },
+        {
+          "threshold": 0.48,
+          "coverage": 0.9509433962264151,
+          "accuracy_kept": 0.9365079365079365
+        },
+        {
+          "threshold": 0.49,
+          "coverage": 0.9509433962264151,
+          "accuracy_kept": 0.9365079365079365
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.9509433962264151,
+          "accuracy_kept": 0.9365079365079365
+        },
+        {
+          "threshold": 0.51,
+          "coverage": 0.9509433962264151,
+          "accuracy_kept": 0.9365079365079365
+        },
+        {
+          "threshold": 0.52,
           "coverage": 0.9471698113207547,
-          "accuracy_kept": 0.9402390438247012,
-          "accuracy_rejected": 0.5714285714285714
+          "accuracy_kept": 0.9402390438247012
         },
         {
-          "threshold": 0.6700000000000003,
+          "threshold": 0.53,
           "coverage": 0.9471698113207547,
-          "accuracy_kept": 0.9402390438247012,
-          "accuracy_rejected": 0.5714285714285714
+          "accuracy_kept": 0.9402390438247012
         },
         {
-          "threshold": 0.6800000000000003,
+          "threshold": 0.54,
           "coverage": 0.9471698113207547,
-          "accuracy_kept": 0.9402390438247012,
-          "accuracy_rejected": 0.5714285714285714
+          "accuracy_kept": 0.9402390438247012
         },
         {
-          "threshold": 0.6900000000000003,
+          "threshold": 0.55,
+          "coverage": 0.9433962264150944,
+          "accuracy_kept": 0.94
+        },
+        {
+          "threshold": 0.56,
           "coverage": 0.939622641509434,
-          "accuracy_kept": 0.9437751004016064,
-          "accuracy_rejected": 0.5625
+          "accuracy_kept": 0.9397590361445783
         },
         {
-          "threshold": 0.7000000000000003,
+          "threshold": 0.57,
           "coverage": 0.939622641509434,
-          "accuracy_kept": 0.9437751004016064,
-          "accuracy_rejected": 0.5625
+          "accuracy_kept": 0.9397590361445783
         },
         {
-          "threshold": 0.7100000000000003,
+          "threshold": 0.58,
+          "coverage": 0.939622641509434,
+          "accuracy_kept": 0.9397590361445783
+        },
+        {
+          "threshold": 0.59,
+          "coverage": 0.939622641509434,
+          "accuracy_kept": 0.9397590361445783
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 0.9320754716981132,
+          "accuracy_kept": 0.9392712550607287
+        },
+        {
+          "threshold": 0.61,
+          "coverage": 0.9283018867924528,
+          "accuracy_kept": 0.9390243902439024
+        },
+        {
+          "threshold": 0.62,
           "coverage": 0.9245283018867925,
-          "accuracy_kept": 0.9428571428571428,
-          "accuracy_rejected": 0.65
+          "accuracy_kept": 0.9387755102040817
         },
         {
-          "threshold": 0.7200000000000003,
+          "threshold": 0.63,
+          "coverage": 0.9207547169811321,
+          "accuracy_kept": 0.9385245901639344
+        },
+        {
+          "threshold": 0.64,
+          "coverage": 0.9169811320754717,
+          "accuracy_kept": 0.9382716049382716
+        },
+        {
+          "threshold": 0.65,
           "coverage": 0.9132075471698113,
-          "accuracy_kept": 0.9504132231404959,
-          "accuracy_rejected": 0.6086956521739131
+          "accuracy_kept": 0.9380165289256198
         },
         {
-          "threshold": 0.7300000000000003,
+          "threshold": 0.66,
           "coverage": 0.9056603773584906,
-          "accuracy_kept": 0.95,
-          "accuracy_rejected": 0.64
+          "accuracy_kept": 0.9375
         },
         {
-          "threshold": 0.7400000000000003,
+          "threshold": 0.67,
           "coverage": 0.9056603773584906,
-          "accuracy_kept": 0.95,
-          "accuracy_rejected": 0.64
+          "accuracy_kept": 0.9375
         },
         {
-          "threshold": 0.7500000000000003,
+          "threshold": 0.68,
           "coverage": 0.9018867924528302,
-          "accuracy_kept": 0.9497907949790795,
-          "accuracy_rejected": 0.6538461538461539
+          "accuracy_kept": 0.9414225941422594
         },
         {
-          "threshold": 0.7600000000000003,
-          "coverage": 0.8905660377358491,
-          "accuracy_kept": 0.9533898305084746,
-          "accuracy_rejected": 0.6551724137931034
+          "threshold": 0.69,
+          "coverage": 0.8981132075471698,
+          "accuracy_kept": 0.9453781512605042
         },
         {
-          "threshold": 0.7700000000000004,
+          "threshold": 0.7,
+          "coverage": 0.8867924528301887,
+          "accuracy_kept": 0.948936170212766
+        },
+        {
+          "threshold": 0.71,
+          "coverage": 0.8867924528301887,
+          "accuracy_kept": 0.948936170212766
+        },
+        {
+          "threshold": 0.72,
+          "coverage": 0.8867924528301887,
+          "accuracy_kept": 0.948936170212766
+        },
+        {
+          "threshold": 0.73,
+          "coverage": 0.8867924528301887,
+          "accuracy_kept": 0.948936170212766
+        },
+        {
+          "threshold": 0.74,
           "coverage": 0.8830188679245283,
-          "accuracy_kept": 0.9572649572649573,
-          "accuracy_rejected": 0.6451612903225806
+          "accuracy_kept": 0.9529914529914529
         },
         {
-          "threshold": 0.7800000000000004,
-          "coverage": 0.8830188679245283,
-          "accuracy_kept": 0.9572649572649573,
-          "accuracy_rejected": 0.6451612903225806
+          "threshold": 0.75,
+          "coverage": 0.879245283018868,
+          "accuracy_kept": 0.9570815450643777
         },
         {
-          "threshold": 0.7900000000000004,
-          "coverage": 0.8754716981132076,
-          "accuracy_kept": 0.9612068965517241,
-          "accuracy_rejected": 0.6363636363636364
+          "threshold": 0.76,
+          "coverage": 0.8716981132075472,
+          "accuracy_kept": 0.961038961038961
         },
         {
-          "threshold": 0.8000000000000004,
+          "threshold": 0.77,
           "coverage": 0.8679245283018868,
-          "accuracy_kept": 0.9652173913043478,
-          "accuracy_rejected": 0.6285714285714286
+          "accuracy_kept": 0.9652173913043478
         },
         {
-          "threshold": 0.8100000000000004,
+          "threshold": 0.78,
+          "coverage": 0.8641509433962264,
+          "accuracy_kept": 0.9650655021834061
+        },
+        {
+          "threshold": 0.79,
           "coverage": 0.8603773584905661,
-          "accuracy_kept": 0.9649122807017544,
-          "accuracy_rejected": 0.6486486486486487
+          "accuracy_kept": 0.9649122807017544
         },
         {
-          "threshold": 0.8200000000000004,
+          "threshold": 0.8,
           "coverage": 0.8566037735849057,
-          "accuracy_kept": 0.9647577092511013,
-          "accuracy_rejected": 0.6578947368421053
+          "accuracy_kept": 0.9647577092511013
         },
         {
-          "threshold": 0.8300000000000004,
+          "threshold": 0.81,
+          "coverage": 0.8490566037735849,
+          "accuracy_kept": 0.9688888888888889
+        },
+        {
+          "threshold": 0.82,
           "coverage": 0.8452830188679246,
-          "accuracy_kept": 0.96875,
-          "accuracy_rejected": 0.6585365853658537
+          "accuracy_kept": 0.9732142857142857
         },
         {
-          "threshold": 0.8400000000000004,
-          "coverage": 0.8452830188679246,
-          "accuracy_kept": 0.96875,
-          "accuracy_rejected": 0.6585365853658537
+          "threshold": 0.83,
+          "coverage": 0.8415094339622642,
+          "accuracy_kept": 0.9730941704035875
         },
         {
-          "threshold": 0.8500000000000004,
-          "coverage": 0.8339622641509434,
-          "accuracy_kept": 0.9728506787330317,
-          "accuracy_rejected": 0.6590909090909091
+          "threshold": 0.84,
+          "coverage": 0.8415094339622642,
+          "accuracy_kept": 0.9730941704035875
         },
         {
-          "threshold": 0.8600000000000004,
+          "threshold": 0.85,
+          "coverage": 0.8301886792452831,
+          "accuracy_kept": 0.9727272727272728
+        },
+        {
+          "threshold": 0.86,
           "coverage": 0.8264150943396227,
-          "accuracy_kept": 0.9726027397260274,
-          "accuracy_rejected": 0.6739130434782609
+          "accuracy_kept": 0.9726027397260274
         },
         {
-          "threshold": 0.8700000000000004,
-          "coverage": 0.8226415094339623,
-          "accuracy_kept": 0.9770642201834863,
-          "accuracy_rejected": 0.6595744680851063
+          "threshold": 0.87,
+          "coverage": 0.8188679245283019,
+          "accuracy_kept": 0.9723502304147466
         },
         {
-          "threshold": 0.8800000000000004,
-          "coverage": 0.8226415094339623,
-          "accuracy_kept": 0.9770642201834863,
-          "accuracy_rejected": 0.6595744680851063
-        },
-        {
-          "threshold": 0.8900000000000005,
-          "coverage": 0.8150943396226416,
-          "accuracy_kept": 0.9768518518518519,
-          "accuracy_rejected": 0.673469387755102
-        },
-        {
-          "threshold": 0.9000000000000005,
+          "threshold": 0.88,
           "coverage": 0.8075471698113208,
-          "accuracy_kept": 0.9813084112149533,
-          "accuracy_rejected": 0.6666666666666666
+          "accuracy_kept": 0.9766355140186916
         },
         {
-          "threshold": 0.9100000000000005,
-          "coverage": 0.8075471698113208,
-          "accuracy_kept": 0.9813084112149533,
-          "accuracy_rejected": 0.6666666666666666
+          "threshold": 0.89,
+          "coverage": 0.7849056603773585,
+          "accuracy_kept": 0.9855769230769231
         },
         {
-          "threshold": 0.9200000000000005,
-          "coverage": 0.7962264150943397,
-          "accuracy_kept": 0.981042654028436,
-          "accuracy_rejected": 0.6851851851851852
-        },
-        {
-          "threshold": 0.9300000000000005,
+          "threshold": 0.9,
           "coverage": 0.7773584905660378,
-          "accuracy_kept": 0.9902912621359223,
-          "accuracy_rejected": 0.6779661016949152
+          "accuracy_kept": 0.9902912621359223
         },
         {
-          "threshold": 0.9400000000000005,
+          "threshold": 0.91,
+          "coverage": 0.7622641509433963,
+          "accuracy_kept": 0.9900990099009901
+        },
+        {
+          "threshold": 0.92,
           "coverage": 0.7018867924528301,
-          "accuracy_kept": 0.9946236559139785,
-          "accuracy_rejected": 0.7468354430379747
+          "accuracy_kept": 0.989247311827957
         },
         {
-          "threshold": 0.9500000000000005,
-          "coverage": 0.47924528301886793,
-          "accuracy_kept": 0.9921259842519685,
-          "accuracy_rejected": 0.855072463768116
+          "threshold": 0.93,
+          "coverage": 0.6188679245283019,
+          "accuracy_kept": 0.9939024390243902
         },
         {
-          "threshold": 0.9600000000000005,
-          "coverage": 0.018867924528301886,
-          "accuracy_kept": 1.0,
-          "accuracy_rejected": 0.9192307692307692
+          "threshold": 0.94,
+          "coverage": 0.45660377358490567,
+          "accuracy_kept": 0.9917355371900827
         },
         {
-          "threshold": 0.9700000000000005,
+          "threshold": 0.95,
+          "coverage": 0.43018867924528303,
+          "accuracy_kept": 1.0
+        },
+        {
+          "threshold": 0.96,
+          "coverage": 0.4,
+          "accuracy_kept": 1.0
+        },
+        {
+          "threshold": 0.97,
+          "coverage": 0.11320754716981132,
+          "accuracy_kept": 1.0
+        },
+        {
+          "threshold": 0.98,
           "coverage": 0.0,
-          "accuracy_kept": null,
-          "accuracy_rejected": 0.9207547169811321
+          "accuracy_kept": null
         },
         {
-          "threshold": 0.9800000000000005,
+          "threshold": 0.99,
           "coverage": 0.0,
-          "accuracy_kept": null,
-          "accuracy_rejected": 0.9207547169811321
-        },
-        {
-          "threshold": 0.9900000000000005,
-          "coverage": 0.0,
-          "accuracy_kept": null,
-          "accuracy_rejected": 0.9207547169811321
+          "accuracy_kept": null
         }
       ],
       "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 95% (coverage >= 50%)",
       "chosen": {
-        "threshold": 0.9,
-        "coverage": 0.8075471698113208,
-        "accuracy_kept": 0.9813084112149533
+        "threshold": 0.89,
+        "coverage": 0.7811320754716982,
+        "accuracy_kept": 0.9855072463768116
       }
     },
     "8class": {
-      "model": "upgrade_8class",
+      "model": "balanced_8class",
       "curve": [
         {
           "threshold": 0.4,
-          "coverage": 0.9758620689655172,
-          "accuracy_kept": 0.833922261484099,
-          "accuracy_rejected": 0.42857142857142855
-        },
-        {
-          "threshold": 0.41000000000000003,
-          "coverage": 0.9758620689655172,
-          "accuracy_kept": 0.833922261484099,
-          "accuracy_rejected": 0.42857142857142855
-        },
-        {
-          "threshold": 0.42000000000000004,
-          "coverage": 0.9724137931034482,
-          "accuracy_kept": 0.8368794326241135,
-          "accuracy_rejected": 0.375
-        },
-        {
-          "threshold": 0.43000000000000005,
-          "coverage": 0.9689655172413794,
-          "accuracy_kept": 0.8398576512455516,
-          "accuracy_rejected": 0.3333333333333333
-        },
-        {
-          "threshold": 0.44000000000000006,
-          "coverage": 0.9620689655172414,
-          "accuracy_kept": 0.8458781362007168,
-          "accuracy_rejected": 0.2727272727272727
-        },
-        {
-          "threshold": 0.45000000000000007,
-          "coverage": 0.9620689655172414,
-          "accuracy_kept": 0.8458781362007168,
-          "accuracy_rejected": 0.2727272727272727
-        },
-        {
-          "threshold": 0.4600000000000001,
-          "coverage": 0.9586206896551724,
-          "accuracy_kept": 0.8489208633093526,
-          "accuracy_rejected": 0.25
-        },
-        {
-          "threshold": 0.4700000000000001,
-          "coverage": 0.9551724137931035,
-          "accuracy_kept": 0.8483754512635379,
-          "accuracy_rejected": 0.3076923076923077
-        },
-        {
-          "threshold": 0.4800000000000001,
           "coverage": 0.9517241379310345,
-          "accuracy_kept": 0.8514492753623188,
-          "accuracy_rejected": 0.2857142857142857
+          "accuracy_kept": 0.8478260869565217
         },
         {
-          "threshold": 0.4900000000000001,
+          "threshold": 0.41,
           "coverage": 0.9448275862068966,
-          "accuracy_kept": 0.8540145985401459,
-          "accuracy_rejected": 0.3125
+          "accuracy_kept": 0.8540145985401459
         },
         {
-          "threshold": 0.5000000000000001,
+          "threshold": 0.42,
+          "coverage": 0.9448275862068966,
+          "accuracy_kept": 0.8540145985401459
+        },
+        {
+          "threshold": 0.43,
           "coverage": 0.9413793103448276,
-          "accuracy_kept": 0.8571428571428571,
-          "accuracy_rejected": 0.29411764705882354
+          "accuracy_kept": 0.8534798534798534
         },
         {
-          "threshold": 0.5100000000000001,
+          "threshold": 0.44,
           "coverage": 0.9413793103448276,
-          "accuracy_kept": 0.8571428571428571,
-          "accuracy_rejected": 0.29411764705882354
+          "accuracy_kept": 0.8534798534798534
         },
         {
-          "threshold": 0.5200000000000001,
-          "coverage": 0.9344827586206896,
-          "accuracy_kept": 0.8634686346863468,
-          "accuracy_rejected": 0.2631578947368421
+          "threshold": 0.45,
+          "coverage": 0.9379310344827586,
+          "accuracy_kept": 0.8566176470588235
         },
         {
-          "threshold": 0.5300000000000001,
-          "coverage": 0.9344827586206896,
-          "accuracy_kept": 0.8634686346863468,
-          "accuracy_rejected": 0.2631578947368421
+          "threshold": 0.46,
+          "coverage": 0.9379310344827586,
+          "accuracy_kept": 0.8566176470588235
         },
         {
-          "threshold": 0.5400000000000001,
-          "coverage": 0.9275862068965517,
-          "accuracy_kept": 0.8698884758364313,
-          "accuracy_rejected": 0.23809523809523808
+          "threshold": 0.47,
+          "coverage": 0.9379310344827586,
+          "accuracy_kept": 0.8566176470588235
         },
         {
-          "threshold": 0.5500000000000002,
+          "threshold": 0.48,
           "coverage": 0.9241379310344827,
-          "accuracy_kept": 0.8694029850746269,
-          "accuracy_rejected": 0.2727272727272727
+          "accuracy_kept": 0.8656716417910447
         },
         {
-          "threshold": 0.5600000000000002,
+          "threshold": 0.49,
           "coverage": 0.9241379310344827,
-          "accuracy_kept": 0.8694029850746269,
-          "accuracy_rejected": 0.2727272727272727
+          "accuracy_kept": 0.8656716417910447
         },
         {
-          "threshold": 0.5700000000000002,
+          "threshold": 0.5,
+          "coverage": 0.9241379310344827,
+          "accuracy_kept": 0.8656716417910447
+        },
+        {
+          "threshold": 0.51,
+          "coverage": 0.9206896551724137,
+          "accuracy_kept": 0.8651685393258427
+        },
+        {
+          "threshold": 0.52,
+          "coverage": 0.9206896551724137,
+          "accuracy_kept": 0.8651685393258427
+        },
+        {
+          "threshold": 0.53,
+          "coverage": 0.9206896551724137,
+          "accuracy_kept": 0.8651685393258427
+        },
+        {
+          "threshold": 0.54,
+          "coverage": 0.9206896551724137,
+          "accuracy_kept": 0.8651685393258427
+        },
+        {
+          "threshold": 0.55,
           "coverage": 0.9172413793103448,
-          "accuracy_kept": 0.8721804511278195,
-          "accuracy_rejected": 0.2916666666666667
+          "accuracy_kept": 0.8646616541353384
         },
         {
-          "threshold": 0.5800000000000002,
+          "threshold": 0.56,
           "coverage": 0.9172413793103448,
-          "accuracy_kept": 0.8721804511278195,
-          "accuracy_rejected": 0.2916666666666667
+          "accuracy_kept": 0.8646616541353384
         },
         {
-          "threshold": 0.5900000000000002,
+          "threshold": 0.57,
+          "coverage": 0.9172413793103448,
+          "accuracy_kept": 0.8646616541353384
+        },
+        {
+          "threshold": 0.58,
+          "coverage": 0.9137931034482759,
+          "accuracy_kept": 0.8641509433962264
+        },
+        {
+          "threshold": 0.59,
+          "coverage": 0.9137931034482759,
+          "accuracy_kept": 0.8641509433962264
+        },
+        {
+          "threshold": 0.6,
           "coverage": 0.9103448275862069,
-          "accuracy_kept": 0.8712121212121212,
-          "accuracy_rejected": 0.34615384615384615
+          "accuracy_kept": 0.8674242424242424
         },
         {
-          "threshold": 0.6000000000000002,
-          "coverage": 0.903448275862069,
-          "accuracy_kept": 0.8702290076335878,
-          "accuracy_rejected": 0.39285714285714285
+          "threshold": 0.61,
+          "coverage": 0.906896551724138,
+          "accuracy_kept": 0.870722433460076
         },
         {
-          "threshold": 0.6100000000000002,
+          "threshold": 0.62,
+          "coverage": 0.906896551724138,
+          "accuracy_kept": 0.870722433460076
+        },
+        {
+          "threshold": 0.63,
           "coverage": 0.9,
-          "accuracy_kept": 0.8697318007662835,
-          "accuracy_rejected": 0.41379310344827586
+          "accuracy_kept": 0.8735632183908046
         },
         {
-          "threshold": 0.6200000000000002,
+          "threshold": 0.64,
           "coverage": 0.896551724137931,
-          "accuracy_kept": 0.8692307692307693,
-          "accuracy_rejected": 0.43333333333333335
+          "accuracy_kept": 0.8769230769230769
         },
         {
-          "threshold": 0.6300000000000002,
-          "coverage": 0.8931034482758621,
-          "accuracy_kept": 0.8687258687258688,
-          "accuracy_rejected": 0.45161290322580644
+          "threshold": 0.65,
+          "coverage": 0.896551724137931,
+          "accuracy_kept": 0.8769230769230769
         },
         {
-          "threshold": 0.6400000000000002,
+          "threshold": 0.66,
           "coverage": 0.8896551724137931,
-          "accuracy_kept": 0.8682170542635659,
-          "accuracy_rejected": 0.46875
+          "accuracy_kept": 0.875968992248062
         },
         {
-          "threshold": 0.6500000000000002,
+          "threshold": 0.67,
           "coverage": 0.8827586206896552,
-          "accuracy_kept": 0.87109375,
-          "accuracy_rejected": 0.47058823529411764
+          "accuracy_kept": 0.87890625
         },
         {
-          "threshold": 0.6600000000000003,
-          "coverage": 0.8793103448275862,
-          "accuracy_kept": 0.8745098039215686,
-          "accuracy_rejected": 0.45714285714285713
-        },
-        {
-          "threshold": 0.6700000000000003,
+          "threshold": 0.68,
           "coverage": 0.8758620689655172,
-          "accuracy_kept": 0.8779527559055118,
-          "accuracy_rejected": 0.4444444444444444
+          "accuracy_kept": 0.8818897637795275
         },
         {
-          "threshold": 0.6800000000000003,
-          "coverage": 0.8758620689655172,
-          "accuracy_kept": 0.8779527559055118,
-          "accuracy_rejected": 0.4444444444444444
+          "threshold": 0.69,
+          "coverage": 0.8620689655172413,
+          "accuracy_kept": 0.884
         },
         {
-          "threshold": 0.6900000000000003,
-          "coverage": 0.8689655172413793,
-          "accuracy_kept": 0.8849206349206349,
-          "accuracy_rejected": 0.42105263157894735
-        },
-        {
-          "threshold": 0.7000000000000003,
+          "threshold": 0.7,
           "coverage": 0.8551724137931035,
-          "accuracy_kept": 0.8870967741935484,
-          "accuracy_rejected": 0.4523809523809524
+          "accuracy_kept": 0.8911290322580645
         },
         {
-          "threshold": 0.7100000000000003,
-          "coverage": 0.8482758620689655,
-          "accuracy_kept": 0.8943089430894309,
-          "accuracy_rejected": 0.4318181818181818
+          "threshold": 0.71,
+          "coverage": 0.8413793103448276,
+          "accuracy_kept": 0.8934426229508197
         },
         {
-          "threshold": 0.7200000000000003,
-          "coverage": 0.8448275862068966,
-          "accuracy_kept": 0.8938775510204081,
-          "accuracy_rejected": 0.4444444444444444
+          "threshold": 0.72,
+          "coverage": 0.8344827586206897,
+          "accuracy_kept": 0.8925619834710744
         },
         {
-          "threshold": 0.7300000000000003,
+          "threshold": 0.73,
           "coverage": 0.8310344827586207,
-          "accuracy_kept": 0.8962655601659751,
-          "accuracy_rejected": 0.46938775510204084
+          "accuracy_kept": 0.8962655601659751
         },
         {
-          "threshold": 0.7400000000000003,
-          "coverage": 0.8103448275862069,
-          "accuracy_kept": 0.902127659574468,
-          "accuracy_rejected": 0.4909090909090909
+          "threshold": 0.74,
+          "coverage": 0.8172413793103448,
+          "accuracy_kept": 0.8945147679324894
         },
         {
-          "threshold": 0.7500000000000003,
-          "coverage": 0.803448275862069,
-          "accuracy_kept": 0.9055793991416309,
-          "accuracy_rejected": 0.49122807017543857
+          "threshold": 0.75,
+          "coverage": 0.7965517241379311,
+          "accuracy_kept": 0.8961038961038961
         },
         {
-          "threshold": 0.7600000000000003,
-          "coverage": 0.7931034482758621,
-          "accuracy_kept": 0.908695652173913,
-          "accuracy_rejected": 0.5
+          "threshold": 0.76,
+          "coverage": 0.7827586206896552,
+          "accuracy_kept": 0.8986784140969163
         },
         {
-          "threshold": 0.7700000000000004,
-          "coverage": 0.7758620689655172,
-          "accuracy_kept": 0.9244444444444444,
-          "accuracy_rejected": 0.47692307692307695
+          "threshold": 0.77,
+          "coverage": 0.7724137931034483,
+          "accuracy_kept": 0.9017857142857143
         },
         {
-          "threshold": 0.7800000000000004,
-          "coverage": 0.7689655172413793,
-          "accuracy_kept": 0.9327354260089686,
-          "accuracy_rejected": 0.4626865671641791
-        },
-        {
-          "threshold": 0.7900000000000004,
+          "threshold": 0.78,
           "coverage": 0.7620689655172413,
-          "accuracy_kept": 0.9366515837104072,
-          "accuracy_rejected": 0.463768115942029
+          "accuracy_kept": 0.9049773755656109
         },
         {
-          "threshold": 0.8000000000000004,
-          "coverage": 0.7482758620689656,
-          "accuracy_kept": 0.9354838709677419,
-          "accuracy_rejected": 0.4931506849315068
+          "threshold": 0.79,
+          "coverage": 0.7551724137931034,
+          "accuracy_kept": 0.91324200913242
         },
         {
-          "threshold": 0.8100000000000004,
-          "coverage": 0.7241379310344828,
-          "accuracy_kept": 0.9333333333333333,
-          "accuracy_rejected": 0.5375
+          "threshold": 0.8,
+          "coverage": 0.7379310344827587,
+          "accuracy_kept": 0.9252336448598131
         },
         {
-          "threshold": 0.8200000000000004,
-          "coverage": 0.7068965517241379,
-          "accuracy_kept": 0.9414634146341463,
-          "accuracy_rejected": 0.5411764705882353
+          "threshold": 0.81,
+          "coverage": 0.7275862068965517,
+          "accuracy_kept": 0.9289099526066351
         },
         {
-          "threshold": 0.8300000000000004,
-          "coverage": 0.6931034482758621,
-          "accuracy_kept": 0.9402985074626866,
-          "accuracy_rejected": 0.5617977528089888
+          "threshold": 0.82,
+          "coverage": 0.7034482758620689,
+          "accuracy_kept": 0.9362745098039216
         },
         {
-          "threshold": 0.8400000000000004,
-          "coverage": 0.6862068965517242,
-          "accuracy_kept": 0.9447236180904522,
-          "accuracy_rejected": 0.5604395604395604
+          "threshold": 0.83,
+          "coverage": 0.7,
+          "accuracy_kept": 0.9359605911330049
         },
         {
-          "threshold": 0.8500000000000004,
-          "coverage": 0.6586206896551724,
-          "accuracy_kept": 0.9528795811518325,
-          "accuracy_rejected": 0.5757575757575758
+          "threshold": 0.84,
+          "coverage": 0.6896551724137931,
+          "accuracy_kept": 0.945
         },
         {
-          "threshold": 0.8600000000000004,
+          "threshold": 0.85,
+          "coverage": 0.6724137931034483,
+          "accuracy_kept": 0.958974358974359
+        },
+        {
+          "threshold": 0.86,
           "coverage": 0.6448275862068965,
-          "accuracy_kept": 0.9518716577540107,
-          "accuracy_rejected": 0.5922330097087378
+          "accuracy_kept": 0.9625668449197861
         },
         {
-          "threshold": 0.8700000000000004,
+          "threshold": 0.87,
+          "coverage": 0.6344827586206897,
+          "accuracy_kept": 0.967391304347826
+        },
+        {
+          "threshold": 0.88,
           "coverage": 0.6275862068965518,
-          "accuracy_kept": 0.967032967032967,
-          "accuracy_rejected": 0.5833333333333334
+          "accuracy_kept": 0.967032967032967
         },
         {
-          "threshold": 0.8800000000000004,
-          "coverage": 0.6137931034482759,
-          "accuracy_kept": 0.9662921348314607,
-          "accuracy_rejected": 0.5982142857142857
+          "threshold": 0.89,
+          "coverage": 0.603448275862069,
+          "accuracy_kept": 0.9657142857142857
         },
         {
-          "threshold": 0.8900000000000005,
-          "coverage": 0.596551724137931,
-          "accuracy_kept": 0.9653179190751445,
-          "accuracy_rejected": 0.6153846153846154
+          "threshold": 0.9,
+          "coverage": 0.5827586206896552,
+          "accuracy_kept": 0.9644970414201184
         },
         {
-          "threshold": 0.9000000000000005,
-          "coverage": 0.5793103448275863,
-          "accuracy_kept": 0.9642857142857143,
-          "accuracy_rejected": 0.6311475409836066
+          "threshold": 0.91,
+          "coverage": 0.5482758620689655,
+          "accuracy_kept": 0.9748427672955975
         },
         {
-          "threshold": 0.9100000000000005,
-          "coverage": 0.5379310344827586,
-          "accuracy_kept": 0.9743589743589743,
-          "accuracy_rejected": 0.6492537313432836
+          "threshold": 0.92,
+          "coverage": 0.5137931034482759,
+          "accuracy_kept": 0.9798657718120806
         },
         {
-          "threshold": 0.9200000000000005,
-          "coverage": 0.503448275862069,
-          "accuracy_kept": 0.9794520547945206,
-          "accuracy_rejected": 0.6666666666666666
+          "threshold": 0.93,
+          "coverage": 0.46206896551724136,
+          "accuracy_kept": 0.9925373134328358
         },
         {
-          "threshold": 0.9300000000000005,
-          "coverage": 0.45517241379310347,
-          "accuracy_kept": 0.9848484848484849,
-          "accuracy_rejected": 0.689873417721519
+          "threshold": 0.94,
+          "coverage": 0.3931034482758621,
+          "accuracy_kept": 0.9912280701754386
         },
         {
-          "threshold": 0.9400000000000005,
-          "coverage": 0.3448275862068966,
-          "accuracy_kept": 1.0,
-          "accuracy_rejected": 0.7315789473684211
+          "threshold": 0.95,
+          "coverage": 0.35517241379310344,
+          "accuracy_kept": 1.0
         },
         {
-          "threshold": 0.9500000000000005,
-          "coverage": 0.1103448275862069,
-          "accuracy_kept": 1.0,
-          "accuracy_rejected": 0.8023255813953488
+          "threshold": 0.96,
+          "coverage": 0.3,
+          "accuracy_kept": 1.0
         },
         {
-          "threshold": 0.9600000000000005,
-          "coverage": 0.010344827586206896,
-          "accuracy_kept": 1.0,
-          "accuracy_rejected": 0.8222996515679443
+          "threshold": 0.97,
+          "coverage": 0.04827586206896552,
+          "accuracy_kept": 1.0
         },
         {
-          "threshold": 0.9700000000000005,
+          "threshold": 0.98,
           "coverage": 0.0,
-          "accuracy_kept": null,
-          "accuracy_rejected": 0.8241379310344827
+          "accuracy_kept": null
         },
         {
-          "threshold": 0.9800000000000005,
+          "threshold": 0.99,
           "coverage": 0.0,
-          "accuracy_kept": null,
-          "accuracy_rejected": 0.8241379310344827
-        },
-        {
-          "threshold": 0.9900000000000005,
-          "coverage": 0.0,
-          "accuracy_kept": null,
-          "accuracy_rejected": 0.8241379310344827
+          "accuracy_kept": null
         }
       ],
       "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 90% (coverage >= 50%)",
       "chosen": {
-        "threshold": 0.65,
+        "threshold": 0.67,
         "coverage": 0.8758620689655172,
-        "accuracy_kept": 0.8740157480314961
+        "accuracy_kept": 0.8818897637795275
       }
     }
   },
@@ -8291,25 +9034,25 @@
         "input": "/gradcam/input/early_blight.png",
         "overlays": [
           {
-            "model": "upgrade_5class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_5class",
+            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
             "pred_key": "spotted_wilt_virus",
-            "confidence": 0.9558373731339744,
+            "confidence": 0.9397451223430369,
             "correct": false,
             "out_of_scope": true,
-            "overlay": "/gradcam/upgrade_5class/early_blight_overlay.png",
-            "heatmap": "/gradcam/upgrade_5class/early_blight_heat.png",
+            "overlay": "/gradcam/balanced_5class/early_blight_overlay.png",
+            "heatmap": "/gradcam/balanced_5class/early_blight_heat.png",
             "on_leaf_share": 0.820316247868802
           },
           {
-            "model": "upgrade_8class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_8class",
+            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
             "pred_key": "spotted_wilt_virus",
-            "confidence": 0.9319432218489636,
+            "confidence": 0.9238233188576207,
             "correct": false,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_8class/early_blight_overlay.png",
-            "heatmap": "/gradcam/upgrade_8class/early_blight_heat.png",
+            "overlay": "/gradcam/balanced_8class/early_blight_overlay.png",
+            "heatmap": "/gradcam/balanced_8class/early_blight_heat.png",
             "on_leaf_share": 0.7332889139328065
           }
         ]
@@ -8321,25 +9064,25 @@
         "input": "/gradcam/input/healthy.png",
         "overlays": [
           {
-            "model": "upgrade_5class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_5class",
+            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
             "pred_key": "healthy",
-            "confidence": 0.8440188661562509,
+            "confidence": 0.7883112222278726,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_5class/healthy_overlay.png",
-            "heatmap": "/gradcam/upgrade_5class/healthy_heat.png",
+            "overlay": "/gradcam/balanced_5class/healthy_overlay.png",
+            "heatmap": "/gradcam/balanced_5class/healthy_heat.png",
             "on_leaf_share": 0.7782084795793989
           },
           {
-            "model": "upgrade_8class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_8class",
+            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
             "pred_key": "healthy",
-            "confidence": 0.7432528221973559,
+            "confidence": 0.7004310565629901,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_8class/healthy_overlay.png",
-            "heatmap": "/gradcam/upgrade_8class/healthy_heat.png",
+            "overlay": "/gradcam/balanced_8class/healthy_overlay.png",
+            "heatmap": "/gradcam/balanced_8class/healthy_heat.png",
             "on_leaf_share": 0.6695378086398095
           }
         ]
@@ -8351,25 +9094,25 @@
         "input": "/gradcam/input/late_blight.png",
         "overlays": [
           {
-            "model": "upgrade_5class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_5class",
+            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
             "pred_key": "spotted_wilt_virus",
-            "confidence": 0.9477589290490294,
+            "confidence": 0.9340509498589248,
             "correct": false,
             "out_of_scope": true,
-            "overlay": "/gradcam/upgrade_5class/late_blight_overlay.png",
-            "heatmap": "/gradcam/upgrade_5class/late_blight_heat.png",
+            "overlay": "/gradcam/balanced_5class/late_blight_overlay.png",
+            "heatmap": "/gradcam/balanced_5class/late_blight_heat.png",
             "on_leaf_share": 0.3591414143567399
           },
           {
-            "model": "upgrade_8class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_8class",
+            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
             "pred_key": "late_blight",
-            "confidence": 0.8338094132207001,
+            "confidence": 0.8463460320776968,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_8class/late_blight_overlay.png",
-            "heatmap": "/gradcam/upgrade_8class/late_blight_heat.png",
+            "overlay": "/gradcam/balanced_8class/late_blight_overlay.png",
+            "heatmap": "/gradcam/balanced_8class/late_blight_heat.png",
             "on_leaf_share": 0.24832738095793291
           }
         ]
@@ -8381,25 +9124,25 @@
         "input": "/gradcam/input/leaf_miner.png",
         "overlays": [
           {
-            "model": "upgrade_5class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_5class",
+            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
             "pred_key": "leaf_miner",
-            "confidence": 0.9477270457261561,
+            "confidence": 0.966188077811031,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_5class/leaf_miner_overlay.png",
-            "heatmap": "/gradcam/upgrade_5class/leaf_miner_heat.png",
+            "overlay": "/gradcam/balanced_5class/leaf_miner_overlay.png",
+            "heatmap": "/gradcam/balanced_5class/leaf_miner_heat.png",
             "on_leaf_share": 0.6402783443375104
           },
           {
-            "model": "upgrade_8class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_8class",
+            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
             "pred_key": "leaf_miner",
-            "confidence": 0.944899570027688,
+            "confidence": 0.9621068078628047,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_8class/leaf_miner_overlay.png",
-            "heatmap": "/gradcam/upgrade_8class/leaf_miner_heat.png",
+            "overlay": "/gradcam/balanced_8class/leaf_miner_overlay.png",
+            "heatmap": "/gradcam/balanced_8class/leaf_miner_heat.png",
             "on_leaf_share": 0.7031398101262613
           }
         ]
@@ -8411,25 +9154,25 @@
         "input": "/gradcam/input/magnesium_deficiency.png",
         "overlays": [
           {
-            "model": "upgrade_5class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_5class",
+            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
             "pred_key": "magnesium_deficiency",
-            "confidence": 0.9572962908209272,
+            "confidence": 0.9390800767122942,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_5class/magnesium_deficiency_overlay.png",
-            "heatmap": "/gradcam/upgrade_5class/magnesium_deficiency_heat.png",
+            "overlay": "/gradcam/balanced_5class/magnesium_deficiency_overlay.png",
+            "heatmap": "/gradcam/balanced_5class/magnesium_deficiency_heat.png",
             "on_leaf_share": 0.7615910064926545
           },
           {
-            "model": "upgrade_8class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_8class",
+            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
             "pred_key": "magnesium_deficiency",
-            "confidence": 0.9531526327596878,
+            "confidence": 0.9584531919894453,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_8class/magnesium_deficiency_overlay.png",
-            "heatmap": "/gradcam/upgrade_8class/magnesium_deficiency_heat.png",
+            "overlay": "/gradcam/balanced_8class/magnesium_deficiency_overlay.png",
+            "heatmap": "/gradcam/balanced_8class/magnesium_deficiency_heat.png",
             "on_leaf_share": 0.7814729210833007
           }
         ]
@@ -8441,25 +9184,25 @@
         "input": "/gradcam/input/nitrogen_deficiency.png",
         "overlays": [
           {
-            "model": "upgrade_5class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_5class",
+            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
             "pred_key": "nitrogen_deficiency",
-            "confidence": 0.4585625295992427,
+            "confidence": 0.3600021932219143,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_5class/nitrogen_deficiency_overlay.png",
-            "heatmap": "/gradcam/upgrade_5class/nitrogen_deficiency_heat.png",
+            "overlay": "/gradcam/balanced_5class/nitrogen_deficiency_overlay.png",
+            "heatmap": "/gradcam/balanced_5class/nitrogen_deficiency_heat.png",
             "on_leaf_share": 0.40639102934526417
           },
           {
-            "model": "upgrade_8class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_8class",
+            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
             "pred_key": "nitrogen_deficiency",
-            "confidence": 0.34060508752713964,
+            "confidence": 0.25595066568428226,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_8class/nitrogen_deficiency_overlay.png",
-            "heatmap": "/gradcam/upgrade_8class/nitrogen_deficiency_heat.png",
+            "overlay": "/gradcam/balanced_8class/nitrogen_deficiency_overlay.png",
+            "heatmap": "/gradcam/balanced_8class/nitrogen_deficiency_heat.png",
             "on_leaf_share": 0.5147560779313816
           }
         ]
@@ -8471,26 +9214,26 @@
         "input": "/gradcam/input/potassium_deficiency.png",
         "overlays": [
           {
-            "model": "upgrade_5class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
-            "pred_key": "spotted_wilt_virus",
-            "confidence": 0.4396932474081353,
+            "model": "balanced_5class",
+            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+            "pred_key": "magnesium_deficiency",
+            "confidence": 0.16768517880835015,
             "correct": false,
             "out_of_scope": true,
-            "overlay": "/gradcam/upgrade_5class/potassium_deficiency_overlay.png",
-            "heatmap": "/gradcam/upgrade_5class/potassium_deficiency_heat.png",
-            "on_leaf_share": 0.5444950929424593
+            "overlay": "/gradcam/balanced_5class/potassium_deficiency_overlay.png",
+            "heatmap": "/gradcam/balanced_5class/potassium_deficiency_heat.png",
+            "on_leaf_share": 0.25843733074562203
           },
           {
-            "model": "upgrade_8class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
-            "pred_key": "spotted_wilt_virus",
-            "confidence": 0.3099978678985888,
+            "model": "balanced_8class",
+            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+            "pred_key": "late_blight",
+            "confidence": 0.1463900092816007,
             "correct": false,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_8class/potassium_deficiency_overlay.png",
-            "heatmap": "/gradcam/upgrade_8class/potassium_deficiency_heat.png",
-            "on_leaf_share": 0.5539445040465799
+            "overlay": "/gradcam/balanced_8class/potassium_deficiency_overlay.png",
+            "heatmap": "/gradcam/balanced_8class/potassium_deficiency_heat.png",
+            "on_leaf_share": 0.32627722139756865
           }
         ]
       },
@@ -8501,67 +9244,67 @@
         "input": "/gradcam/input/spotted_wilt_virus.png",
         "overlays": [
           {
-            "model": "upgrade_5class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_5class",
+            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
             "pred_key": "spotted_wilt_virus",
-            "confidence": 0.9466178052941563,
+            "confidence": 0.9260796547760831,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_5class/spotted_wilt_virus_overlay.png",
-            "heatmap": "/gradcam/upgrade_5class/spotted_wilt_virus_heat.png",
+            "overlay": "/gradcam/balanced_5class/spotted_wilt_virus_overlay.png",
+            "heatmap": "/gradcam/balanced_5class/spotted_wilt_virus_heat.png",
             "on_leaf_share": 0.9131302707026789
           },
           {
-            "model": "upgrade_8class",
-            "model_name": "ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+            "model": "balanced_8class",
+            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
             "pred_key": "spotted_wilt_virus",
-            "confidence": 0.8118191016926367,
+            "confidence": 0.7512937907672758,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/upgrade_8class/spotted_wilt_virus_overlay.png",
-            "heatmap": "/gradcam/upgrade_8class/spotted_wilt_virus_heat.png",
+            "overlay": "/gradcam/balanced_8class/spotted_wilt_virus_overlay.png",
+            "heatmap": "/gradcam/balanced_8class/spotted_wilt_virus_heat.png",
             "on_leaf_share": 0.8826907875882961
           }
         ]
       }
     ],
     "models": [
-      "upgrade_5class",
-      "upgrade_8class"
+      "balanced_5class",
+      "balanced_8class"
     ],
-    "summary": "Mean share of Grad-CAM mass on the leaf (leaf mask from saturation thresholding): ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default) 65%; ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default) 64%.",
+    "summary": "Mean share of Grad-CAM mass on the leaf (leaf mask from saturation thresholding): Tomato Care v2 \u00b7 focused \u00b7 balanced 62%; Tomato Care v2 \u00b7 full \u00b7 balanced 61%.",
     "on_leaf_share": {
-      "upgrade_5class": 0.6529439857031885,
-      "upgrade_8class": 0.6358947755382961
+      "balanced_5class": 0.6171867654285839,
+      "balanced_8class": 0.6074363652071697
     }
   },
   "hero": {
     "input": "/gradcam/input/leaf_miner.png",
-    "heatmap": "/gradcam/upgrade_5class/leaf_miner_heat.png",
+    "heatmap": "/gradcam/balanced_5class/leaf_miner_heat.png",
     "true_key": "leaf_miner",
     "pred_key": "leaf_miner",
-    "confidence": 0.9477270457261561,
-    "model_name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+    "confidence": 0.966188077811031,
+    "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
     "probabilities": [
       {
         "key": "leaf_miner",
-        "p": 0.9477270457261561
+        "p": 0.966188077811031
       },
       {
         "key": "spotted_wilt_virus",
-        "p": 0.015919181581130856
-      },
-      {
-        "key": "nitrogen_deficiency",
-        "p": 0.01339113562147307
-      },
-      {
-        "key": "magnesium_deficiency",
-        "p": 0.012290722567963779
+        "p": 0.012598049371123216
       },
       {
         "key": "healthy",
-        "p": 0.010671914503276184
+        "p": 0.010518372494934886
+      },
+      {
+        "key": "magnesium_deficiency",
+        "p": 0.006851870471486035
+      },
+      {
+        "key": "nitrogen_deficiency",
+        "p": 0.0038436298514248133
       }
     ]
   },

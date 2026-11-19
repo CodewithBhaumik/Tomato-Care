@@ -3,19 +3,16 @@
     "index": 3,
     "key": "leaf_miner",
     "name": "Leaf Miner",
-    "confidence": 0.9477281476740564,
+    "confidence": 0.9661889090709008,
     "is_healthy": false,
     "status": "Diseased"
   },
   "desktop_pages": 10,
   "phone_pages": 10,
   "ui_heading": "Leaf Miner",
-  "compare_rows": 2,
+  "compare_rows": 3,
   "invalid_file_rejected": true,
-  "lab_rows": 11,
-  "problems": [
-    "phone: request failed: https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2",
-    "phone: Failed to load resource: net::ERR_QUIC_PROTOCOL_ERROR"
-  ],
-  "passed": false
+  "lab_rows": 13,
+  "problems": [],
+  "passed": true
 }

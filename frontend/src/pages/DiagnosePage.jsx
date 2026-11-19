@@ -126,18 +126,18 @@ export default function DiagnosePage() {
                 <CardHeader
                   icon={FlaskConical}
                   title="Second opinion"
-                  subtitle="Run both Tomato Care models — focused (5 conditions) and full (8 conditions) — on this photo"
+                  subtitle="Run every Tomato Care model — focused balanced, focused calibrated and full — on this photo"
                   action={
                     <Button variant="secondary" size="sm" onClick={() => runCompare()} loading={compareStatus === "running"} disabled={!online}>
-                      {comparison ? "Run again" : "Ask both models"}
+                      {comparison ? "Run again" : "Ask all models"}
                     </Button>
                   }
                 />
                 <div className="p-5">
                   {compareStatus === "error" && <ErrorState error={compareError} onRetry={() => runCompare()} />}
-                  {compareStatus === "running" && <p className="text-sm text-muted">Running both models on the same photo…</p>}
+                  {compareStatus === "running" && <p className="text-sm text-muted">Running all models on the same photo…</p>}
                   {comparison && compareStatus === "done" && <CompareTable results={comparison.results} trueKey={result.trueKey} models={models} />}
-                  {compareStatus === "idle" && !comparison && <p className="text-sm text-muted">See whether the full 8-condition model agrees with the focused one on exactly this photo.</p>}
+                  {compareStatus === "idle" && !comparison && <p className="text-sm text-muted">See whether the other Tomato Care models agree on exactly this photo.</p>}
                 </div>
               </Card>
             </motion.div>

@@ -71,8 +71,11 @@ def render() -> None:
               delta=f"{core.pct(ood['flagged_in'], 0)} of normal photos flagged too", delta_color="off", border=True,
               help="Held-out non-leaf probe images (photos, textures, drawings) answered with 'Unusual image' "
                    "instead of a diagnosis — and the price: normal leaf photos sent there as well.")
-    st.caption("How these models were chosen, how they compare with the original study's models and where they "
-               "fail: see the Model lab and How it works.")
+    bal = new5["test"].get("balanced_accuracy")
+    st.caption((f"Focused model (bias-corrected): balanced accuracy {core.pct(bal)} — the mean of the per-condition "
+                "recalls, so rare conditions count as much as common ones. " if bal else "")
+               + "How these models were chosen, how they compare with the original study's models and where they fail: "
+                 "see the Model lab and How it works.")
 
     st.space("medium")
     theme.section("What is inside", kicker="Tomato Care v2")
@@ -83,9 +86,9 @@ def render() -> None:
          ("account_tree", "Chosen by cross-validation",
           "Five-fold cross-validation on 1,813 photos, leaf groups never split, and a selection rule fixed before "
           "the test photos were scored."),
-         ("groups", "A committee of networks",
-          "Each model is its cross-validation networks voting together; every member has photos it never saw, so "
-          "its calibration was fitted honestly.")],
+         ("groups", "Fair to rare conditions",
+          "A class-prior correction stops frequent conditions (Leaf Miner) out-voting rare ones, and per-class "
+          "calibration makes every condition's confidence mean the same thing.")],
         [("help", "Says “not sure”",
           "Temperature-scaled confidence and a threshold chosen on out-of-fold data: below it, no diagnosis."),
          ("image_not_supported", "Flags unusual photos",

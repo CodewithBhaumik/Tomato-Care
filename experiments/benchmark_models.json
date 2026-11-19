@@ -947,6 +947,403 @@
         "chosen_on": "the original validation split",
         "rule": "lowest calibrated-confidence threshold with validation accuracy on kept photos >= 95% (coverage >= 50%); chosen on validation, reported once on test"
       }
+    },
+    {
+      "key": "calibrated_5class",
+      "name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
+      "task": "5class",
+      "generation": "upgrade",
+      "family": "Deep learning",
+      "kind": "ensemble",
+      "type": "ensemble",
+      "class_keys": [
+        "healthy",
+        "leaf_miner",
+        "magnesium_deficiency",
+        "nitrogen_deficiency",
+        "spotted_wilt_virus"
+      ],
+      "members": [
+        {
+          "key": "convnext_t_in1k_robust_fold0",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 0",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold0.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 7617.606058798722
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold1",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 1",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold1.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 9487.424078753942
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold2",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 2",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold2.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 5556.958219939239
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold3",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 3",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold3.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 5148.6658390229295
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold4",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 4",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold4.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 5758.58740522891
+        }
+      ],
+      "recipes": [
+        "convnext_t_in1k_robust"
+      ],
+      "tta_views": 1,
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust",
+      "description": "Same networks; per-class calibration so every condition's confidence matches its own accuracy.",
+      "confidence_threshold": 0.89,
+      "operating_point": {
+        "threshold": 0.89,
+        "chosen_on": "out-of-fold cross-validation predictions (cross-fitted)",
+        "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 95% (coverage >= 50%)",
+        "oof": {
+          "threshold": 0.89,
+          "coverage": 0.8615477629987908,
+          "accuracy_kept": 0.952280701754386
+        }
+      },
+      "ood": {
+        "method": "maha feature distance (fold models' own training photos)",
+        "keep": 0.95
+      },
+      "variant": "calibrated",
+      "base_model": "upgrade_5class",
+      "adjust": {
+        "calibration": {
+          "a": [
+            0.9765991996663875,
+            0.6756593869388563,
+            1.1504854498285084,
+            1.289181969450313,
+            1.0756613271866013
+          ],
+          "b": [
+            -0.12817061027599183,
+            -0.005557178918370992,
+            0.07021327948268082,
+            -0.008322718502051803,
+            0.07183683737449245
+          ]
+        },
+        "prior": [
+          0.11426844014510278,
+          0.5350665054413543,
+          0.062273276904474005,
+          0.022974607013301087,
+          0.26541717049576785
+        ],
+        "tau": 0.0,
+        "fitted_on": "out-of-fold predictions of the train+val photos (cross-fitted)"
+      }
+    },
+    {
+      "key": "balanced_5class",
+      "name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+      "task": "5class",
+      "generation": "upgrade",
+      "family": "Deep learning",
+      "kind": "ensemble",
+      "type": "ensemble",
+      "class_keys": [
+        "healthy",
+        "leaf_miner",
+        "magnesium_deficiency",
+        "nitrogen_deficiency",
+        "spotted_wilt_virus"
+      ],
+      "members": [
+        {
+          "key": "convnext_t_in1k_robust_fold0",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 0",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold0.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 7617.606058798722
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold1",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 1",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold1.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 9487.424078753942
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold2",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 2",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold2.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 5556.958219939239
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold3",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 3",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold3.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 5148.6658390229295
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold4",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 4",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold4.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 5758.58740522891
+        }
+      ],
+      "recipes": [
+        "convnext_t_in1k_robust"
+      ],
+      "tta_views": 1,
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust",
+      "description": "Same networks; per-class calibration, and a class-prior correction so rare conditions are not out-voted by frequent ones (confidence stays calibrated).",
+      "confidence_threshold": 0.89,
+      "operating_point": {
+        "threshold": 0.89,
+        "chosen_on": "out-of-fold cross-validation predictions (cross-fitted)",
+        "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 95% (coverage >= 50%)",
+        "oof": {
+          "threshold": 0.89,
+          "coverage": 0.8609431680773881,
+          "accuracy_kept": 0.9529494382022472
+        }
+      },
+      "ood": {
+        "method": "maha feature distance (fold models' own training photos)",
+        "keep": 0.95
+      },
+      "variant": "balanced",
+      "base_model": "upgrade_5class",
+      "adjust": {
+        "calibration": {
+          "a": [
+            0.9765991996663875,
+            0.6756593869388563,
+            1.1504854498285084,
+            1.289181969450313,
+            1.0756613271866013
+          ],
+          "b": [
+            -0.12817061027599183,
+            -0.005557178918370992,
+            0.07021327948268082,
+            -0.008322718502051803,
+            0.07183683737449245
+          ]
+        },
+        "prior": [
+          0.11426844014510278,
+          0.5350665054413543,
+          0.062273276904474005,
+          0.022974607013301087,
+          0.26541717049576785
+        ],
+        "tau": 1.2,
+        "fitted_on": "out-of-fold predictions of the train+val photos (cross-fitted)"
+      }
+    },
+    {
+      "key": "balanced_8class",
+      "name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+      "task": "8class",
+      "generation": "upgrade",
+      "family": "Deep learning",
+      "kind": "ensemble",
+      "type": "ensemble",
+      "class_keys": [
+        "early_blight",
+        "healthy",
+        "late_blight",
+        "leaf_miner",
+        "magnesium_deficiency",
+        "nitrogen_deficiency",
+        "potassium_deficiency",
+        "spotted_wilt_virus"
+      ],
+      "members": [
+        {
+          "key": "convnext_t_in1k_base_fold0",
+          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 0",
+          "path": "deploy/8class/convnext_t_in1k_base/fold0.pt",
+          "temperature": 0.8818965164263328,
+          "tta_views": 1,
+          "ood_method": "knn",
+          "ood_threshold": 0.5479396650461782
+        },
+        {
+          "key": "convnext_t_in1k_base_fold1",
+          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 1",
+          "path": "deploy/8class/convnext_t_in1k_base/fold1.pt",
+          "temperature": 0.8818965164263328,
+          "tta_views": 1,
+          "ood_method": "knn",
+          "ood_threshold": 0.5525677028172168
+        },
+        {
+          "key": "convnext_t_in1k_base_fold2",
+          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 2",
+          "path": "deploy/8class/convnext_t_in1k_base/fold2.pt",
+          "temperature": 0.8818965164263328,
+          "tta_views": 1,
+          "ood_method": "knn",
+          "ood_threshold": 0.5451465668214415
+        },
+        {
+          "key": "convnext_t_in1k_base_fold3",
+          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 3",
+          "path": "deploy/8class/convnext_t_in1k_base/fold3.pt",
+          "temperature": 0.8818965164263328,
+          "tta_views": 1,
+          "ood_method": "knn",
+          "ood_threshold": 0.5502236839726602
+        },
+        {
+          "key": "convnext_t_in1k_base_fold4",
+          "name": "ConvNeXt-T IN-1k \u00b7 original recipe \u00b7 fold 4",
+          "path": "deploy/8class/convnext_t_in1k_base/fold4.pt",
+          "temperature": 0.8818965164263328,
+          "tta_views": 1,
+          "ood_method": "knn",
+          "ood_threshold": 0.5339745274425819
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold0",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 0",
+          "path": "deploy/8class/convnext_t_in1k_robust/fold0.pt",
+          "temperature": 0.9293462680040425,
+          "tta_views": 1,
+          "ood_method": "knn",
+          "ood_threshold": 0.4746751318197772
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold1",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 1",
+          "path": "deploy/8class/convnext_t_in1k_robust/fold1.pt",
+          "temperature": 0.9293462680040425,
+          "tta_views": 1,
+          "ood_method": "knn",
+          "ood_threshold": 0.5329634041652979
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold2",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 2",
+          "path": "deploy/8class/convnext_t_in1k_robust/fold2.pt",
+          "temperature": 0.9293462680040425,
+          "tta_views": 1,
+          "ood_method": "knn",
+          "ood_threshold": 0.49929446924160226
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold3",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 3",
+          "path": "deploy/8class/convnext_t_in1k_robust/fold3.pt",
+          "temperature": 0.9293462680040425,
+          "tta_views": 1,
+          "ood_method": "knn",
+          "ood_threshold": 0.48689690259678464
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold4",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 4",
+          "path": "deploy/8class/convnext_t_in1k_robust/fold4.pt",
+          "temperature": 0.9293462680040425,
+          "tta_views": 1,
+          "ood_method": "knn",
+          "ood_threshold": 0.4296991670372549
+        }
+      ],
+      "recipes": [
+        "convnext_t_in1k_base",
+        "convnext_t_in1k_robust"
+      ],
+      "tta_views": 1,
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust",
+      "description": "Same networks; per-class calibration, and a class-prior correction so rare conditions are not out-voted by frequent ones (confidence stays calibrated).",
+      "confidence_threshold": 0.67,
+      "operating_point": {
+        "threshold": 0.67,
+        "chosen_on": "out-of-fold cross-validation predictions (cross-fitted)",
+        "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 90% (coverage >= 50%)",
+        "oof": {
+          "threshold": 0.67,
+          "coverage": 0.8698290126861555,
+          "accuracy_kept": 0.9010779961953076
+        }
+      },
+      "ood": {
+        "method": "knn feature distance (fold models' own training photos)",
+        "keep": 0.95
+      },
+      "variant": "balanced",
+      "base_model": "upgrade_8class",
+      "adjust": {
+        "calibration": {
+          "a": [
+            0.9147657879020937,
+            1.107222961584229,
+            0.9607359917607028,
+            0.8732632915097697,
+            1.158507029970809,
+            1.2576890075681477,
+            1.2184969458118493,
+            0.9325499508057551
+          ],
+          "b": [
+            -0.07093618105168664,
+            -0.04837108253293729,
+            -0.0035193792321499486,
+            0.2032653413016448,
+            0.1215162303620249,
+            -0.004065642447885104,
+            -0.04484861751477954,
+            -0.15304108530664923
+          ]
+        },
+        "prior": [
+          0.02978488692774407,
+          0.10424710424710425,
+          0.05405405405405406,
+          0.4881412024269167,
+          0.0568119139547711,
+          0.020959735245449532,
+          0.003861003861003861,
+          0.24214009928295643
+        ],
+        "tau": 0.65,
+        "fitted_on": "out-of-fold predictions of the train+val photos (cross-fitted)"
+      }
     }
   ]
 }

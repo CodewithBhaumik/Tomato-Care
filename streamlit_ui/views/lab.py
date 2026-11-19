@@ -101,6 +101,29 @@ def _calibration(models: list[dict], task: str):
                    f"{core.pct(old['selective']['accuracy_kept'])} accurate.")
 
 
+def _bias(models: list[dict], task: str):
+    rows = [{"Model": ("★ " if m["is_default"] else "") + m["name"], "Accuracy": m["test"]["accuracy"],
+             "Balanced accuracy": m["test"]["balanced_accuracy"], "Macro-F1": m["test"]["f1_macro"],
+             "Per-class calibration error": m["test"]["classwise_ece"]}
+            for m in models if m["test"].get("balanced_accuracy") is not None]
+    if not rows:
+        return
+    st.markdown("**Class bias and per-class confidence** (test photos)")
+    st.dataframe(pd.DataFrame(rows).sort_values("Balanced accuracy", ascending=False), hide_index=True, width="stretch",
+                 column_config={"Accuracy": st.column_config.NumberColumn(format="percent"),
+                                "Balanced accuracy": st.column_config.NumberColumn(
+                                    format="percent", help="Mean of the per-condition recalls: rare conditions count "
+                                                           "as much as common ones (higher = less bias)"),
+                                "Macro-F1": st.column_config.NumberColumn(format="%.3f"),
+                                "Per-class calibration error": st.column_config.NumberColumn(
+                                    format="%.3f", help="How far each condition's average confidence is from its own "
+                                                        "accuracy (lower = more even confidence)")})
+    st.caption("Balanced and calibrated variants: the same networks with per-class calibration (and, for balanced, a "
+               "class-prior correction), fitted on out-of-fold data before the test photos were scored. A GAN was "
+               "not used to synthesise rare-class photos: with 9 Potassium and 45 Nitrogen photographs it would "
+               "copy them rather than add new information, and generated images would need their own validation.")
+
+
 def _robustness(task: str):
     data = core.platform()
     rb = data["audit"]["robustness"][task]
@@ -182,6 +205,7 @@ def render() -> None:
         _confusion(models, task)
     with tabs[3]:
         _calibration(models, task)
+        _bias(models, task)
     with tabs[4]:
         _robustness(task)
     with tabs[5]:

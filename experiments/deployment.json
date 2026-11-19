@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "default_model": "upgrade_5class",
+  "default_model": "balanced_5class",
   "defaults_by_task": {
-    "5class": "upgrade_5class",
-    "8class": "upgrade_8class"
+    "5class": "balanced_5class",
+    "8class": "balanced_8class"
   },
   "previous_defaults": {
     "5class": "ensemble_5class",
@@ -12,8 +12,8 @@
   "confidence_threshold": 0.6,
   "models": [
     {
-      "key": "upgrade_5class",
-      "name": "ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+      "key": "balanced_5class",
+      "name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
       "task": "5class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -78,21 +78,20 @@
       ],
       "tta_views": 1,
       "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust",
-      "description": "Chosen by cross-validation: Highest pooled out-of-fold macro-F1 among candidates (single recipes with/without 8-view TTA, and probability ensembles of 2-3 recipes) whose estimated CPU time for the whole fold ensemble is <= 1000 ms per photo; ties within 0.001 go to higher out-of-fold accuracy, then lower latency. Decided on out-of-fold data only; the test set is scored once afterwards.",
-      "confidence_threshold": 0.9,
+      "description": "Same networks; per-class calibration, and a class-prior correction so rare conditions are not out-voted by frequent ones (confidence stays calibrated).",
+      "confidence_threshold": 0.89,
       "operating_point": {
-        "threshold": 0.9,
-        "chosen_on": "out-of-fold cross-validation predictions",
+        "threshold": 0.89,
+        "chosen_on": "out-of-fold cross-validation predictions (cross-fitted)",
         "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 95% (coverage >= 50%)",
         "oof": {
-          "threshold": 0.9,
-          "coverage": 0.8911729141475212,
-          "accuracy_kept": 0.9518317503392131,
-          "accuracy_rejected": 0.6055555555555555
+          "threshold": 0.89,
+          "coverage": 0.8609431680773881,
+          "accuracy_kept": 0.9529494382022472
         },
         "test": {
-          "coverage": 0.8075471698113208,
-          "accuracy_kept": 0.9813084112149533,
+          "coverage": 0.7811320754716982,
+          "accuracy_kept": 0.9855072463768116,
           "photos": 265
         }
       },
@@ -100,27 +99,195 @@
         "method": "maha feature distance (fold models' own training photos)",
         "keep": 0.95
       },
+      "variant": "balanced",
+      "base_model": "upgrade_5class",
+      "adjust": {
+        "calibration": {
+          "a": [
+            0.9765991996663875,
+            0.6756593869388563,
+            1.1504854498285084,
+            1.289181969450313,
+            1.0756613271866013
+          ],
+          "b": [
+            -0.12817061027599183,
+            -0.005557178918370992,
+            0.07021327948268082,
+            -0.008322718502051803,
+            0.07183683737449245
+          ]
+        },
+        "prior": [
+          0.11426844014510278,
+          0.5350665054413543,
+          0.062273276904474005,
+          0.022974607013301087,
+          0.26541717049576785
+        ],
+        "tau": 1.2,
+        "fitted_on": "out-of-fold predictions of the train+val photos (cross-fitted)"
+      },
       "test_metrics": {
-        "accuracy": 0.9207547169811321,
-        "precision_macro": 0.8303920914036909,
-        "recall_macro": 0.862888883032768,
-        "f1_macro": 0.8438113297319072,
-        "f1_weighted": 0.9216336035762506,
+        "accuracy": 0.9056603773584906,
+        "precision_macro": 0.7897907582613465,
+        "recall_macro": 0.8807922160440146,
+        "f1_macro": 0.8257151766444457,
+        "f1_weighted": 0.909554839794986,
         "accuracy_ci": [
-          0.8841698841698842,
-          0.9534071017754439
+          0.8661710037174721,
+          0.940001872659176
         ],
         "f1_macro_ci": [
-          0.7427985128098167,
-          0.9147848154899239
+          0.7272847920756138,
+          0.9007318477930402
         ],
-        "ece": 0.055365664975080775
+        "ece": 0.06711748114276003,
+        "balanced_accuracy": 0.8807922160440146,
+        "classwise_ece": 0.03838664828521992
       },
       "latency_ms": 209.71599999757018
     },
     {
-      "key": "upgrade_8class",
-      "name": "ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default)",
+      "key": "calibrated_5class",
+      "name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
+      "task": "5class",
+      "generation": "upgrade",
+      "family": "Deep learning",
+      "kind": "ensemble",
+      "type": "ensemble",
+      "class_keys": [
+        "healthy",
+        "leaf_miner",
+        "magnesium_deficiency",
+        "nitrogen_deficiency",
+        "spotted_wilt_virus"
+      ],
+      "members": [
+        {
+          "key": "convnext_t_in1k_robust_fold0",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 0",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold0.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 7617.606058798722
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold1",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 1",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold1.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 9487.424078753942
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold2",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 2",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold2.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 5556.958219939239
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold3",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 3",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold3.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 5148.6658390229295
+        },
+        {
+          "key": "convnext_t_in1k_robust_fold4",
+          "name": "ConvNeXt-T IN-1k \u00b7 robust \u00b7 fold 4",
+          "path": "deploy/5class/convnext_t_in1k_robust/fold4.pt",
+          "temperature": 0.8850030226081058,
+          "tta_views": 1,
+          "ood_method": "maha",
+          "ood_threshold": 5758.58740522891
+        }
+      ],
+      "recipes": [
+        "convnext_t_in1k_robust"
+      ],
+      "tta_views": 1,
+      "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust",
+      "description": "Same networks; per-class calibration so every condition's confidence matches its own accuracy.",
+      "confidence_threshold": 0.89,
+      "operating_point": {
+        "threshold": 0.89,
+        "chosen_on": "out-of-fold cross-validation predictions (cross-fitted)",
+        "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 95% (coverage >= 50%)",
+        "oof": {
+          "threshold": 0.89,
+          "coverage": 0.8615477629987908,
+          "accuracy_kept": 0.952280701754386
+        },
+        "test": {
+          "coverage": 0.7811320754716982,
+          "accuracy_kept": 0.9855072463768116,
+          "photos": 265
+        }
+      },
+      "ood": {
+        "method": "maha feature distance (fold models' own training photos)",
+        "keep": 0.95
+      },
+      "variant": "calibrated",
+      "base_model": "upgrade_5class",
+      "adjust": {
+        "calibration": {
+          "a": [
+            0.9765991996663875,
+            0.6756593869388563,
+            1.1504854498285084,
+            1.289181969450313,
+            1.0756613271866013
+          ],
+          "b": [
+            -0.12817061027599183,
+            -0.005557178918370992,
+            0.07021327948268082,
+            -0.008322718502051803,
+            0.07183683737449245
+          ]
+        },
+        "prior": [
+          0.11426844014510278,
+          0.5350665054413543,
+          0.062273276904474005,
+          0.022974607013301087,
+          0.26541717049576785
+        ],
+        "tau": 0.0,
+        "fitted_on": "out-of-fold predictions of the train+val photos (cross-fitted)"
+      },
+      "test_metrics": {
+        "accuracy": 0.9207547169811321,
+        "precision_macro": 0.827699244018393,
+        "recall_macro": 0.8357563033822026,
+        "f1_macro": 0.8307896896132189,
+        "f1_weighted": 0.9212338810119055,
+        "accuracy_ci": [
+          0.8847583643122676,
+          0.9528996163682865
+        ],
+        "f1_macro_ci": [
+          0.7212733421550894,
+          0.9057972033306633
+        ],
+        "ece": 0.06327238455505813,
+        "balanced_accuracy": 0.8357563033822026,
+        "classwise_ece": 0.04108905782699766
+      },
+      "latency_ms": 209.71599999757018
+    },
+    {
+      "key": "balanced_8class",
+      "name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
       "task": "8class",
       "generation": "upgrade",
       "family": "Deep learning",
@@ -234,21 +401,20 @@
       ],
       "tta_views": 1,
       "feature_set": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust",
-      "description": "Chosen by cross-validation: Highest pooled out-of-fold macro-F1 among candidates (single recipes with/without 8-view TTA, and probability ensembles of 2-3 recipes) whose estimated CPU time for the whole fold ensemble is <= 1000 ms per photo; ties within 0.001 go to higher out-of-fold accuracy, then lower latency. Decided on out-of-fold data only; the test set is scored once afterwards.",
-      "confidence_threshold": 0.65,
+      "description": "Same networks; per-class calibration, and a class-prior correction so rare conditions are not out-voted by frequent ones (confidence stays calibrated).",
+      "confidence_threshold": 0.67,
       "operating_point": {
-        "threshold": 0.65,
-        "chosen_on": "out-of-fold cross-validation predictions",
+        "threshold": 0.67,
+        "chosen_on": "out-of-fold cross-validation predictions (cross-fitted)",
         "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 90% (coverage >= 50%)",
         "oof": {
-          "threshold": 0.65,
-          "coverage": 0.8847214561500276,
-          "accuracy_kept": 0.9002493765586035,
-          "accuracy_rejected": 0.5502392344497608
+          "threshold": 0.67,
+          "coverage": 0.8698290126861555,
+          "accuracy_kept": 0.9010779961953076
         },
         "test": {
           "coverage": 0.8758620689655172,
-          "accuracy_kept": 0.8740157480314961,
+          "accuracy_kept": 0.8818897637795275,
           "photos": 290
         }
       },
@@ -256,21 +422,61 @@
         "method": "knn feature distance (fold models' own training photos)",
         "keep": 0.95
       },
+      "variant": "balanced",
+      "base_model": "upgrade_8class",
+      "adjust": {
+        "calibration": {
+          "a": [
+            0.9147657879020937,
+            1.107222961584229,
+            0.9607359917607028,
+            0.8732632915097697,
+            1.158507029970809,
+            1.2576890075681477,
+            1.2184969458118493,
+            0.9325499508057551
+          ],
+          "b": [
+            -0.07093618105168664,
+            -0.04837108253293729,
+            -0.0035193792321499486,
+            0.2032653413016448,
+            0.1215162303620249,
+            -0.004065642447885104,
+            -0.04484861751477954,
+            -0.15304108530664923
+          ]
+        },
+        "prior": [
+          0.02978488692774407,
+          0.10424710424710425,
+          0.05405405405405406,
+          0.4881412024269167,
+          0.0568119139547711,
+          0.020959735245449532,
+          0.003861003861003861,
+          0.24214009928295643
+        ],
+        "tau": 0.65,
+        "fitted_on": "out-of-fold predictions of the train+val photos (cross-fitted)"
+      },
       "test_metrics": {
-        "accuracy": 0.8241379310344827,
-        "precision_macro": 0.5537365057505723,
-        "recall_macro": 0.5679670915282427,
-        "f1_macro": 0.5588966235901658,
-        "f1_weighted": 0.8156708171599794,
+        "accuracy": 0.8275862068965517,
+        "precision_macro": 0.570634821889384,
+        "recall_macro": 0.6013525717887228,
+        "f1_macro": 0.5841119191312039,
+        "f1_weighted": 0.8269184432710331,
         "accuracy_ci": [
-          0.7765851831937937,
-          0.8697219274551418
+          0.7801418439716312,
+          0.8725565999595715
         ],
         "f1_macro_ci": [
-          0.4819707543075189,
-          0.614787492597519
+          0.5058812164635957,
+          0.643554783335393
         ],
-        "ece": 0.07576448694633954
+        "ece": 0.06541281950681088,
+        "balanced_accuracy": 0.6013525717887228,
+        "classwise_ece": 0.02580964945027572
       },
       "latency_ms": 385.0234999990789
     }

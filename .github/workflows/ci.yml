@@ -24,7 +24,7 @@ jobs:
           pip install -r requirements-train.txt pytest==9.2.0 httpx==0.28.1 ruff==0.14.6
           pip install -e . --no-deps
       - name: Lint
-        run: ruff check src backend tests streamlit_ui streamlit_app.py scripts/19_baseline_audit.py scripts/2*.py scripts/30_streamlit_check.py scripts/download_weights.py scripts/make_brand_assets.py
+        run: ruff check src backend tests streamlit_ui streamlit_app.py scripts/19_baseline_audit.py scripts/2*.py scripts/3*.py scripts/download_weights.py scripts/make_brand_assets.py
       - name: Tests
         # API tests are skipped without the model weights, dataset-dependent tests without the images.
         run: pytest -q

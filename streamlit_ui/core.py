@@ -139,13 +139,30 @@ def model_entry(key: str) -> dict:
 
 
 def task_model(task: str) -> dict:
-    """The served (version-2) model of a task."""
+    """The default served model of a task."""
     return model_entry(deployment()["defaults_by_task"][task])
+
+
+def task_models(task: str) -> list[dict]:
+    """Served models of a task, default first."""
+    default = deployment()["defaults_by_task"][task]
+    entries = [e for e in deployment()["models"] if e.get("task") == task]
+    return sorted(entries, key=lambda e: e["key"] != default)
+
+
+VARIANT_LABEL = {"balanced": "Balanced", "calibrated": "Calibrated"}
+VARIANT_HELP = {
+    "balanced": "Bias-corrected: frequent conditions (Leaf Miner, Spotted Wilt) cannot out-vote rare ones, and every "
+                "condition's confidence is calibrated. Recommended.",
+    "calibrated": "Calibrated only: every condition's confidence matches its own accuracy; no correction for how "
+                  "common each condition is in the training photos.",
+}
 
 
 def short_name(entry: dict) -> str:
     n = len(entry.get("members") or [1])
-    return f"Tomato Care v2 · {n} ConvNeXt-T networks"
+    variant = VARIANT_LABEL.get(entry.get("variant"), "")
+    return f"{TASK_LABEL[entry['task']].split(' · ')[0]} · {variant} · {n} ConvNeXt-T networks".replace(" ·  ·", " ·")
 
 
 # ---------------------------------------------------------------------------------------------------- inference

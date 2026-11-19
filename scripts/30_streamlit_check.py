@@ -126,7 +126,7 @@ def main():
         if page.locator('[data-testid="stImage"]').count() < 2:
             failures.append("Grad-CAM images missing")
         # all-model comparison (5-class)
-        page.get_by_text("Ask the other model too").click()
+        page.get_by_text("Ask the other models too").click()
         settle(page)
         page.wait_for_selector('[data-testid="stDataFrame"]', timeout=180000)
         report["diagnose"]["compare"] = "shown"

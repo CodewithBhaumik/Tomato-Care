@@ -25,6 +25,7 @@ import numpy as np
 import torch
 from PIL import Image
 
+from tomatoleaf import balance
 from tomatoleaf.config import CLASS_KEYS, CLASSES, EXPERIMENTS_DIR, IMAGENET_MEAN, IMAGENET_STD, MODELS_DIR
 from tomatoleaf.features import extract_features, feature_vector
 from tomatoleaf.gradcam import GradCAM, heatmap_png, overlay
@@ -103,6 +104,22 @@ class Predictor:
         self.threshold = entry.get("confidence_threshold")  # per-model threshold chosen on validation / OOF data
         self.operating_point = entry.get("operating_point")
         self.ood_config = entry.get("ood")  # {"method": "knn8", "thresholds": [...]} for upgraded models
+        # per-class calibration + class-prior correction fitted on out-of-fold data (tomatoleaf.balance, scripts/31)
+        self.adjust = entry.get("adjust")
+        self.variant = entry.get("variant")
+
+    def calibrate(self, probs: np.ndarray) -> np.ndarray:
+        """Per-class calibration (if the entry has one): every condition's confidence matches its own accuracy."""
+        if self.adjust and self.adjust.get("calibration"):
+            return balance.apply(probs, self.adjust["calibration"])
+        return probs
+
+    def decide(self, probs: np.ndarray) -> int:
+        """Index of the answered class: the most probable one or, for bias-corrected models, the most probable after
+        dividing by the class prior ** tau. The confidence reported is probs[decision] (still calibrated)."""
+        if self.adjust and self.adjust.get("tau"):
+            return int(balance.decide(probs, self.adjust["prior"], self.adjust["tau"]))
+        return int(np.argmax(probs))
 
     def predict_proba(self, rgb: np.ndarray) -> np.ndarray:
         return self.analyse(rgb)[0]
@@ -198,7 +215,7 @@ class TorchPredictor(Predictor):
 
     def analyse(self, rgb: np.ndarray):
         logits, feats = self.forward(rgb)
-        return _softmax(logits, self.temperature), self.ood_ratio(feats)
+        return self.calibrate(_softmax(logits, self.temperature)), self.ood_ratio(feats)
 
     def explain(self, rgb: np.ndarray, class_index: int) -> dict:
         """Grad-CAM for `class_index`: a blended overlay and the bare heat map (RGBA, alpha = strength), PNG data URLs.
@@ -227,12 +244,19 @@ class EnsemblePredictor(Predictor):
     score_type = "calibrated_softmax"
 
     def __init__(self, entry: dict, device: torch.device, loaded: dict | None = None):
+        """`loaded`: a cache shared by the registry, so ensembles built from the same fold networks (e.g. the
+        calibrated and the balanced focused model) load each network once."""
         super().__init__(entry)
         self.members = []
+        cache = {} if loaded is None else loaded
         for m in entry["members"]:
             spec = {**m, "key": m["key"], "name": m.get("name", m["key"]), "family": entry["family"],
                     "kind": "transfer", "feature_set": entry["feature_set"], "class_keys": entry.get("class_keys")}
-            self.members.append(TorchPredictor(spec, device))
+            ident = (m["path"], int(m.get("tta_views") or 1), m.get("temperature"), m.get("ood_method"),
+                     m.get("ood_threshold"))
+            if ident not in cache:
+                cache[ident] = TorchPredictor(spec, device)
+            self.members.append(cache[ident])
         self.input = " + ".join(f"{m.arch.replace('timm:', '')} ({m.size}px{', TTA' if m.tta_views > 1 else ''})"
                                 for m in self.members)
         self.class_keys = self.members[0].class_keys
@@ -246,7 +270,7 @@ class EnsemblePredictor(Predictor):
         outs = [m.analyse(rgb) for m in self.members]
         probs = np.mean([p for p, _ in outs], axis=0)
         ratios = [r for _, r in outs if r is not None]
-        return probs, (float(np.mean(ratios)) if ratios else None)
+        return self.calibrate(probs), (float(np.mean(ratios)) if ratios else None)
 
     def explain(self, rgb: np.ndarray, class_index: int) -> dict:
         out = self.members[0].explain(rgb, class_index)
@@ -255,8 +279,13 @@ class EnsemblePredictor(Predictor):
 
     @property
     def calibration(self):
-        return {"method": "temperature_scaling (per member)", "temperature": None,
-                "member_temperatures": [m.temperature for m in self.members]}
+        out = {"method": "temperature_scaling (per member)", "temperature": None,
+               "member_temperatures": [m.temperature for m in self.members]}
+        if self.adjust:
+            out.update({"method": "temperature scaling per member + per-class calibration"
+                        + (" + class-prior correction" if self.adjust.get("tau") else ""),
+                        "prior_correction_tau": self.adjust.get("tau", 0.0)})
+        return out
 
 
 class SklearnPredictor(Predictor):
@@ -286,7 +315,8 @@ class ModelRegistry:
         self.models: dict[str, Predictor] = {}
         self.errors: dict[str, str] = {}
         self.default_key, self.threshold, self.entries, self.meta = None, 0.6, [], {}
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
+        self._members: dict = {}  # fold networks shared between ensembles (EnsemblePredictor `loaded`)
         if not deployment_path.exists():
             self.errors["deployment"] = f"{deployment_path.name} not found - run the training pipeline first"
             return
@@ -314,7 +344,7 @@ class ModelRegistry:
                 if entry is None:
                     raise KeyError(f"unknown model {key!r}")
                 builders = {"torch": lambda e: TorchPredictor(e, self.device), "sklearn": SklearnPredictor,
-                            "ensemble": lambda e: EnsemblePredictor(e, self.device)}
+                            "ensemble": lambda e: EnsemblePredictor(e, self.device, loaded=self._members)}
                 try:
                     self.models[key] = builders[entry["type"]](entry)
                 except Exception as exc:
@@ -337,7 +367,7 @@ class ModelRegistry:
         t0 = time.perf_counter()
         probs, ood_ratio = predictor.analyse(rgb)
         elapsed = 1000 * (time.perf_counter() - t0)
-        top = int(np.argmax(probs))  # index into this model's own class list
+        top = predictor.decide(probs)  # index into this model's own class list
         top_cls = CLASSES[CLASS_KEYS.index(predictor.class_keys[top])]
         explanation = None
         if explain:

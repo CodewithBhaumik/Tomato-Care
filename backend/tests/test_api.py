@@ -76,7 +76,7 @@ def test_models_have_one_default_per_task(client):
     by_key = {m["key"]: m for m in body["models"]}
     assert by_key[defaults["5class"]]["classes"] == FIVE and by_key[defaults["8class"]]["classes"] == CLASS_KEYS
     assert all(m["loaded"] for m in body["models"]), [m["key"] for m in body["models"] if not m["loaded"]]
-    assert set(by_key) == set(defaults.values())  # only the version-2 models are served
+    assert set(defaults.values()) <= set(by_key) and len(by_key) == 3  # 2 focused + 1 full, all version 2
     assert {m["generation"] for m in body["models"]} == {"upgrade"}
     for key in defaults.values():
         m = by_key[key]
@@ -147,8 +147,26 @@ def test_api_matches_offline_pipeline(client, test_photo):
                        views=m.tta_views)[0] / m.temperature
         e = np.exp(logits - logits.max())
         probs.append(e / e.sum())
+    expected = np.mean(probs, 0)
+    adjust = registry.entry(registry.default_key).get("adjust")
+    if adjust:  # per-class calibration fitted on out-of-fold data
+        from tomatoleaf import balance
+        expected = balance.apply(expected, adjust["calibration"])
     api = post(client, data).json()
-    np.testing.assert_allclose([p["probability"] for p in api["probabilities"]], np.mean(probs, 0), atol=1e-5)
+    np.testing.assert_allclose([p["probability"] for p in api["probabilities"]], expected, atol=1e-5)
+
+
+def test_balanced_model_answers_with_prior_correction_and_calibrated_confidence(client, test_photo):
+    from tomatoleaf import balance
+
+    _, data = test_photo
+    for model in client.get("/api/models").json()["models"]:
+        body = post(client, data, f"?model={model['key']}").json()
+        probs = np.array([p["probability"] for p in body["probabilities"]])
+        adjust = client.app.state.registry.entry(model["key"])["adjust"]
+        decision = int(balance.decide(probs, adjust["prior"], adjust["tau"]))
+        assert body["probabilities"][decision]["key"] == body["prediction"]["key"]
+        assert abs(body["prediction"]["confidence"] - probs[decision]) < 1e-12
 
 
 def test_threshold_decides_uncertain(client, test_photo):
