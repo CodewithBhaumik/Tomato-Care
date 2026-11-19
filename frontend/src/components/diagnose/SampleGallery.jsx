@@ -5,7 +5,7 @@ import { classMeta } from "../../lib/classes.js";
 import { cx } from "../../lib/format.js";
 import { Skeleton } from "../ui/primitives.jsx";
 
-/** Held-out test photographs (byte-identical copies) with their true labels: never used for training or selection. */
+/** Demo examples: held-out test photographs (byte-identical copies, never used for training or selection) with their true labels. */
 export default function SampleGallery({ onPick, activeKey, disabled, scope, columns = "grid-cols-4 sm:grid-cols-8" }) {
   const [state, setState] = useState({ samples: null, error: null });
   const [loading, setLoading] = useState(null);
@@ -34,8 +34,8 @@ export default function SampleGallery({ onPick, activeKey, disabled, scope, colu
   return (
     <div>
       <div className="mb-3 flex items-center gap-2 text-sm font-medium text-ink">
-        <Images className="size-4 text-muted" aria-hidden /> Held-out test photos
-        <span className="text-xs font-normal text-muted">· the most typical of each condition, true label shown, never seen in training</span>
+        <Images className="size-4 text-muted" aria-hidden /> Example photos
+        <span className="text-xs font-normal text-muted">· demo examples: held-out photos with a clear result, true label shown (accuracy: Model lab)</span>
       </div>
       <div className={cx("grid gap-2", columns)}>
         {!state.samples &&

@@ -1,4 +1,4 @@
-"""Exports one held-out TEST photograph per class for the web apps' example gallery.
+"""Exports one held-out TEST photograph per class for the web apps' example gallery (default rule: demo).
 
 Rules (both deterministic and NOT based on any model's answer):
   --rule typical (default since 2026-11-19): the most typical test photo of each class — the medoid of the class's
@@ -20,6 +20,10 @@ from tomatoleaf.data import load_images, load_splits
 from tomatoleaf.utils import save_json
 
 NOTES = {
+    "demo": ("Demo examples: for each condition, the held-out test photo (never used for training or model selection) "
+             "on which the served models give the clearest correct result — a confident correct diagnosis, or for a "
+             "condition outside the focused model's five, a refusal; ties go to the most typical photo. They show how "
+             "the app works, NOT how often it is right: the unbiased test results are in the Model lab."),
     "typical": ("One held-out test photograph per class (never used for training or model selection): the most typical "
                 "test photo of each class, i.e. the medoid in a generic ImageNet feature space (ConvNeXt-Tiny, not trained "
                 "on this dataset). Chosen from images and labels only, without looking at any model's answer."),
@@ -44,24 +48,55 @@ def generic_features(images: np.ndarray) -> np.ndarray:
     return np.stack(feats)
 
 
+def demo_scores(test, images) -> np.ndarray:
+    """Per test photo: how clearly the SERVED models handle it (higher = clearer). Each mode adds 2 for a confident
+    correct answer (or, for a condition outside that model's classes, any refusal), 1 for 'not sure' with the right
+    best guess, 0 for a wrong answer."""
+    from backend.services.predictor import ModelRegistry
+    from tomatoleaf.config import EXPERIMENTS_DIR
+
+    reg = ModelRegistry(EXPERIMENTS_DIR / "deployment.json", device="cuda" if torch.cuda.is_available() else "cpu")
+    keys = list(reg.meta["defaults_by_task"].values())
+    score = np.zeros(len(test))
+    for i, (rgb, true) in enumerate(zip(images, test.class_key)):
+        for key in keys:
+            r = reg.predict(rgb, key)
+            p = r["prediction"]
+            answered = p["status"] in ("Healthy", "Diseased")
+            if true not in r["classes"]:
+                score[i] += 2 if not answered else 0
+            elif answered:
+                score[i] += 2 if p["key"] == true else 0
+            else:
+                score[i] += 1 if p["key"] == true else 0
+    return score
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--rule", choices=list(NOTES), default="typical")
+    parser.add_argument("--rule", choices=list(NOTES), default="demo")
     args = parser.parse_args()
     splits = load_splits()
     test = splits[splits.split == "test"].sort_values("photo_id").reset_index(drop=True)
     out = ROOT / "frontend" / "public" / "test-samples"
     out.mkdir(parents=True, exist_ok=True)
-    feats = generic_features(load_images(test.path)) if args.rule == "typical" else None
+    images = load_images(test.path) if args.rule != "first" else None
+    feats = generic_features(images) if images is not None else None
+    demo = demo_scores(test, images) if args.rule == "demo" else None
     manifest = []
     for c in CLASSES:
         rows = test[test.label == c["index"]]
-        if args.rule == "typical":
-            f = feats[rows.index.to_numpy()]
+        if args.rule in ("typical", "demo"):
+            idx = rows.index.to_numpy()
+            f = feats[idx]
             sim = f @ f.T
             mean_other = (sim.sum(1) - 1.0) / max(len(rows) - 1, 1)
-            row = rows.iloc[int(np.argmax(mean_other))]  # ties: first by photo_id
-            extra = {"typicality": float(mean_other.max()), "class_test_photos": int(len(rows))}
+            order = np.lexsort((-mean_other, -(demo[idx] if demo is not None else np.zeros(len(idx)))))
+            best = int(order[0])  # demo: clearest result first, then most typical; typical: most typical
+            row = rows.iloc[best]
+            extra = {"typicality": float(mean_other[best]), "class_test_photos": int(len(rows))}
+            if demo is not None:
+                extra["demo_score"] = float(demo[idx][best])
         else:
             row = splits[(splits.split == "test") & (splits.label == c["index"])].iloc[0]
             extra = {}

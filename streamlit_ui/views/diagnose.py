@@ -29,9 +29,9 @@ def _examples():
                          help=s["name"]):
                 st.session_state["example"] = str(s["path"])
                 st.rerun()
-    st.caption("Tomato-Village dataset (Gehlot et al., 2023). The first eight are held-out test photos — the most "
-               "typical of each condition, picked without looking at any model's answer — never used for training or "
-               "for choosing a model. The three more per condition are training photos.")
+    st.caption("Tomato-Village dataset (Gehlot et al., 2023). The first eight are demo examples: held-out test photos "
+               "(never used for training) on which the models give a clear result — they show how the app works, not "
+               "how often it is right (see Model lab). The three more per condition are training photos.")
     if current:
         name = next((s["name"] for s in items if str(s["path"]) == current), "example")
         return core.sample_bytes(current), f"Example · {name}"

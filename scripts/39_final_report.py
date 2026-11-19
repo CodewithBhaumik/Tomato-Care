@@ -118,7 +118,8 @@ def main():
 
     # 2. examples
     L += ["## 2. Example-image verification (Diagnose gallery, through `POST /api/predict`)", "",
-          "One held-out test photo per condition: the most typical test photo of each class (medoid in a generic ImageNet feature space, chosen without looking at any model's answer; scripts/export_test_samples.py). The before models are run on the same photos. "
+          load_json(ROOT / "frontend" / "public" / "test-samples" / "manifest.json")["note"]
+          + " The before models are run on the same photos. "
           "“Refused” = Uncertain or Unusual image (no diagnosis).", ""]
     before = gallery_rows_direct(list(BEFORE.values()))
     after = gallery_rows(RESULTS_DIR / "audit_examples.json", set(FINAL.values()))
