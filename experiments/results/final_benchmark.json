@@ -5703,11 +5703,11 @@
       "threshold": 0.67,
       "selective": {
         "threshold": 0.67,
-        "coverage": 0.8758620689655172,
-        "accuracy_kept": 0.8818897637795275,
-        "accuracy_rejected": 0.4444444444444444
+        "coverage": 0.8448275862068966,
+        "accuracy_kept": 0.889795918367347,
+        "accuracy_rejected": 0.4888888888888889
       },
-      "flagged_unusual": 0.04827586206896552,
+      "flagged_unusual": 0.06206896551724138,
       "same_leaf_consistency": {
         "groups": 26,
         "pairs": 46,
@@ -7905,5 +7905,5 @@
       ]
     }
   },
-  "variants_note": "Calibrated / bias-corrected variants scored once on 2026-11-19 11:06, after they had been fixed on out-of-fold data (scripts/31)."
+  "variants_note": "Calibrated / bias-corrected variants scored on 2026-11-19 11:36, after they had been fixed on out-of-fold data (scripts/31). Re-scored once after the full model received per-condition unusual-image limits (scripts/33, fixed on out-of-fold data); the answers themselves did not change."
 }

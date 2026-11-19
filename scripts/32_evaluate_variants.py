@@ -72,6 +72,7 @@ def main():
         probs = np.stack([p for p, _ in out])
         ratios = np.array([np.nan if r is None else r for _, r in out], dtype=float)
         decision = np.array([pred.decide(p) for p in probs])
+        ratios = np.array([np.nan if np.isnan(r) else pred.unusualness(r, int(d)) for r, d in zip(ratios, decision)])
         preds[key] = local[decision]
         if key not in VARIANTS:
             continue
@@ -98,7 +99,7 @@ def main():
                "flagged_unusual": float(np.mean(unusual))}
         if task == "5class":
             oos = ~in5
-            oos_conf = np.array([balance.confidence_of(p, pred.decide(p)) for p in probs[oos]])
+            oos_conf = np.array([balance.confidence_of(p, pred.decide(p)) for p in probs[oos]])  # ratios: per answer
             row["out_of_scope"] = {"photos": int(oos.sum()), "confidence_mean": float(oos_conf.mean()),
                                    "share_uncertain_or_unusual": float(np.mean((oos_conf < thr) | (ratios[oos] > 1))),
                                    "share_flagged_unusual": float(np.mean(ratios[oos] > 1))}
@@ -141,8 +142,10 @@ def main():
     bench["models"] = [m for m in bench["models"] if m["key"] not in VARIANTS] + rows
     bench["comparisons"] = [c for c in bench["comparisons"] if not c.get("variant")] + comparisons
     bench["risk_coverage_variants"] = curves
-    bench["variants_note"] = (f"Calibrated / bias-corrected variants scored once on {time.strftime('%Y-%m-%d %H:%M')}, "
-                              "after they had been fixed on out-of-fold data (scripts/31).")
+    bench["variants_note"] = (f"Calibrated / bias-corrected variants scored on {time.strftime('%Y-%m-%d %H:%M')}, after "
+                              "they had been fixed on out-of-fold data (scripts/31). Re-scored once after the full "
+                              "model received per-condition unusual-image limits (scripts/33, fixed on out-of-fold data); "
+                              "the answers themselves did not change.")
     for key in VARIANTS:  # same networks as the uncorrected model: same CPU time (+ microseconds of arithmetic)
         base = load_json(EXPERIMENTS_DIR / "benchmark_models.json")
         base_key = next(m for m in base["models"] if m["key"] == key)["base_model"]

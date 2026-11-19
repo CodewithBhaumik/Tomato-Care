@@ -121,6 +121,12 @@ class Predictor:
             return int(balance.decide(probs, self.adjust["prior"], self.adjust["tau"]))
         return int(np.argmax(probs))
 
+    def unusualness(self, ratio: float | None, decision: int) -> float | None:
+        """OOD ratio against the limit of the answered condition (scripts/33: equal false-flag rates per condition)."""
+        if ratio is None or not (self.adjust and self.adjust.get("ood_class_scale")):
+            return ratio
+        return float(ratio / self.adjust["ood_class_scale"][decision])
+
     def predict_proba(self, rgb: np.ndarray) -> np.ndarray:
         return self.analyse(rgb)[0]
 
@@ -368,6 +374,7 @@ class ModelRegistry:
         probs, ood_ratio = predictor.analyse(rgb)
         elapsed = 1000 * (time.perf_counter() - t0)
         top = predictor.decide(probs)  # index into this model's own class list
+        ood_ratio = predictor.unusualness(ood_ratio, top)
         top_cls = CLASSES[CLASS_KEYS.index(predictor.class_keys[top])]
         explanation = None
         if explain:

@@ -413,8 +413,8 @@
           "accuracy_kept": 0.9010779961953076
         },
         "test": {
-          "coverage": 0.8758620689655172,
-          "accuracy_kept": 0.8818897637795275,
+          "coverage": 0.8448275862068966,
+          "accuracy_kept": 0.889795918367347,
           "photos": 290
         }
       },
@@ -458,7 +458,17 @@
           0.24214009928295643
         ],
         "tau": 0.65,
-        "fitted_on": "out-of-fold predictions of the train+val photos (cross-fitted)"
+        "fitted_on": "out-of-fold predictions of the train+val photos (cross-fitted)",
+        "ood_class_scale": [
+          1.1505667531598611,
+          0.9040288217453131,
+          1.1326877094430543,
+          0.8032520978969885,
+          1.1307191269858439,
+          1.091360352724319,
+          1.025995499608144,
+          0.9817698185102667
+        ]
       },
       "test_metrics": {
         "accuracy": 0.8275862068965517,

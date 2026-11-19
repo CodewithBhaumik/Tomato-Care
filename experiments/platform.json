@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generated_at": "2026-11-19T11:11:12",
+  "generated_at": "2026-11-19T11:37:02",
   "project": {
     "name": "Tomato Care"
   },
@@ -6379,11 +6379,11 @@
       ],
       "selective": {
         "threshold": 0.67,
-        "coverage": 0.8758620689655172,
-        "accuracy_kept": 0.8818897637795275,
+        "coverage": 0.8448275862068966,
+        "accuracy_kept": 0.889795918367347,
         "test": {
-          "coverage": 0.8758620689655172,
-          "accuracy_kept": 0.8818897637795275
+          "coverage": 0.8448275862068966,
+          "accuracy_kept": 0.889795918367347
         }
       },
       "calibration": {
@@ -6457,7 +6457,7 @@
         "fitted_on": "out-of-fold predictions"
       },
       "latency_ms": 385.0234999990789,
-      "flagged_unusual": 0.04827586206896552,
+      "flagged_unusual": 0.06206896551724138,
       "out_of_scope": null
     }
   ],
@@ -8907,8 +8907,8 @@
       "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 90% (coverage >= 50%)",
       "chosen": {
         "threshold": 0.67,
-        "coverage": 0.8758620689655172,
-        "accuracy_kept": 0.8818897637795275
+        "coverage": 0.8448275862068966,
+        "accuracy_kept": 0.889795918367347
       }
     }
   },
