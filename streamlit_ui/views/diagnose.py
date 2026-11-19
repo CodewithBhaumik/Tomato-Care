@@ -60,10 +60,11 @@ def _model_panel():
         task = st.segmented_control("Task", ["5class", "8class"], format_func=lambda t: core.TASK_LABEL[t],
                                     default="5class", key="task", required=True, label_visibility="collapsed")
         st.caption(core.TASK_HELP[task])
-        keys = [e["key"] for e in core.models_for(task)]
-        key = st.selectbox("Model", keys, format_func=lambda k: core.model_label(core.model_entry(k)), key=f"model_{task}",
-                           help="★ = the version-2 model chosen by cross-validation; the others are the original "
-                                "study's models, kept for comparison. % = accuracy on the held-out test photos.")
+        entry = core.task_model(task)
+        acc = (entry.get("test_metrics") or {}).get("accuracy")
+        st.html(theme.chip(core.short_name(entry), "g")
+                + (theme.chip(f"{100 * acc:.1f}% on held-out test photos", "c") if acc is not None else ""))
+        key = entry["key"]
         explain = st.toggle("Show where it looked (Grad-CAM)", value=True, key="explain")
     return task, key, explain
 
@@ -143,15 +144,15 @@ def _details(r: dict, label: str):
                        "application/json", icon=":material/download:")
 
 
-def _compare(data: bytes, task: str):
-    keys = tuple(e["key"] for e in core.models_for(task))
-    with st.spinner(f"Running all {len(keys)} models of this task…"):
+def _compare(data: bytes):
+    keys = tuple(core.deployment()["defaults_by_task"][t] for t in ("5class", "8class"))
+    with st.spinner("Asking both models…"):
         rows = core.compare(data, keys)
     table = []
     for r in rows:
         e = core.model_entry(r["model"]["key"])
         p = r["prediction"]
-        table.append({"Model": core.short_name(e), "Version": "v2" if e.get("generation") == "upgrade" else "v1",
+        table.append({"Model": core.TASK_LABEL[e["task"]], "Networks": len(e.get("members") or [1]),
                       "Answer": p["name"] if p["status"] in ("Healthy", "Diseased") else p["status"],
                       "Top class": p["name"], "Confidence": p["confidence"], "Status": p["status"],
                       "Time (ms)": round(r["total_ms"])})
@@ -161,9 +162,10 @@ def _compare(data: bytes, task: str):
         "Answer": st.column_config.TextColumn(help="What the app would show: the condition, or Uncertain / Unusual image"),
     })
     agree = df["Top class"].nunique() == 1
-    st.caption("All models agree on the top class." if agree else
-               "The models disagree — a hint that this photo is hard. Prefer the ★ model; it was chosen on "
-               "cross-validation data and is calibrated.")
+    st.caption("Both models agree on the top class." if agree else
+               "The models disagree — a hint that this photo is hard. The focused model is the more reliable one "
+               "for its five conditions; the full model also knows Early Blight, Late Blight and Potassium "
+               "Deficiency, but recognises them poorly.")
 
 
 def _history_add(r: dict, label: str):
@@ -197,6 +199,9 @@ def _result(data: bytes, label: str, task: str, key: str, explain: bool):
     except (UnidentifiedImageError, OSError, ValueError) as exc:
         st.error(f"This file could not be read as an image ({type(exc).__name__}). Please upload a JPEG or PNG photo.")
         return
+    except Exception as exc:  # a server problem: say so instead of crashing the page
+        st.error(f"The diagnosis failed on the server ({type(exc).__name__}: {exc}). Please try again in a moment.")
+        return
     theme.status_card(r)
     p = r["prediction"]
     c1, c2, c3 = st.columns(3)
@@ -221,9 +226,9 @@ def _result(data: bytes, label: str, task: str, key: str, explain: bool):
         _details(r, label)
     _history_add(r, label)
     st.space("small")
-    if st.toggle("Compare every model on this photo", key="compare_on",
-                 help="Runs the version-2 model and all of the original study's models of this task on the same photo."):
-        _compare(data, task)
+    if st.toggle("Ask the other model too", key="compare_on",
+                 help="Runs both Tomato Care models — focused (5 conditions) and full (8 conditions) — on this photo."):
+        _compare(data)
 
 
 def render() -> None:

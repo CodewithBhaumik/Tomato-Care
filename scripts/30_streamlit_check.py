@@ -71,6 +71,8 @@ def main():
     parser.add_argument("--no-shots", action="store_true")
     args = parser.parse_args()
     base = args.url.rstrip("/")
+    if base.endswith(".streamlit.app"):  # Community Cloud serves the app itself in an iframe at /~/+/
+        base += "/~/+"
     report, failures = {"url": base, "pages": [], "diagnose": {}}, []
     SHOTS.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as p:
@@ -122,7 +124,7 @@ def main():
         if page.locator('[data-testid="stImage"]').count() < 2:
             failures.append("Grad-CAM images missing")
         # all-model comparison (5-class)
-        page.get_by_text("Compare every model on this photo").click()
+        page.get_by_text("Ask the other model too").click()
         settle(page)
         page.wait_for_selector('[data-testid="stDataFrame"]', timeout=180000)
         report["diagnose"]["compare"] = "shown"

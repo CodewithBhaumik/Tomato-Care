@@ -101,10 +101,12 @@ def main():
             if shown.strip() != expected:
                 problems.append(f"UI shows '{shown}', API says '{expected}'")
             expect(page.get_by_alt_text("Grad-CAM heat map").first).to_be_visible()
-            page.get_by_role("button", name="Compare models").click()
+            page.get_by_role("button", name="Ask both models").click()
             expect(page.get_by_text("Votes:")).to_be_visible(timeout=180000)
             page.screenshot(path=str(SHOTS / "desktop_diagnose_result.png"), full_page=True)
             checks["compare_rows"] = page.locator("table tbody tr").count()
+            if checks["compare_rows"] != 2:  # the two served (version-2) models
+                problems.append(f"comparison shows {checks['compare_rows']} rows, expected 2")
 
             # ---- invalid upload is rejected with a message
             page.goto(BASE + "/diagnose", wait_until="networkidle")

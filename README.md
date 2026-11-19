@@ -15,6 +15,8 @@ an unusual-image check and Grad-CAM explanations, evaluated without data leakage
 ![React](https://img.shields.io/badge/React-19-61DAFB)
 ![License](https://img.shields.io/badge/code-MIT-green)
 
+**Live app: [tomato-care.streamlit.app](https://tomato-care.streamlit.app)**
+
 <img src="docs/screenshots/streamlit-home-desktop-light.png" width="860" alt="Tomato Care — home page">
 
 </div>
@@ -45,7 +47,9 @@ and how sure it is:
 | **Unusual image** | the photo looks unlike every training photo (not a leaf on paper, another crop, …) |
 
 Every answer comes with the probability of each condition, a Grad-CAM heat map of where the networks looked, the
-symptoms and management of the condition, and — on request — the answers of every other model on the same photo.
+symptoms and management of the condition, and — on request — the answer of the other Tomato Care model (focused
+or full) on the same photo. The apps serve only the version-2 models; the original study's models appear only as
+the baseline in the evaluation.
 
 Two front ends share one prediction engine (`backend/services/predictor.py`):
 
@@ -80,7 +84,7 @@ What this means, without spin:
 * **Full 8-class model: not better than v1.** It was chosen by a rule fixed in advance on out-of-fold data (where it
   ranked first: macro-F1 0.634 vs 0.620 for the original recipe); on the test photos the ranking of these close
   recipes did not hold. Re-choosing after seeing the test results would turn the test set into a tuning set, so the
-  pre-registered choice stays and both results are reported. The app offers the v1 model next to it.
+  pre-registered choice stays and both results are reported.
 * **New in v2:** uploads are converted like the training photos (prediction changes on simulated phone photos fall
   from 2.1–3.5% to 0.0–1.4%, validation), an **unusual-image check** (100% of held-out non-leaf probe images flagged;
   7.9% of normal test photos flagged as the price), and calibrated confidence with an abstention threshold chosen on
@@ -110,7 +114,7 @@ What this means, without spin:
 git clone https://github.com/CodewithBhaumik/Tomato-Care.git && cd Tomato-Care
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt                          # CPU-only PyTorch on Linux; regular wheels elsewhere
-streamlit run streamlit_app.py                           # downloads the weights on first start (1.2 GB, SHA-256 checked)
+streamlit run streamlit_app.py                           # downloads the weights on first start (0.9 GB, SHA-256 checked)
 ```
 
 ### Docker: REST API + React platform in one container
@@ -125,7 +129,7 @@ docker run -p 8000:8000 tomato-care   # open http://localhost:8000  (API docs: /
 ```bash
 pip install torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements-train.txt && pip install -e .
-python scripts/download_weights.py                        # model weights from the release
+python scripts/download_weights.py                        # served model weights from the release (--all: + baselines)
 uvicorn backend.main:app --port 8000                      # API + docs at http://127.0.0.1:8000/api/docs
 cd frontend && npm ci && npm run dev                      # website at http://localhost:5173
 ```
@@ -149,7 +153,7 @@ cd frontend && npm ci && npm run dev                      # website at http://lo
 3. **Advanced settings → Python 3.12**, then **Deploy**.
 
 `requirements.txt` installs CPU-only PyTorch; `.streamlit/config.toml` holds the light and dark themes. On first
-start the app downloads the weights (1.2 GB, SHA-256 checked) from the
+start the app downloads the weights (0.9 GB, SHA-256 checked) from the
 [`weights-v2` release](https://github.com/CodewithBhaumik/Tomato-Care/releases/tag/weights-v2), so the first visit
 after a restart takes longer. It runs in low-memory mode (about 0.9 GB of private memory for the two version-2
 models) to fit a small server.

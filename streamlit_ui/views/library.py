@@ -16,12 +16,11 @@ def _photos(key: str) -> list:
 def _scores(key: str) -> pd.DataFrame:
     rows = []
     for task in ("5class", "8class"):
-        new, old = core.task_defaults(task)
-        for m, ver in ((new, "v2"), (old, "v1")):
-            c = next((c for c in m["per_class"] if c["key"] == key), None)
-            if c:
-                rows.append({"Model": f"{m['name']} ({ver})", "Task": core.TASK_LABEL[task], "Precision": c["precision"],
-                             "Recall": c["recall"], "F1": c["f1"], "Test photos": c["support"]})
+        m, _ = core.task_defaults(task)
+        c = next((c for c in m["per_class"] if c["key"] == key), None)
+        if c:
+            rows.append({"Model": core.TASK_LABEL[task], "Precision": c["precision"], "Recall": c["recall"],
+                         "F1": c["f1"], "Test photos": c["support"]})
     return pd.DataFrame(rows)
 
 

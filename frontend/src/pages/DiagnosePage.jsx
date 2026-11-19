@@ -125,19 +125,19 @@ export default function DiagnosePage() {
               <Card>
                 <CardHeader
                   icon={FlaskConical}
-                  title="Second opinions"
-                  subtitle={`Run every ${task === "5class" ? "5-class" : "8-class"} model on this same photo`}
+                  title="Second opinion"
+                  subtitle="Run both Tomato Care models — focused (5 conditions) and full (8 conditions) — on this photo"
                   action={
-                    <Button variant="secondary" size="sm" onClick={() => runCompare({ task })} loading={compareStatus === "running"} disabled={!online}>
-                      {comparison ? "Run again" : "Compare models"}
+                    <Button variant="secondary" size="sm" onClick={() => runCompare()} loading={compareStatus === "running"} disabled={!online}>
+                      {comparison ? "Run again" : "Ask both models"}
                     </Button>
                   }
                 />
                 <div className="p-5">
-                  {compareStatus === "error" && <ErrorState error={compareError} onRetry={() => runCompare({ task })} />}
-                  {compareStatus === "running" && <p className="text-sm text-muted">Running all models (classical and deep learning) on the same photo…</p>}
+                  {compareStatus === "error" && <ErrorState error={compareError} onRetry={() => runCompare()} />}
+                  {compareStatus === "running" && <p className="text-sm text-muted">Running both models on the same photo…</p>}
                   {comparison && compareStatus === "done" && <CompareTable results={comparison.results} trueKey={result.trueKey} models={models} />}
-                  {compareStatus === "idle" && !comparison && <p className="text-sm text-muted">Compare the original study's models with the upgraded ones on exactly this photo.</p>}
+                  {compareStatus === "idle" && !comparison && <p className="text-sm text-muted">See whether the full 8-condition model agrees with the focused one on exactly this photo.</p>}
                 </div>
               </Card>
             </motion.div>

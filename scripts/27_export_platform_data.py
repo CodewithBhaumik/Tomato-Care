@@ -71,7 +71,7 @@ def gradcam_for(predictor, rgb, class_index):
 def build_gallery(defaults, previous, bench_models):
     manifest = load_json(FRONT / "test-samples" / "manifest.json")
     reg = ModelRegistry(EXPERIMENTS_DIR / "deployment.json", device="cuda" if torch.cuda.is_available() else "cpu", lazy=True)
-    models = [defaults["5class"], defaults["8class"], previous["8class"]]
+    models = [defaults["5class"], defaults["8class"]]  # the apps serve only the version-2 models
     names = {m["key"]: m["name"] for m in bench_models}
     items, hero = [], None
     for s in manifest["samples"]:

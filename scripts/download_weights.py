@@ -1,7 +1,7 @@
 """Download the deployed model weights from the GitHub release and verify their SHA-256.
 
-    python scripts/download_weights.py            # everything in experiments/weights_manifest.json
-    python scripts/download_weights.py --defaults # only the two default models (smaller servers)
+    python scripts/download_weights.py        # the served models (experiments/deployment.json)
+    python scripts/download_weights.py --all  # + the original study's reference models (to re-run the benchmark)
 
 Files that already exist with the right hash are skipped. Uses only the Python standard library.
 """
@@ -17,12 +17,13 @@ from tomatoleaf.weights import DEPLOYMENT, MODELS_DIR, fetch, files_for, is_pres
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--defaults", action="store_true", help="only the files of the two default models")
+    parser.add_argument("--all", action="store_true",
+                        help="also the original study's reference models (needed only to re-run the final benchmark)")
+    parser.add_argument("--defaults", action="store_true", help=argparse.SUPPRESS)  # old flag; now the default
     args = parser.parse_args()
     manifest = load_manifest()
     deployment = json.loads(DEPLOYMENT.read_text(encoding="utf-8"))
-    keys = list(deployment["defaults_by_task"].values()) if args.defaults else None
-    files = files_for(keys, manifest, deployment) if keys else manifest["files"]
+    files = manifest["files"] if args.all else files_for(None, manifest, deployment)
     failed = 0
     for f in files:
         if is_present(f, MODELS_DIR, verify=True):

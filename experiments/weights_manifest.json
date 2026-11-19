@@ -5,6 +5,7 @@
     {
       "path": "deploy/5class/convnext_t_in1k_robust/fold0.pt",
       "asset": "deploy__5class__convnext_t_in1k_robust__fold0.pt",
+      "served": true,
       "bytes": 60107599,
       "sha256": "a987c23b2d69fbfe4df9d140c60eb3ead9d08b41d86137d3b4732c14de3d4d20",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__5class__convnext_t_in1k_robust__fold0.pt"
@@ -12,6 +13,7 @@
     {
       "path": "deploy/5class/convnext_t_in1k_robust/fold1.pt",
       "asset": "deploy__5class__convnext_t_in1k_robust__fold1.pt",
+      "served": true,
       "bytes": 60086095,
       "sha256": "c52da57450c7daab43887f0ca030e3e5341e0ec9e9fbba1c7fc6ea6fadde7267",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__5class__convnext_t_in1k_robust__fold1.pt"
@@ -19,6 +21,7 @@
     {
       "path": "deploy/5class/convnext_t_in1k_robust/fold2.pt",
       "asset": "deploy__5class__convnext_t_in1k_robust__fold2.pt",
+      "served": true,
       "bytes": 60098383,
       "sha256": "2591530a41d57278b2897cb92210237fec9ea791e5d40a0b1d38bbc10cbd55e1",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__5class__convnext_t_in1k_robust__fold2.pt"
@@ -26,6 +29,7 @@
     {
       "path": "deploy/5class/convnext_t_in1k_robust/fold3.pt",
       "asset": "deploy__5class__convnext_t_in1k_robust__fold3.pt",
+      "served": true,
       "bytes": 60096847,
       "sha256": "e18d6ede78c9aeb17e3b44f3e5012fd2589f40c78822e068724a4a3c813e3fe0",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__5class__convnext_t_in1k_robust__fold3.pt"
@@ -33,6 +37,7 @@
     {
       "path": "deploy/5class/convnext_t_in1k_robust/fold4.pt",
       "asset": "deploy__5class__convnext_t_in1k_robust__fold4.pt",
+      "served": true,
       "bytes": 60112207,
       "sha256": "7e2e4c8b0a5ed07b0a167aa770b1b1f9a4cb25b1214148bae08a11e8956c0640",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__5class__convnext_t_in1k_robust__fold4.pt"
@@ -40,6 +45,7 @@
     {
       "path": "deploy/8class/convnext_t_in1k_base/fold0.pt",
       "asset": "deploy__8class__convnext_t_in1k_base__fold0.pt",
+      "served": true,
       "bytes": 60322703,
       "sha256": "3d154fc324d0fe262cccada6c6cc6eef66880eea3e337b1dad01c1c38b662743",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__8class__convnext_t_in1k_base__fold0.pt"
@@ -47,6 +53,7 @@
     {
       "path": "deploy/8class/convnext_t_in1k_base/fold1.pt",
       "asset": "deploy__8class__convnext_t_in1k_base__fold1.pt",
+      "served": true,
       "bytes": 60295055,
       "sha256": "ae24e690f38f9d0ab73625aa9184d427651e13f837ae2b6b27f44e29d7fb2730",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__8class__convnext_t_in1k_base__fold1.pt"
@@ -54,6 +61,7 @@
     {
       "path": "deploy/8class/convnext_t_in1k_base/fold2.pt",
       "asset": "deploy__8class__convnext_t_in1k_base__fold2.pt",
+      "served": true,
       "bytes": 60313487,
       "sha256": "da07e7a95e4a31e9351f7150a15ae3854a1258b9723d921bc644b9f9e475a05a",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__8class__convnext_t_in1k_base__fold2.pt"
@@ -61,6 +69,7 @@
     {
       "path": "deploy/8class/convnext_t_in1k_base/fold3.pt",
       "asset": "deploy__8class__convnext_t_in1k_base__fold3.pt",
+      "served": true,
       "bytes": 60304271,
       "sha256": "cf7f2c122504edc62b869483c340406f357e4f2f71e462d50ba7d6f569828985",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__8class__convnext_t_in1k_base__fold3.pt"
@@ -68,6 +77,7 @@
     {
       "path": "deploy/8class/convnext_t_in1k_base/fold4.pt",
       "asset": "deploy__8class__convnext_t_in1k_base__fold4.pt",
+      "served": true,
       "bytes": 60311951,
       "sha256": "88b13607912902a8d1875abaf394eafa04e691e1901ea0532474060e59c20760",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__8class__convnext_t_in1k_base__fold4.pt"
@@ -75,6 +85,7 @@
     {
       "path": "deploy/8class/convnext_t_in1k_robust/fold0.pt",
       "asset": "deploy__8class__convnext_t_in1k_robust__fold0.pt",
+      "served": true,
       "bytes": 60322703,
       "sha256": "b1e9ce47c8df9f0d25f0e66bac4ea4a27d0e6c83d0a7f7aff62242c1184d86e5",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__8class__convnext_t_in1k_robust__fold0.pt"
@@ -82,6 +93,7 @@
     {
       "path": "deploy/8class/convnext_t_in1k_robust/fold1.pt",
       "asset": "deploy__8class__convnext_t_in1k_robust__fold1.pt",
+      "served": true,
       "bytes": 60295055,
       "sha256": "108cb04cc0013711e2cdce91dd00b6407d9bb45da807b617dfa3bf4626effa3b",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__8class__convnext_t_in1k_robust__fold1.pt"
@@ -89,6 +101,7 @@
     {
       "path": "deploy/8class/convnext_t_in1k_robust/fold2.pt",
       "asset": "deploy__8class__convnext_t_in1k_robust__fold2.pt",
+      "served": true,
       "bytes": 60313487,
       "sha256": "b615d0256ea340b5c24b5ea00223d6a2a16587489bcd100787ce62e5fda32a0f",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__8class__convnext_t_in1k_robust__fold2.pt"
@@ -96,6 +109,7 @@
     {
       "path": "deploy/8class/convnext_t_in1k_robust/fold3.pt",
       "asset": "deploy__8class__convnext_t_in1k_robust__fold3.pt",
+      "served": true,
       "bytes": 60304271,
       "sha256": "0ff7a17a525b6b73a8cbd4c7889b7ce54845b2b329095f88cc0e207dde197bb9",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__8class__convnext_t_in1k_robust__fold3.pt"
@@ -103,6 +117,7 @@
     {
       "path": "deploy/8class/convnext_t_in1k_robust/fold4.pt",
       "asset": "deploy__8class__convnext_t_in1k_robust__fold4.pt",
+      "served": true,
       "bytes": 60311951,
       "sha256": "396661eae3d3cb384e047a37ab0eb0883bac32aa5d1ce8f5f78f941e89413101",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/deploy__8class__convnext_t_in1k_robust__fold4.pt"
@@ -110,6 +125,7 @@
     {
       "path": "dl/clean/convnext_tiny_5class.pt",
       "asset": "dl__clean__convnext_tiny_5class.pt",
+      "served": false,
       "bytes": 111365471,
       "sha256": "41b2172135d8c106c62eaa493acf4e4ec3aa48102c4db1182166ea4257f02344",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/dl__clean__convnext_tiny_5class.pt"
@@ -117,6 +133,7 @@
     {
       "path": "dl/clean/convnext_tiny_v2.pt",
       "asset": "dl__clean__convnext_tiny_v2.pt",
+      "served": false,
       "bytes": 111373999,
       "sha256": "ec5b150a672fb1939b66838d71f33fcf88c38c7b8cf297bca0d46927bed77444",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/dl__clean__convnext_tiny_v2.pt"
@@ -124,6 +141,7 @@
     {
       "path": "dl/clean/efficientnet_b0_5class.pt",
       "asset": "dl__clean__efficientnet_b0_5class.pt",
+      "served": false,
       "bytes": 16360417,
       "sha256": "e524acb813f2c2986a33497234b870924271bbb15ce293adff1f5ba15e07ad0e",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/dl__clean__efficientnet_b0_5class.pt"
@@ -131,6 +149,7 @@
     {
       "path": "dl/clean/efficientnet_b0_v2.pt",
       "asset": "dl__clean__efficientnet_b0_v2.pt",
+      "served": false,
       "bytes": 16374121,
       "sha256": "c726f21b4b7ab10ca39272f16682d85ce476b9feb2717ce0df293dbae3a6d724",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/dl__clean__efficientnet_b0_v2.pt"
@@ -138,6 +157,7 @@
     {
       "path": "dl/clean/mobilenetv2_ft.pt",
       "asset": "dl__clean__mobilenetv2_ft.pt",
+      "served": false,
       "bytes": 9183883,
       "sha256": "9eab21132a0816a507905d05dcfadea111ef368ef427d1da257337c007d41461",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/dl__clean__mobilenetv2_ft.pt"
@@ -145,6 +165,7 @@
     {
       "path": "ml/rf_5class.joblib",
       "asset": "ml__rf_5class.joblib",
+      "served": false,
       "bytes": 23569379,
       "sha256": "ecdd22c7780fdd611bab359e0b82cb0bcb8c03a2fe94c3101f1a59e0e0501bdc",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/ml__rf_5class.joblib"
@@ -152,6 +173,7 @@
     {
       "path": "ml/rf__color.joblib",
       "asset": "ml__rf__color.joblib",
+      "served": false,
       "bytes": 38026486,
       "sha256": "3a1b1f3a4733c02367a0b38f3b8f6be33ce958fda75c854b2417a4b4e6c376d1",
       "url": "https://github.com/CodewithBhaumik/Tomato-Care/releases/download/weights-v2/ml__rf__color.joblib"

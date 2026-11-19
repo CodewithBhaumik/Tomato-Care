@@ -76,8 +76,8 @@ def test_models_have_one_default_per_task(client):
     by_key = {m["key"]: m for m in body["models"]}
     assert by_key[defaults["5class"]]["classes"] == FIVE and by_key[defaults["8class"]]["classes"] == CLASS_KEYS
     assert all(m["loaded"] for m in body["models"]), [m["key"] for m in body["models"] if not m["loaded"]]
-    assert {m["generation"] for m in body["models"]} == {"original", "upgrade"}
-    assert {m["family"] for m in body["models"]} == {"Classical ML", "Deep learning"}
+    assert set(by_key) == set(defaults.values())  # only the version-2 models are served
+    assert {m["generation"] for m in body["models"]} == {"upgrade"}
     for key in defaults.values():
         m = by_key[key]
         assert m["operating_point"]["chosen_on"].startswith("out-of-fold")
@@ -190,9 +190,19 @@ def test_explain_does_not_change_the_prediction(client, test_photo):
     assert plain["explanation"] is None and "input_image" not in plain
 
 
-def test_classical_model_explain_returns_note(client, test_photo):
-    _, data = test_photo
-    body = post(client, data, "?model=rf&explain=true").json()
+def test_classical_model_explain_returns_note(test_photo, tmp_path):
+    """No classical model is served any more, but the registry still handles one correctly (benchmark entry)."""
+    import json
+
+    from backend.services.predictor import ModelRegistry
+    from tomatoleaf.preprocessing import prepare_upload
+
+    rf = next(m for m in load_json(EXPERIMENTS_DIR / "benchmark_models.json")["models"] if m["key"] == "rf")
+    if not (MODELS_DIR / rf["path"]).exists():
+        pytest.skip("reference model weights not downloaded (scripts/download_weights.py --all)")
+    dep = tmp_path / "deployment.json"
+    dep.write_text(json.dumps({"default_model": "rf", "confidence_threshold": 0.6, "models": [rf]}), encoding="utf-8")
+    body = ModelRegistry(dep, device="cpu").predict(prepare_upload(BytesIO(test_photo[1]))[0], "rf", explain=True)
     assert body["explanation"]["overlay"] is None and body["explanation"]["note"]
     assert body["ood"] is None
 
@@ -213,6 +223,8 @@ def test_compare_runs_models_on_the_same_image(client, test_photo):
     pick = [models[0]["key"], models[-1]["key"]]
     body = client.post(f"/api/compare?models={','.join(pick)}", files={"file": ("leaf.jpg", data, "image/jpeg")}).json()
     assert [r["model"]["key"] for r in body["results"]] == pick
+    body = client.post("/api/compare", files={"file": ("leaf.jpg", data, "image/jpeg")}).json()
+    assert [r["model"]["key"] for r in body["results"]] == [m["key"] for m in models]  # both version-2 models
     r = client.post("/api/compare?models=nope", files={"file": ("leaf.jpg", data, "image/jpeg")})
     assert r.status_code == 404
 
@@ -304,5 +316,6 @@ def test_lazy_registry_loads_on_first_use(test_photo):
     lazy = ModelRegistry(lazy=True)
     assert list(lazy.models) == [lazy.default_key]  # only the default is loaded up front
     rgb, _ = prepare_upload(data)
-    out = lazy.predict(rgb, "rf")
-    assert "rf" in lazy.models and out["model"]["key"] == "rf"
+    other = next(k for k in lazy.meta["defaults_by_task"].values() if k != lazy.default_key)
+    out = lazy.predict(rgb, other)
+    assert other in lazy.models and out["model"]["key"] == other

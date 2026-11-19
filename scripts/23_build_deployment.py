@@ -122,8 +122,9 @@ def main():
              "confidence_threshold": 0.6, "models": upgrade + legacy}
     save_json(bench, EXPERIMENTS_DIR / "benchmark_models.json")
 
-    serve = {"upgrade_5class", "upgrade_8class", "ensemble_5class", "rf_5class", "convnext_tiny_v2_tta",
-             "convnext_tiny_v2", "efficientnet_b0_v2", "mobilenetv2_ft", "rf"}
+    # The apps and the API serve only the version-2 models; the original study's models stay in the benchmark (as the
+    # baseline) and in deployment_v1.json (their weights remain in the release to reproduce the comparison).
+    serve = set(defaults.values())
     deployment = {**{k: v for k, v in bench.items() if k != "models"},
                   "models": [m for m in bench["models"] if m["key"] in serve]}
     save_json(deployment, EXPERIMENTS_DIR / "deployment.json")

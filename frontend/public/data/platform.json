@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generated_at": "2026-11-19T08:47:58",
+  "generated_at": "2026-11-19T09:29:02",
   "project": {
     "name": "Tomato Care"
   },
@@ -2423,7 +2423,7 @@
       "tta_views": 1,
       "recipe": null,
       "recipes": null,
-      "deployed": true,
+      "deployed": false,
       "is_default": false,
       "description": "Color",
       "cv": null,
@@ -3189,7 +3189,7 @@
       "tta_views": 1,
       "recipe": null,
       "recipes": null,
-      "deployed": true,
+      "deployed": false,
       "is_default": false,
       "description": "Learned features (ImageNet-pretrained MobileNetV2, 224px)",
       "cv": null,
@@ -3449,7 +3449,7 @@
       "tta_views": 1,
       "recipe": null,
       "recipes": null,
-      "deployed": true,
+      "deployed": false,
       "is_default": false,
       "description": "Learned features (ImageNet-pretrained EfficientNet-B0, 256px)",
       "cv": null,
@@ -3709,7 +3709,7 @@
       "tta_views": 1,
       "recipe": null,
       "recipes": null,
-      "deployed": true,
+      "deployed": false,
       "is_default": false,
       "description": "Learned features (ImageNet-pretrained ConvNeXt-Tiny, 256px)",
       "cv": null,
@@ -3969,7 +3969,7 @@
       "tta_views": 8,
       "recipe": null,
       "recipes": null,
-      "deployed": true,
+      "deployed": false,
       "is_default": false,
       "description": "Learned features; averaged over 8 test-time views",
       "cv": null,
@@ -4607,7 +4607,7 @@
       "tta_views": 1,
       "recipe": null,
       "recipes": null,
-      "deployed": true,
+      "deployed": false,
       "is_default": false,
       "description": "Color",
       "cv": null,
@@ -5538,7 +5538,7 @@
       "tta_views": 8,
       "recipe": null,
       "recipes": null,
-      "deployed": true,
+      "deployed": false,
       "is_default": false,
       "description": "Average of calibrated probabilities: ConvNeXt-Tiny (single view) + EfficientNet-B0 (8-view TTA)",
       "cv": null,
@@ -8311,17 +8311,6 @@
             "overlay": "/gradcam/upgrade_8class/early_blight_overlay.png",
             "heatmap": "/gradcam/upgrade_8class/early_blight_heat.png",
             "on_leaf_share": 0.7332889139328065
-          },
-          {
-            "model": "convnext_tiny_v2_tta",
-            "model_name": "ConvNeXt-Tiny + TTA (original 8-class default)",
-            "pred_key": "spotted_wilt_virus",
-            "confidence": 0.9220996010131298,
-            "correct": false,
-            "out_of_scope": false,
-            "overlay": "/gradcam/convnext_tiny_v2_tta/early_blight_overlay.png",
-            "heatmap": "/gradcam/convnext_tiny_v2_tta/early_blight_heat.png",
-            "on_leaf_share": 0.7026275204235416
           }
         ]
       },
@@ -8352,17 +8341,6 @@
             "overlay": "/gradcam/upgrade_8class/healthy_overlay.png",
             "heatmap": "/gradcam/upgrade_8class/healthy_heat.png",
             "on_leaf_share": 0.6695378086398095
-          },
-          {
-            "model": "convnext_tiny_v2_tta",
-            "model_name": "ConvNeXt-Tiny + TTA (original 8-class default)",
-            "pred_key": "healthy",
-            "confidence": 0.8269026329334747,
-            "correct": true,
-            "out_of_scope": false,
-            "overlay": "/gradcam/convnext_tiny_v2_tta/healthy_overlay.png",
-            "heatmap": "/gradcam/convnext_tiny_v2_tta/healthy_heat.png",
-            "on_leaf_share": 0.6815732884586018
           }
         ]
       },
@@ -8393,17 +8371,6 @@
             "overlay": "/gradcam/upgrade_8class/late_blight_overlay.png",
             "heatmap": "/gradcam/upgrade_8class/late_blight_heat.png",
             "on_leaf_share": 0.24832738095793291
-          },
-          {
-            "model": "convnext_tiny_v2_tta",
-            "model_name": "ConvNeXt-Tiny + TTA (original 8-class default)",
-            "pred_key": "late_blight",
-            "confidence": 0.8718248171059882,
-            "correct": true,
-            "out_of_scope": false,
-            "overlay": "/gradcam/convnext_tiny_v2_tta/late_blight_overlay.png",
-            "heatmap": "/gradcam/convnext_tiny_v2_tta/late_blight_heat.png",
-            "on_leaf_share": 0.23053583000954336
           }
         ]
       },
@@ -8434,17 +8401,6 @@
             "overlay": "/gradcam/upgrade_8class/leaf_miner_overlay.png",
             "heatmap": "/gradcam/upgrade_8class/leaf_miner_heat.png",
             "on_leaf_share": 0.7031398101262613
-          },
-          {
-            "model": "convnext_tiny_v2_tta",
-            "model_name": "ConvNeXt-Tiny + TTA (original 8-class default)",
-            "pred_key": "leaf_miner",
-            "confidence": 0.9111956078389811,
-            "correct": true,
-            "out_of_scope": false,
-            "overlay": "/gradcam/convnext_tiny_v2_tta/leaf_miner_overlay.png",
-            "heatmap": "/gradcam/convnext_tiny_v2_tta/leaf_miner_heat.png",
-            "on_leaf_share": 0.5979512837447287
           }
         ]
       },
@@ -8475,17 +8431,6 @@
             "overlay": "/gradcam/upgrade_8class/magnesium_deficiency_overlay.png",
             "heatmap": "/gradcam/upgrade_8class/magnesium_deficiency_heat.png",
             "on_leaf_share": 0.7814729210833007
-          },
-          {
-            "model": "convnext_tiny_v2_tta",
-            "model_name": "ConvNeXt-Tiny + TTA (original 8-class default)",
-            "pred_key": "magnesium_deficiency",
-            "confidence": 0.9592285198276371,
-            "correct": true,
-            "out_of_scope": false,
-            "overlay": "/gradcam/convnext_tiny_v2_tta/magnesium_deficiency_overlay.png",
-            "heatmap": "/gradcam/convnext_tiny_v2_tta/magnesium_deficiency_heat.png",
-            "on_leaf_share": 0.777749956598961
           }
         ]
       },
@@ -8516,17 +8461,6 @@
             "overlay": "/gradcam/upgrade_8class/nitrogen_deficiency_overlay.png",
             "heatmap": "/gradcam/upgrade_8class/nitrogen_deficiency_heat.png",
             "on_leaf_share": 0.5147560779313816
-          },
-          {
-            "model": "convnext_tiny_v2_tta",
-            "model_name": "ConvNeXt-Tiny + TTA (original 8-class default)",
-            "pred_key": "nitrogen_deficiency",
-            "confidence": 0.2905767034367266,
-            "correct": true,
-            "out_of_scope": false,
-            "overlay": "/gradcam/convnext_tiny_v2_tta/nitrogen_deficiency_overlay.png",
-            "heatmap": "/gradcam/convnext_tiny_v2_tta/nitrogen_deficiency_heat.png",
-            "on_leaf_share": 0.3833415361641495
           }
         ]
       },
@@ -8557,17 +8491,6 @@
             "overlay": "/gradcam/upgrade_8class/potassium_deficiency_overlay.png",
             "heatmap": "/gradcam/upgrade_8class/potassium_deficiency_heat.png",
             "on_leaf_share": 0.5539445040465799
-          },
-          {
-            "model": "convnext_tiny_v2_tta",
-            "model_name": "ConvNeXt-Tiny + TTA (original 8-class default)",
-            "pred_key": "late_blight",
-            "confidence": 0.36550653647392484,
-            "correct": false,
-            "out_of_scope": false,
-            "overlay": "/gradcam/convnext_tiny_v2_tta/potassium_deficiency_overlay.png",
-            "heatmap": "/gradcam/convnext_tiny_v2_tta/potassium_deficiency_heat.png",
-            "on_leaf_share": 0.34563251404482837
           }
         ]
       },
@@ -8598,31 +8521,18 @@
             "overlay": "/gradcam/upgrade_8class/spotted_wilt_virus_overlay.png",
             "heatmap": "/gradcam/upgrade_8class/spotted_wilt_virus_heat.png",
             "on_leaf_share": 0.8826907875882961
-          },
-          {
-            "model": "convnext_tiny_v2_tta",
-            "model_name": "ConvNeXt-Tiny + TTA (original 8-class default)",
-            "pred_key": "spotted_wilt_virus",
-            "confidence": 0.7068539277304003,
-            "correct": true,
-            "out_of_scope": false,
-            "overlay": "/gradcam/convnext_tiny_v2_tta/spotted_wilt_virus_overlay.png",
-            "heatmap": "/gradcam/convnext_tiny_v2_tta/spotted_wilt_virus_heat.png",
-            "on_leaf_share": 0.8270057759023134
           }
         ]
       }
     ],
     "models": [
       "upgrade_5class",
-      "upgrade_8class",
-      "convnext_tiny_v2_tta"
+      "upgrade_8class"
     ],
-    "summary": "Mean share of Grad-CAM mass on the leaf (leaf mask from saturation thresholding): ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default) 65%; ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default) 64%; ConvNeXt-Tiny + TTA (original 8-class default) 57%.",
+    "summary": "Mean share of Grad-CAM mass on the leaf (leaf mask from saturation thresholding): ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default) 65%; ConvNeXt-T IN-1k \u00b7 original recipe + ConvNeXt-T IN-1k \u00b7 robust fold ensemble (upgrade default) 64%.",
     "on_leaf_share": {
       "upgrade_5class": 0.6529439857031885,
-      "upgrade_8class": 0.6358947755382961,
-      "convnext_tiny_v2_tta": 0.5683022131683335
+      "upgrade_8class": 0.6358947755382961
     }
   },
   "hero": {

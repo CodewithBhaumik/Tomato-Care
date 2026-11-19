@@ -3,16 +3,16 @@ import altair as alt
 import pandas as pd
 
 GREEN, CYAN, AMBER, RED, VIOLET, GRAY = "#22a262", "#0891b2", "#f29a16", "#f0543f", "#7c3aed", "#94a3b8"
-GEN_LABEL = {"upgrade": "v2 · upgrade", "original": "v1 · original study"}
 
 
 def generation(m: dict) -> str:
     if m.get("generation") == "upgrade":
-        return "v2 · upgrade"
-    return "Classical ML (v1)" if m.get("family") == "Classical ML" else "v1 · original study"
+        return "Tomato Care v2"
+    return "Baseline · classical ML" if m.get("family") == "Classical ML" else "Baseline · original study"
 
 
-GEN_SCALE = alt.Scale(domain=["v2 · upgrade", "v1 · original study", "Classical ML (v1)"], range=[GREEN, CYAN, GRAY])
+GEN_SCALE = alt.Scale(domain=["Tomato Care v2", "Baseline · original study", "Baseline · classical ML"],
+                      range=[GREEN, CYAN, GRAY])
 
 
 def probabilities(rows: list[dict], top_key: str, threshold: float | None) -> alt.Chart:

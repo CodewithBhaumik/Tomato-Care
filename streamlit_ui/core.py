@@ -138,25 +138,14 @@ def model_entry(key: str) -> dict:
     return next(e for e in deployment()["models"] if e["key"] == key)
 
 
-def models_for(task: str) -> list[dict]:
-    """Deployed models of one task: the upgrade default first, then the original study's models."""
-    entries = [e for e in deployment()["models"] if e.get("task") == task]
-    default = deployment()["defaults_by_task"][task]
-    return sorted(entries, key=lambda e: (e["key"] != default, e.get("generation") != "upgrade", e["name"]))
+def task_model(task: str) -> dict:
+    """The served (version-2) model of a task."""
+    return model_entry(deployment()["defaults_by_task"][task])
 
 
 def short_name(entry: dict) -> str:
-    """Display name: the version-2 fold ensembles by size, the original study's models by architecture."""
-    if entry.get("generation") == "upgrade":
-        n = len(entry.get("members") or [1])
-        return f"Tomato Care v2 ({n} networks)"
-    return entry["name"].split(" (original")[0] + " · v1"
-
-
-def model_label(entry: dict) -> str:
-    star = "★ " if entry["key"] in deployment()["defaults_by_task"].values() else ""
-    acc = (entry.get("test_metrics") or {}).get("accuracy")
-    return f"{star}{short_name(entry)}" + (f" · {100 * acc:.1f}%" if acc is not None else "")
+    n = len(entry.get("members") or [1])
+    return f"Tomato Care v2 · {n} ConvNeXt-T networks"
 
 
 # ---------------------------------------------------------------------------------------------------- inference
@@ -178,7 +167,14 @@ def predict(image_bytes: bytes, model_key: str, explain: bool = True) -> dict:
     """One diagnosis (the API's /api/predict response) plus the canonical input and the Grad-CAM heat map."""
     rgb, info = canonical(image_bytes)
     t0 = time.perf_counter()
-    out = registry().predict(rgb, model_key, explain=explain)
+    try:
+        out = registry().predict(rgb, model_key, explain=explain)
+    except Exception as exc:  # never lose the diagnosis because the heat map failed
+        if not explain:
+            raise
+        out = registry().predict(rgb, model_key, explain=False)
+        out["explanation"] = {"method": None, "overlay": None, "heatmap": None,
+                              "note": f"Grad-CAM is unavailable on this server ({type(exc).__name__})."}
     out["total_ms"] = 1000 * (time.perf_counter() - t0)
     out["input"] = info
     out["canonical"] = rgb

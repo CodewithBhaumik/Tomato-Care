@@ -1,4 +1,4 @@
-"""Home: what Tomato Care does, the headline results (v2 against v1) and what changed."""
+"""Home: what Tomato Care does, its headline test results and what is inside."""
 import base64
 import io
 
@@ -26,8 +26,8 @@ def _hero_figure(hero: dict | None) -> str:
 
 def render() -> None:
     data = core.platform()
-    new5, old5 = core.task_defaults("5class")
-    new8, old8 = core.task_defaults("8class")
+    new5, _ = core.task_defaults("5class")
+    new8, _ = core.task_defaults("8class")
 
     with st.container(key="hero"):
         left, right = st.columns([1.25, 1], gap="large", vertical_alignment="center")
@@ -48,53 +48,49 @@ def render() -> None:
 
     st.space("medium")
     theme.section("Measured, not claimed",
-                  "Every number below comes from the same 290 held-out test photos, scored once after every model "
-                  "choice was fixed on cross-validation data. Differences are against the original study (v1).",
+                  "Every number below comes from held-out test photos (290; 265 in the focused scope), scored once "
+                  "after the models had been chosen on cross-validation data. Brackets: 95% confidence intervals.",
                   kicker="Results")
     c1, c2, c3, c4 = st.columns(4)
+    ci5, ci8 = new5["test"]["accuracy_ci"], new8["test"]["accuracy_ci"]
     c1.metric("Focused · accuracy", core.pct(new5["test"]["accuracy"]),
-              delta=f"{core.pts(new5['test']['accuracy'] - old5['test']['accuracy'])} vs v1", border=True,
-              help="Five conditions (the app's default task), 265 test photos. 95% CI "
-                   f"{core.pct(new5['test']['accuracy_ci'][0])}–{core.pct(new5['test']['accuracy_ci'][1])}.")
+              delta=f"[{core.pct(ci5[0])} – {core.pct(ci5[1])}]", delta_color="off", border=True,
+              help="Five conditions — Healthy, Leaf Miner, Magnesium and Nitrogen Deficiency, Spotted Wilt Virus "
+                   f"(the app's default task); macro-F1 {new5['test']['f1_macro']:.3f}.")
     sel = new5["selective"]
     c2.metric("Focused · when it answers", core.pct(sel["accuracy_kept"]),
               delta=f"answers {core.pct(sel['coverage'], 0)} of photos", delta_color="off", border=True,
-              help="Below its confidence threshold (or for an unusual photo) the app says 'not sure' instead. "
-                   f"v1 at its own threshold: {core.pct(old5['selective']['accuracy_kept'])} on "
-                   f"{core.pct(old5['selective']['coverage'], 0)} of photos.")
+              help="Below its confidence threshold, or for an unusual photo, the app says 'not sure' instead of "
+                   "guessing; this is its accuracy on the photos it does answer.")
     c3.metric("8 conditions · accuracy", core.pct(new8["test"]["accuracy"]),
-              delta=f"{core.pts(new8['test']['accuracy'] - old8['test']['accuracy'])} vs v1", border=True,
-              help="Includes the three hard classes (Early Blight, Late Blight, Potassium Deficiency). 95% CI "
-                   f"{core.pct(new8['test']['accuracy_ci'][0])}–{core.pct(new8['test']['accuracy_ci'][1])}.")
-    far = data["ood"]["test"]["flagged_far"]
-    c4.metric("Non-leaf photos caught", core.pct(far, 0), delta="new in v2 · v1 had no check", delta_color="off",
-              border=True, help="Share of held-out non-leaf probe images (photos, textures, drawings) flagged as "
-                                "'Unusual image' instead of receiving a diagnosis.")
-    comp5, comp8 = core.headline_comparison("5class"), core.headline_comparison("8class")
-    if comp5 and comp8:
-        st.caption(
-            f"Paired bootstrap over leaf groups (v2 − v1): focused task accuracy {core.pts(comp5['accuracy_diff'])} "
-            f"(95% CI {core.pts(comp5['accuracy_ci'][0])} to {core.pts(comp5['accuracy_ci'][1])}); full task "
-            f"{core.pts(comp8['accuracy_diff'])} (95% CI {core.pts(comp8['accuracy_ci'][0])} to "
-            f"{core.pts(comp8['accuracy_ci'][1])}). Intervals that include 0 mean the difference is within the noise "
-            "of a 290-photo test set.")
+              delta=f"[{core.pct(ci8[0])} – {core.pct(ci8[1])}]", delta_color="off", border=True,
+              help="Includes the three hard classes (Early Blight, Late Blight, Potassium Deficiency), which have "
+                   f"few training photos; macro-F1 {new8['test']['f1_macro']:.3f}.")
+    ood = data["ood"]["test"]
+    c4.metric("Non-leaf photos caught", core.pct(ood["flagged_far"], 0),
+              delta=f"{core.pct(ood['flagged_in'], 0)} of normal photos flagged too", delta_color="off", border=True,
+              help="Held-out non-leaf probe images (photos, textures, drawings) answered with 'Unusual image' "
+                   "instead of a diagnosis — and the price: normal leaf photos sent there as well.")
+    st.caption("How these models were chosen, how they compare with the original study's models and where they "
+               "fail: see the Model lab and How it works.")
 
     st.space("medium")
-    theme.section("What changed in version 2", kicker="Upgrade")
+    theme.section("What is inside", kicker="Tomato Care v2")
     rows = [
         [("tune", "Sees uploads the way it was trained",
-          "Dataset photos are whole 3:4 phone frames squashed to 256×256 in Display P3 colour. Uploads now go through "
-          "the same steps (the old app centre-cropped them and ignored colour profiles)."),
+          "The dataset photos are whole 3:4 phone frames squashed to 256×256 in Display P3 colour. Every upload goes "
+          "through exactly the same steps before a model sees it."),
          ("account_tree", "Chosen by cross-validation",
-          "Five-fold cross-validation on 1,813 photos, leaf groups never split, replaced a single 311-photo "
-          "validation split on which one photo could move the score by 0.12."),
-         ("groups", "A committee of five",
-          "Each deployed model is the five fold networks voting together; every member has data it never saw, so "
+          "Five-fold cross-validation on 1,813 photos, leaf groups never split, and a selection rule fixed before "
+          "the test photos were scored."),
+         ("groups", "A committee of networks",
+          "Each model is its cross-validation networks voting together; every member has photos it never saw, so "
           "its calibration was fitted honestly.")],
         [("help", "Says “not sure”",
           "Temperature-scaled confidence and a threshold chosen on out-of-fold data: below it, no diagnosis."),
          ("image_not_supported", "Flags unusual photos",
-          "Feature-space distance to the training photos catches non-leaf images and many unknown conditions."),
+          "Feature-space distance to the training photos catches non-leaf images. Unknown leaf conditions are "
+          "harder: most are not flagged."),
          ("visibility", "Shows where it looked",
           "Grad-CAM heat maps for every diagnosis, so you can check the model looked at the leaf.")],
     ]
