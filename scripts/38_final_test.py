@@ -48,9 +48,9 @@ from tomatoleaf.utils import load_json, save_json, set_seed  # noqa: E402
 
 FIVE = ["healthy", "leaf_miner", "magnesium_deficiency", "nitrogen_deficiency", "spotted_wilt_virus"]
 FINAL = {"5class": "focused_5class", "8class": "full_8class"}
-ORIGINAL = {"5class": ["balanced_5class", "calibrated_5class", "ensemble_5class"],
-            "8class": ["balanced_8class", "convnext_tiny_v2_tta"]}
-SERVED_BEFORE = {"5class": "balanced_5class", "8class": "balanced_8class"}
+ORIGINAL = {"5class": ["focused_5class_r1", "balanced_5class", "calibrated_5class", "ensemble_5class"],
+            "8class": ["full_8class_r1", "balanced_8class", "convnext_tiny_v2_tta"]}
+SERVED_BEFORE = {"5class": "focused_5class_r1", "8class": "full_8class_r1"}  # live before the last round
 OUT_FIG = FIGURES_DIR / "final"
 
 

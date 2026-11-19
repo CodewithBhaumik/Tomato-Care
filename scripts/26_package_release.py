@@ -20,7 +20,8 @@ from tomatoleaf.config import EXPERIMENTS_DIR, MODELS_DIR
 from tomatoleaf.utils import load_json, save_json
 
 RELEASE_TAG = "weights-v3"
-REFERENCE = ["balanced_5class", "calibrated_5class", "balanced_8class",  # v2.1 served models (the "before" of the final round)
+REFERENCE = ["focused_5class_r1", "full_8class_r1",  # live before the last round
+             "balanced_5class", "calibrated_5class", "balanced_8class",  # v2.1 served models
              "ensemble_5class", "convnext_tiny_v2_tta", "convnext_tiny_v2", "efficientnet_b0_v2", "mobilenetv2_ft",
              "rf", "rf_5class"]  # keys in experiments/benchmark_models.json
 

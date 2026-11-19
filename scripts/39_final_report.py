@@ -15,7 +15,7 @@ from tomatoleaf.utils import load_json  # noqa: E402
 NAME = {c["key"]: c["name"] for c in CLASSES}
 FIVE = ["healthy", "leaf_miner", "magnesium_deficiency", "nitrogen_deficiency", "spotted_wilt_virus"]
 FINAL = {"5class": "focused_5class", "8class": "full_8class"}
-BEFORE = {"5class": "balanced_5class", "8class": "balanced_8class"}
+BEFORE = {"5class": "focused_5class_r1", "8class": "full_8class_r1"}  # live before the last round
 TASK = {"5class": "Focused model (5 conditions)", "8class": "Full model (8 conditions)"}
 STRESS = {"blur_sigma2": "Blur (σ 2)", "blur_sigma4": "Strong blur (σ 4)", "dark_x0.35": "Very dark (×0.35)",
           "overexposed_x1.7": "Over-exposed (×1.7)", "jpeg_q15": "Heavy JPEG (quality 15)",
@@ -98,8 +98,9 @@ def main():
             "Threshold", "Answered", "Accuracy when answering", "Unsupported photos: confident wrong answer"]
     rows = []
     for t in ("5class", "8class"):
-        for key in [FINAL[t]] + [k for k in ("balanced_5class", "calibrated_5class", "ensemble_5class", "balanced_8class",
-                                             "convnext_tiny_v2_tta") if fr["models"].get(k, {}).get("task") == t]:
+        for key in [FINAL[t]] + [k for k in ("focused_5class_r1", "full_8class_r1", "balanced_5class", "calibrated_5class",
+                                             "ensemble_5class", "balanced_8class", "convnext_tiny_v2_tta")
+                                 if fr["models"].get(k, {}).get("task") == t]:
             r = fr["models"][key]
             te = r["test"]
             rows.append([("**" + r["name"] + "**") if key == FINAL[t] else r["name"],

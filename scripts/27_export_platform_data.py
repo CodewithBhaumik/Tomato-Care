@@ -121,8 +121,8 @@ def final_round_block(final_pipe, final_round, final_keys):
                             if k.startswith(("auroc", "flagged", "out_of_scope"))}},
                 "reference": fp.get("reference") or None}
         if final_round:
-            before = {"5class": ["balanced_5class", "calibrated_5class", "ensemble_5class"],
-                      "8class": ["balanced_8class", "convnext_tiny_v2_tta"]}[t]
+            before = {"5class": ["focused_5class_r1", "balanced_5class", "calibrated_5class", "ensemble_5class"],
+                      "8class": ["full_8class_r1", "balanced_8class", "convnext_tiny_v2_tta"]}[t]
             rows = []
             for key in [final_keys[t]] + before:
                 r = final_round["models"].get(key)

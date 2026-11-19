@@ -1356,11 +1356,11 @@
       }
     },
     {
-      "key": "focused_5class",
-      "name": "Tomato Care \u00b7 Focused (5 conditions)",
+      "key": "focused_5class_r1",
+      "name": "Tomato Care \u00b7 Focused (5 conditions) (round 1)",
       "task": "5class",
       "generation": "upgrade",
-      "round": "final",
+      "round": "final-1",
       "family": "Deep learning",
       "kind": "ensemble",
       "type": "ensemble",
@@ -1498,11 +1498,11 @@
       "latency_ms": 143.45940000202972
     },
     {
-      "key": "full_8class",
-      "name": "Tomato Care \u00b7 Full (8 conditions)",
+      "key": "full_8class_r1",
+      "name": "Tomato Care \u00b7 Full (8 conditions) (round 1)",
       "task": "8class",
       "generation": "upgrade",
-      "round": "final",
+      "round": "final-1",
       "family": "Deep learning",
       "kind": "ensemble",
       "type": "ensemble",
