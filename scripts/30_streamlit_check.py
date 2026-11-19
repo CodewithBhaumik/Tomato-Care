@@ -133,7 +133,9 @@ def main():
         # 8-class model
         focused = page.locator(".tc-status").first.inner_text()
         segment(page, "Full · 8 conditions").click()
-        page.wait_for_selector("text=10 ConvNeXt-T networks", timeout=120000)
+        dep = json.loads((ROOT / "experiments" / "deployment.json").read_text(encoding="utf-8"))
+        full = next(e for e in dep["models"] if e["key"] == dep["defaults_by_task"]["8class"])
+        page.wait_for_selector(f"text=Full · {len(full['members'])} ConvNeXt-T networks", timeout=300000)
         for _ in range(60):  # a slow server may still show the previous answer for a moment
             text = page.locator(".tc-status").first.inner_text() if page.locator(".tc-status").count() else ""
             if text and text != focused:
