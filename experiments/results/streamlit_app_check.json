@@ -123,10 +123,10 @@
     }
   ],
   "diagnose": {
-    "example": "CONDITION DETECTED \u00b7 96.6% CONFIDENCE\nLeaf Miner\nSee the condition below for symptoms and management.",
+    "example": "CONDITION DETECTED \u00b7 97.1% CONFIDENCE\nLeaf Miner\nSee the condition below for symptoms and management.",
     "compare": "shown",
-    "example_8class": "CONDITION DETECTED \u00b7 96.2% CONFIDENCE\nLeaf Miner\nSee the condition below for symptoms and management.",
-    "upload": "CONDITION DETECTED \u00b7 96.2% CONFIDENCE\nLeaf Miner\nSee the condition below for symptoms and management.",
+    "example_8class": "CONDITION DETECTED \u00b7 95.5% CONFIDENCE\nLeaf Miner\nSee the condition below for symptoms and management.",
+    "upload": "CONDITION DETECTED \u00b7 95.4% CONFIDENCE\nLeaf Miner\nSee the condition below for symptoms and management.",
     "invalid": "This file could not be read as an image (UnidentifiedImageError). Please upload a JPEG or PNG photo."
   },
   "failures": []
