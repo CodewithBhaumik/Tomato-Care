@@ -4,8 +4,6 @@ import {
   CartesianGrid,
   Cell,
   ComposedChart,
-  ErrorBar,
-  LabelList,
   Legend,
   Line,
   LineChart,
@@ -66,35 +64,6 @@ export function RiskCoverage({ curve, chosen, height = 260 }) {
         <Line type="monotone" dataKey="accuracy_kept" stroke={t.accent} strokeWidth={2.2} dot={false} isAnimationActive />
         {chosen && <ReferenceDot x={chosen.coverage} y={chosen.accuracy_kept} r={6} fill={t.warn} stroke={t.surface} strokeWidth={2} />}
       </LineChart>
-    </ResponsiveContainer>
-  );
-}
-
-/* Horizontal bars of one metric per model, with 95% CI whiskers. */
-export function MetricBars({ rows, metric = "accuracy", ciKey, height, highlight }) {
-  const t = useChartTheme();
-  const data = rows.map((r) => {
-    const v = r.value;
-    const lo = r.ci ? v - r.ci[0] : 0;
-    const hi = r.ci ? r.ci[1] - v : 0;
-    return { ...r, v, err: [lo, hi] };
-  });
-  const h = height || Math.max(180, data.length * 34 + 40);
-  return (
-    <ResponsiveContainer width="100%" height={h}>
-      <BarChart data={data} layout="vertical" margin={{ top: 4, right: 44, left: 4, bottom: 4 }}>
-        <CartesianGrid stroke={t.grid} horizontal={false} />
-        <XAxis type="number" domain={[0, 1]} tickFormatter={pctTick} {...axisProps(t)} />
-        <YAxis type="category" dataKey="label" width={170} {...axisProps(t)} tick={{ fill: t.ink, fontSize: 11.5 }} />
-        <Tooltip {...tooltipStyle(t)} formatter={(v, n, p) => [`${pct(p.payload.v)}${p.payload.ci ? ` (95% CI ${pct(p.payload.ci[0])}–${pct(p.payload.ci[1])})` : ""}`, metric]} />
-        <Bar dataKey="v" radius={[0, 4, 4, 0]} barSize={18} isAnimationActive>
-          {data.map((d) => (
-            <Cell key={d.key} fill={d.key === highlight ? t.accent : d.color || t.muted} fillOpacity={d.key === highlight ? 1 : 0.75} />
-          ))}
-          {ciKey !== false && <ErrorBar dataKey="err" width={4} strokeWidth={1.3} stroke={t.ink} direction="x" />}
-          <LabelList dataKey="v" position="right" formatter={(v) => pct(v)} style={{ fill: t.ink, fontSize: 11, fontWeight: 600 }} />
-        </Bar>
-      </BarChart>
     </ResponsiveContainer>
   );
 }

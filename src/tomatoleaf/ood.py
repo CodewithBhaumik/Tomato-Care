@@ -1,6 +1,5 @@
 """Uncertainty and out-of-distribution (OOD) scores. Higher score = more unusual input.
 
-- msp:    1 - maximum softmax probability (Hendrycks & Gimpel, 2017)
 - energy: -logsumexp(logits) (Liu et al., 2020)
 - maha:   minimum class-conditional Mahalanobis distance of the penultimate features, shared covariance with
           Ledoit-Wolf shrinkage (Lee et al., 2018)
@@ -57,10 +56,6 @@ class FeatureDensity:
         return obj
 
 
-def msp_score(probs: np.ndarray) -> np.ndarray:
-    return 1.0 - np.asarray(probs).max(axis=1)
-
-
 def energy_score(logits: np.ndarray) -> np.ndarray:
     return -logsumexp(np.asarray(logits, dtype=np.float64), axis=1)
 
@@ -76,7 +71,3 @@ def fpr_at_tpr(in_scores, out_scores, tpr: float = 0.95) -> float:
     thr = np.quantile(np.asarray(out_scores), 1 - tpr)
     return float((np.asarray(in_scores) >= thr).mean())
 
-
-def threshold_for_in_distribution(in_scores, keep: float = 0.95) -> float:
-    """Score threshold that keeps `keep` of in-distribution inputs (flags the rest as unusual)."""
-    return float(np.quantile(np.asarray(in_scores), keep))

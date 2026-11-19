@@ -61,15 +61,7 @@ def _model_panel():
         task = st.segmented_control("Task", ["5class", "8class"], format_func=lambda t: core.TASK_LABEL[t],
                                     default="5class", key="task", required=True, label_visibility="collapsed")
         st.caption(core.TASK_HELP[task])
-        options = core.task_models(task)
-        if len(options) > 1:
-            pick = st.segmented_control(
-                "Model", [e["key"] for e in options], default=options[0]["key"], key=f"variant_{task}", required=True,
-                format_func=lambda k: core.VARIANT_LABEL.get(core.model_entry(k).get("variant"), k)
-                + (" (recommended)" if k == options[0]["key"] else ""))
-            entry = core.model_entry(pick)
-        else:
-            entry = options[0]
+        entry = core.task_models(task)[0]  # one validated model per scope
         st.caption(core.model_help(entry))
         acc = (entry.get("test_metrics") or {}).get("accuracy")
         st.html(theme.chip(core.short_name(entry), "g")
@@ -202,7 +194,7 @@ def _history():
                 st.caption(f"{answer} · {100 * h['conf']:.0f}%")
 
 
-def _result(data: bytes, label: str, task: str, key: str, explain: bool):
+def _result(data: bytes, label: str, key: str, explain: bool):
     try:
         with st.spinner("Analysing the photo…"):
             r = core.predict(data, key, explain)
@@ -252,6 +244,6 @@ def render() -> None:
         if data is None:
             _empty_state()
         else:
-            _result(data, label, task, key, explain)
+            _result(data, label, key, explain)
     with left:
         _history()

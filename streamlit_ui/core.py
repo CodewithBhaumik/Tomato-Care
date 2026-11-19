@@ -29,7 +29,7 @@ import streamlit as st  # noqa: E402
 from PIL import Image  # noqa: E402
 
 from tomatoleaf import weights  # noqa: E402
-from tomatoleaf.config import CLASS_KEYS, CLASSES  # noqa: E402
+from tomatoleaf.config import CLASSES  # noqa: E402
 
 EXPERIMENTS = ROOT / "experiments"
 PUBLIC = ROOT / "frontend" / "public"
@@ -168,11 +168,6 @@ def model_entry(key: str) -> dict:
     return next(e for e in deployment()["models"] if e["key"] == key)
 
 
-def task_model(task: str) -> dict:
-    """The default served model of a task."""
-    return model_entry(deployment()["defaults_by_task"][task])
-
-
 def task_models(task: str) -> list[dict]:
     """Served models of a task, default first."""
     default = deployment()["defaults_by_task"][task]
@@ -180,26 +175,16 @@ def task_models(task: str) -> list[dict]:
     return sorted(entries, key=lambda e: e["key"] != default)
 
 
-VARIANT_LABEL = {"balanced": "Balanced", "calibrated": "Calibrated"}
-VARIANT_HELP = {
-    "balanced": "Bias-corrected: frequent conditions (Leaf Miner, Spotted Wilt) cannot out-vote rare ones, and every "
-                "condition's confidence is calibrated. Recommended.",
-    "calibrated": "Calibrated only: every condition's confidence matches its own accuracy; no correction for how "
-                  "common each condition is in the training photos.",
-}
-
-
 def short_name(entry: dict) -> str:
     n = len(entry.get("members") or [1])
-    variant = VARIANT_LABEL.get(entry.get("variant"), "")
-    return f"{TASK_LABEL[entry['task']].split(' · ')[0]} · {variant} · {n} ConvNeXt-T networks".replace(" ·  ·", " ·")
+    return f"{TASK_LABEL[entry['task']].split(' · ')[0]} · {n} ConvNeXt-T networks"
 
 
 def model_help(entry: dict) -> str:
-    """One line on how the served model was built (final round), or the older variant help."""
+    """One line on how the served model was built (its validated pipeline)."""
     p = entry.get("pipeline")
     if not p:
-        return VARIANT_HELP.get(entry.get("variant"), "")
+        return entry.get("description") or ""
     return (f"{p['imbalance'][0].upper() + p['imbalance'][1:]}"
             + (" + outlier exposure (learned to be unsure on the 3 conditions it does not cover)"
                if p.get("outlier_exposure") else "")
@@ -313,6 +298,3 @@ def pct(x, digits=1) -> str:
 def pts(x, digits=1) -> str:
     return "—" if x is None else f"{100 * x:+.{digits}f} pts"
 
-
-def class_index(key: str) -> int:
-    return CLASS_KEYS.index(key)

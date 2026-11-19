@@ -6,15 +6,12 @@ outputs (logits and the penultimate features used by the out-of-distribution che
 weights; the PyTorch model is still used for Grad-CAM. Any export or runtime problem falls back to PyTorch.
 """
 import hashlib
-import logging
 import os
 from pathlib import Path
 
 import torch
 
 from tomatoleaf.models import final_linear
-
-log = logging.getLogger("tomato.onnx")
 
 
 def enabled() -> bool:

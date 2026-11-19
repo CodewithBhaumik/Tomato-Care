@@ -1,6 +1,6 @@
 import { AlertTriangle, BookMarked, Brain, Camera, CheckCircle2, Crop, Database, FlaskConical, Gauge, Microscope, Palette, ScanEye, Split, Target } from "lucide-react";
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
-import { Badge, Callout, Card, CardHeader, PageHeader, SectionTitle, Skeleton } from "../components/ui/primitives.jsx";
+import { Badge, Callout, Card, CardHeader, PageHeader, Skeleton } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
 import { defaultModel, recipesFor } from "../lib/analytics.js";
 import { pct, signedPct } from "../lib/format.js";

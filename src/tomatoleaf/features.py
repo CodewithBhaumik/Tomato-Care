@@ -15,7 +15,6 @@ LAB_MOMENTS = [f"lab_{ch}_{stat}" for ch in ("L", "a", "b") for stat in ("mean",
 COLOR_FEATURE_NAMES = ([f"hue_{i}" for i in range(H_BINS)] + [f"sat_{i}" for i in range(S_BINS)]
                        + [f"val_{i}" for i in range(V_BINS)] + LAB_MOMENTS)
 COLOR_DIM = len(COLOR_FEATURE_NAMES)  # 73
-HOG_FEATURE_NAMES = [f"hog_{i}" for i in range(HOG_DIM)]
 
 FEATURE_SETS = {"HOG": ("hog",), "Color": ("color",), "HOG + Color": ("hog", "color")}
 
@@ -69,8 +68,3 @@ def extract_features(rgb: np.ndarray) -> dict:
 
 def feature_vector(features: dict, feature_set: str) -> np.ndarray:
     return np.concatenate([features[part] for part in FEATURE_SETS[feature_set]])
-
-
-def feature_names(feature_set: str) -> list:
-    names = {"hog": HOG_FEATURE_NAMES, "color": COLOR_FEATURE_NAMES}
-    return [n for part in FEATURE_SETS[feature_set] for n in names[part]]

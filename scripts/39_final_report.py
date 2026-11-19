@@ -34,6 +34,11 @@ def f(x, d=3):
     return "—" if x is None else f"{x:.{d}f}"
 
 
+def outcome_text(o):
+    return (f"{p(o.get('answered_correct'), 0)} right · {p(o.get('answered_wrong', o['answered']), 0)} wrong · "
+            f"{p(o['refused'], 0)} refused")
+
+
 def table(head, rows):
     out = ["| " + " | ".join(head) + " |", "|" + "|".join("---" for _ in head) + "|"]
     out += ["| " + " | ".join(str(c) for c in r) + " |" for r in rows]
@@ -244,9 +249,7 @@ def main():
             b, a = fr["stress"][BEFORE[t]].get(s), fr["stress"][FINAL[t]].get(s)
             if not a:
                 continue
-            fmt = lambda o: (f"{p(o.get('answered_correct'), 0)} right · {p(o.get('answered_wrong', o['answered']), 0)} "
-                             f"wrong · {p(o['refused'], 0)} refused")
-            rows.append([label, a["photos"], fmt(b), fmt(a)])
+            rows.append([label, a["photos"], outcome_text(b), outcome_text(a)])
         L += [f"Stress tests — {TASK[t]} (in-scope test photos changed on purpose; mixed collages have no single right "
               "answer, so any answer counts as wrong):", "", table(["Change", "Photos", "Before", "Final"], rows), ""]
 

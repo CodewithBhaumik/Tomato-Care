@@ -67,9 +67,9 @@ def main():
                 errors = []
                 # third-party web fonts (Google Fonts) can fail on some networks; the site falls back to system fonts
                 cdn = ("fonts.gstatic.com", "fonts.googleapis.com")
-                page.on("console", lambda m, errors=errors: m.type == "error" and not any(
+                page.on("console", lambda m, errors=errors, cdn=cdn: m.type == "error" and not any(
                     c in (m.location or {}).get("url", "") or "QUIC" in m.text for c in cdn) and errors.append(m.text))
-                page.on("requestfailed", lambda r, errors=errors: not any(c in r.url for c in cdn)
+                page.on("requestfailed", lambda r, errors=errors, cdn=cdn: not any(c in r.url for c in cdn)
                         and errors.append(f"request failed: {r.url}"))
                 for path in PAGES:
                     page.goto(BASE + path, wait_until="networkidle")

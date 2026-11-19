@@ -195,16 +195,6 @@ export function PageHeader({ eyebrow, title, description, actions, children }) {
   );
 }
 
-export function SectionTitle({ eyebrow, title, description, className = "" }) {
-  return (
-    <div className={cx("mb-6", className)}>
-      {eyebrow && <p className="mb-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-leaf-600 dark:text-leaf-400">{eyebrow}</p>}
-      <h2 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">{title}</h2>
-      {description && <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-muted">{description}</p>}
-    </div>
-  );
-}
-
 /* ---------------------------------------------------------------- States */
 export function Spinner({ className = "" }) {
   return <Loader2 className={cx("size-5 animate-spin text-leaf-600", className)} aria-label="Loading" />;

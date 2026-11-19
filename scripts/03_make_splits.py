@@ -9,12 +9,11 @@ Outputs: data/splits.csv, data/class_map.json, experiments/results/split_summary
 """
 import numpy as np
 import pandas as pd
-from PIL import Image
 
 from tomatoleaf.config import CLASSES, DATA_DIR, DATASET_DIR, FIGURES_DIR, RESULTS_DIR, ROOT, SEED
 from tomatoleaf.data import assert_no_group_leakage, assign_leaf_groups, load_index, make_group_split
 from tomatoleaf.plotting import SHORT_NAMES, SPLIT_COLORS, apply_style, plt, save
-from tomatoleaf.preprocessing import load_canonical_array, strip_jpeg_metadata
+from tomatoleaf.preprocessing import strip_jpeg_metadata
 from tomatoleaf.utils import save_json
 
 

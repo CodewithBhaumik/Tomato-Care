@@ -2,7 +2,7 @@
 import altair as alt
 import pandas as pd
 
-GREEN, CYAN, AMBER, RED, VIOLET, GRAY = "#22a262", "#0891b2", "#f29a16", "#f0543f", "#7c3aed", "#94a3b8"
+GREEN, CYAN, AMBER, VIOLET, GRAY = "#22a262", "#0891b2", "#f29a16", "#7c3aed", "#94a3b8"
 
 
 def generation(m: dict) -> str:

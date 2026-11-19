@@ -26,8 +26,6 @@ CLASSES = [
 NUM_CLASSES = len(CLASSES)
 CLASS_KEYS = [c["key"] for c in CLASSES]
 CLASS_NAMES = [c["name"] for c in CLASSES]
-FOLDER_TO_INDEX = {c["folder"]: c["index"] for c in CLASSES}
-HEALTHY_INDEX = 1
 
 # Every dataset image is 256x256; uploads are mapped to the same geometry before any model sees them.
 CANONICAL_SIZE = 256

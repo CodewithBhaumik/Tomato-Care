@@ -31,6 +31,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT / "src")]
 from backend.services.predictor import ModelRegistry  # noqa: E402
+from tomatoleaf import balance  # noqa: E402
 from tomatoleaf.config import CLASS_KEYS, EXPERIMENTS_DIR, FIGURES_DIR, RESULTS_DIR, SEED  # noqa: E402
 from tomatoleaf.data import load_images, load_splits  # noqa: E402
 from tomatoleaf.evaluation import (  # noqa: E402
@@ -44,7 +45,6 @@ from tomatoleaf.features import leaf_mask  # noqa: E402
 from tomatoleaf.preprocessing import canonicalize, jpeg_roundtrip, prepare_upload  # noqa: E402
 from tomatoleaf.probes import far_ood_probes  # noqa: E402
 from tomatoleaf.utils import load_json, save_json, set_seed  # noqa: E402
-from tomatoleaf import balance  # noqa: E402
 
 FIVE = ["healthy", "leaf_miner", "magnesium_deficiency", "nitrogen_deficiency", "spotted_wilt_virus"]
 FINAL = {"5class": "focused_5class", "8class": "full_8class"}
@@ -157,7 +157,10 @@ def stress_sets(images, keys, rng):
         while len(q) < 4:
             q.append(q[0])
         mixed.append(np.vstack([np.hstack(q[:2]), np.hstack(q[2:])]))
-    to256 = lambda arr: np.stack([np.asarray(canonicalize(Image.fromarray(a))) for a in arr])
+
+    def to256(arr):
+        return np.stack([np.asarray(canonicalize(Image.fromarray(a))) for a in arr])
+
     if same:
         sets["four_leaves_same"] = (to256(same), same_keys)
     sets["four_leaves_mixed"] = (to256(mixed), None)
@@ -353,7 +356,6 @@ def main():
     parser.add_argument("--skip-latency", action="store_true")
     args = parser.parse_args()
     set_seed(SEED)
-    rng = np.random.default_rng(SEED)
 
     final_entries = load_json(EXPERIMENTS_DIR / "final_models.json")["models"]
     bench_models = load_json(EXPERIMENTS_DIR / "benchmark_models.json")

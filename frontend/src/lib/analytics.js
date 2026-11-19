@@ -1,8 +1,6 @@
 // Selectors over the platform analytics document (experiments/platform.json, served at /api/analytics and bundled at
 // /data/platform.json). Pages use these helpers instead of reaching into the JSON directly.
 
-export const TASK_LABEL = { "5class": "Focused · 5 classes", "8class": "Full · 8 classes" };
-
 export const taskInfo = (a, task) => a?.tasks?.[task] ?? null;
 export const taskClasses = (a, task) => taskInfo(a, task)?.classes ?? [];
 export const modelsFor = (a, task) => (a?.models || []).filter((m) => !task || m.task === task);
@@ -21,8 +19,6 @@ export function ranked(a, task, metric = "f1_macro") {
 export const comparisonsFor = (a, task) => (a?.comparisons || []).filter((c) => c.task === task);
 export const recipesFor = (a, task) => (a?.cv?.recipes || []).filter((r) => r.task === task);
 
-export const GEN_LABEL = { original: "Original study", upgrade: "Upgrade" };
-export const FAMILY_COLOR = { "Deep learning": "#15834e", "Classical ML": "#d6760b" };
 
 export function modelColor(m) {
   if (!m) return "#64748b";

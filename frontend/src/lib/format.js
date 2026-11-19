@@ -2,9 +2,7 @@ export const pct = (v, digits = 1) => (v == null || Number.isNaN(v) ? "—" : `$
 export const num = (v, digits = 3) => (v == null || Number.isNaN(v) ? "—" : Number(v).toFixed(digits));
 export const ms = (v) => (v == null ? "—" : v >= 1000 ? `${(v / 1000).toFixed(2)} s` : `${Math.round(v)} ms`);
 export const ci = (pair, digits = 1) => (pair ? `${pct(pair[0], digits)} – ${pct(pair[1], digits)}` : "—");
-export const ciNum = (pair, digits = 3) => (pair ? `${num(pair[0], digits)} – ${num(pair[1], digits)}` : "—");
 export const signedPct = (v, digits = 1) => (v == null ? "—" : `${v >= 0 ? "+" : "−"}${Math.abs(100 * v).toFixed(digits)} pts`);
-export const signedNum = (v, digits = 3) => (v == null ? "—" : `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(digits)}`);
 
 export function compactParams(n) {
   if (n == null) return "—";

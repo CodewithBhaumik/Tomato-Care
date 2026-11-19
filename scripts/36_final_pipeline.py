@@ -245,7 +245,6 @@ def build_gate(task, chosen, device):
     inside = pool[pool.class_key.isin(keys)]
     local = {CLASS_KEYS.index(c): i for i, c in enumerate(keys)}
     paper = {"knn": [], "maha": []}
-    probe = {"knn": [], "maha": []}
     for k in range(5):
         src = CV_DIR / task / recipe_name / f"fold{k}.pt"
         model, ckpt = load_checkpoint(src, device)
