@@ -5870,25 +5870,25 @@
           "accuracy": 0.98989898989899
         }
       ],
-      "threshold": 0.95,
+      "threshold": 0.81,
       "selective": {
-        "threshold": 0.95,
-        "coverage": 0.4641509433962264,
-        "accuracy_kept": 0.991869918699187,
-        "accuracy_rejected": 0.8380281690140845
+        "threshold": 0.81,
+        "coverage": 0.8150943396226416,
+        "accuracy_kept": 0.9768518518518519,
+        "accuracy_rejected": 0.6122448979591837
       },
       "flagged_unusual": 0.06037735849056604,
       "label_differs_from_tallest_bar": 0.0,
       "out_of_scope": {
         "photos": 25,
-        "answered": 0.0,
-        "uncertain": 0.52,
+        "answered": 0.48,
+        "uncertain": 0.04,
         "unusual": 0.48,
-        "refused": 1.0,
+        "refused": 0.52,
         "answered_correct": 0.0,
-        "answered_wrong": 0.0,
+        "answered_wrong": 0.48,
         "accuracy_all": 0.0,
-        "accuracy_answered": null,
+        "accuracy_answered": 0.0,
         "confidence_mean": 0.7001710846412582
       },
       "same_leaf_consistency": {
@@ -6352,6 +6352,25 @@
     {
       "task": "5class",
       "a": "focused_5class",
+      "b": "focused_5class_r1",
+      "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
+      "b_name": "Tomato Care \u00b7 Focused (5 conditions) (round 1)",
+      "final_round": true,
+      "f1_diff": 0.0,
+      "f1_ci": [
+        0.0,
+        0.0
+      ],
+      "accuracy_diff": 0.0,
+      "accuracy_ci": [
+        0.0,
+        0.0
+      ],
+      "share_a_not_better_f1": 1.0
+    },
+    {
+      "task": "5class",
+      "a": "focused_5class",
       "b": "balanced_5class",
       "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
       "b_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
@@ -6405,6 +6424,25 @@
         0.02602717792350645
       ],
       "share_a_not_better_f1": 0.4515
+    },
+    {
+      "task": "8class",
+      "a": "full_8class",
+      "b": "full_8class_r1",
+      "a_name": "Tomato Care \u00b7 Full (8 conditions)",
+      "b_name": "Tomato Care \u00b7 Full (8 conditions) (round 1)",
+      "final_round": true,
+      "f1_diff": 0.0,
+      "f1_ci": [
+        0.0,
+        0.0
+      ],
+      "accuracy_diff": 0.0,
+      "accuracy_ci": [
+        0.0,
+        0.0
+      ],
+      "share_a_not_better_f1": 1.0
     },
     {
       "task": "8class",
@@ -7509,18 +7547,32 @@
       "measured": "2026-11-19 16:08"
     },
     "focused_5class": {
-      "median_ms": 143.45940000202972,
-      "p90_ms": 154.33007001702208,
+      "median_ms": 137.19604999641888,
+      "p90_ms": 140.91228997858707,
       "threads": 8,
       "runtime": "onnxruntime",
-      "measured": "2026-11-19 16:07"
+      "measured": "2026-11-19 18:48"
     },
     "full_8class": {
-      "median_ms": 176.07889998180326,
-      "p90_ms": 210.01152002136223,
+      "median_ms": 156.69324998452794,
+      "p90_ms": 165.90837000694592,
       "threads": 8,
       "runtime": "onnxruntime",
-      "measured": "2026-11-19 16:08"
+      "measured": "2026-11-19 18:48"
+    },
+    "focused_5class_r1": {
+      "median_ms": 138.93894999637268,
+      "p90_ms": 141.1054399999557,
+      "threads": 8,
+      "runtime": "onnxruntime",
+      "measured": "2026-11-19 18:48"
+    },
+    "full_8class_r1": {
+      "median_ms": 157.34649999649264,
+      "p90_ms": 167.6989799947478,
+      "threads": 8,
+      "runtime": "onnxruntime",
+      "measured": "2026-11-19 18:48"
     }
   },
   "cpu_gpu_max_abs_prob_diff": {
@@ -9167,5 +9219,5 @@
     "5class": "focused_5class",
     "8class": "full_8class"
   },
-  "final_round_note": "Final pipelines fixed on out-of-fold data (scripts/36, rules in docs/AUDIT.md \u00a76) and scored here once on the test photos. The test photos had been used for reporting in earlier rounds (v1, v2, v2.1), never for a choice. Scored 2026-11-19 16:08."
+  "final_round_note": "Final pipelines fixed on out-of-fold data (scripts/36, rules in docs/AUDIT.md \u00a76) and scored here once on the test photos. The test photos had been used for reporting in earlier rounds (v1, v2, v2.1), never for a choice. Scored 2026-11-19 18:48."
 }

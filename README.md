@@ -51,11 +51,16 @@ symptoms and management of the condition, and — on request — the answers of 
 same photo. The apps serve **one validated model per mode** (final round, `docs/FINAL_REPORT.md`):
 
 * **Focused · 5 conditions** — 5 ConvNeXt-Tiny networks, class-weighted loss, trained to be unsure on the three
-  conditions it does not cover (outlier exposure). Test: accuracy 90.9%, it answers
-  46% of photos at 99.2% accuracy and gives **no diagnosis**
-  to 100% of the Early Blight / Late Blight / Potassium test photos (before: 16%).
-* **Full · 8 conditions** — 5 ConvNeXt-Tiny networks, class-balanced sampling. Test: accuracy 83.1%,
-  answers 80% of photos at 92.2% accuracy.
+  conditions it does not cover (outlier exposure). Threshold 0.81 (>= 90% accuracy on answered
+  photos, cross-validation). Test: accuracy 90.9%; it answers 82% of photos at
+  97.7% accuracy and gives no diagnosis to 52% of the Early Blight / Late Blight /
+  Potassium test photos (the rest get a wrong diagnosis — use the Full mode for those conditions).
+* **Full · 8 conditions** — 5 ConvNeXt-Tiny networks, class-balanced sampling, threshold 0.76. Test: accuracy
+  83.1%, answers 80% of photos at 92.2% accuracy. Early Blight and Potassium are still
+  rarely recognised (too few photos).
+
+The example gallery shows demo examples: held-out test photos chosen for a clear result (disclosed on the page); the
+unbiased numbers above and in the Model lab are what to quote.
 
 Both were chosen on cross-validation data only; earlier models appear only in the evaluation.
 

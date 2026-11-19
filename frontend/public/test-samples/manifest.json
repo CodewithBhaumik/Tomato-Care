@@ -1,14 +1,15 @@
 {
-  "note": "One held-out test photograph per class (never used for training or model selection): the most typical test photo of each class, i.e. the medoid in a generic ImageNet feature space (ConvNeXt-Tiny, not trained on this dataset). Chosen from images and labels only, without looking at any model's answer.",
-  "rule": "typical",
+  "note": "Demo examples: for each condition, the held-out test photo (never used for training or model selection) on which the served models give the clearest correct result \u2014 a confident correct diagnosis, or for a condition outside the focused model's five, a refusal; ties go to the most typical photo. They show how the app works, NOT how often it is right: the unbiased test results are in the Model lab.",
+  "rule": "demo",
   "samples": [
     {
       "key": "early_blight",
       "name": "Early Blight",
       "file": "/test-samples/early_blight.jpg",
-      "photo_id": "IMG20220324175916",
-      "typicality": 0.7592581510543823,
-      "class_test_photos": 8
+      "photo_id": "IMG20220324180120",
+      "typicality": 0.7212483286857605,
+      "class_test_photos": 8,
+      "demo_score": 2.0
     },
     {
       "key": "healthy",
@@ -16,15 +17,17 @@
       "file": "/test-samples/healthy.jpg",
       "photo_id": "IMG20220325141803",
       "typicality": 0.779490053653717,
-      "class_test_photos": 27
+      "class_test_photos": 27,
+      "demo_score": 4.0
     },
     {
       "key": "late_blight",
       "name": "Late Blight",
       "file": "/test-samples/late_blight.jpg",
-      "photo_id": "IMG20220324121427",
-      "typicality": 0.6696580648422241,
-      "class_test_photos": 15
+      "photo_id": "IMG20220323182243",
+      "typicality": 0.6657446622848511,
+      "class_test_photos": 15,
+      "demo_score": 4.0
     },
     {
       "key": "leaf_miner",
@@ -32,7 +35,8 @@
       "file": "/test-samples/leaf_miner.jpg",
       "photo_id": "IMG20220325141452",
       "typicality": 0.7606804966926575,
-      "class_test_photos": 139
+      "class_test_photos": 139,
+      "demo_score": 4.0
     },
     {
       "key": "magnesium_deficiency",
@@ -40,15 +44,17 @@
       "file": "/test-samples/magnesium_deficiency.jpg",
       "photo_id": "IMG20220323183119",
       "typicality": 0.7581899166107178,
-      "class_test_photos": 14
+      "class_test_photos": 14,
+      "demo_score": 4.0
     },
     {
       "key": "nitrogen_deficiency",
       "name": "Nitrogen Deficiency",
       "file": "/test-samples/nitrogen_deficiency.jpg",
-      "photo_id": "IMG20220324110207",
-      "typicality": 0.6366114020347595,
-      "class_test_photos": 7
+      "photo_id": "IMG20220324111154",
+      "typicality": 0.5815491080284119,
+      "class_test_photos": 7,
+      "demo_score": 4.0
     },
     {
       "key": "potassium_deficiency",
@@ -56,7 +62,8 @@
       "file": "/test-samples/potassium_deficiency.jpg",
       "photo_id": "IMG20220324115111",
       "typicality": 0.7017890214920044,
-      "class_test_photos": 2
+      "class_test_photos": 2,
+      "demo_score": 2.0
     },
     {
       "key": "spotted_wilt_virus",
@@ -64,7 +71,8 @@
       "file": "/test-samples/spotted_wilt_virus.jpg",
       "photo_id": "IMG20220323183223",
       "typicality": 0.7334032654762268,
-      "class_test_photos": 78
+      "class_test_photos": 78,
+      "demo_score": 4.0
     }
   ]
 }

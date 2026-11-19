@@ -8,7 +8,7 @@ Format after Mitchell et al., *Model Cards for Model Reporting* (2019). Numbers:
   mode, from the final round (`docs/FINAL_REPORT.md`, `scripts/36_final_pipeline.py`):
   * **Focused** (`focused_5class`, default): Healthy, Leaf Miner, Magnesium Deficiency, Nitrogen Deficiency, Spotted
     Wilt Virus. Class-weighted loss plus outlier exposure: trained to be unsure on Early Blight, Late Blight and
-    Potassium photos. Threshold 0.95.
+    Potassium photos. Threshold 0.81.
   * **Full** (`full_8class`): all eight conditions. Class-balanced sampling. Threshold 0.76.
   * Both: per-class vector-scaling calibration and a per-condition "unusual image" limit, all fitted on cross-fitted
     out-of-fold predictions; the answer is the most probable condition.

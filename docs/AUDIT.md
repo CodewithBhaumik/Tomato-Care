@@ -305,10 +305,14 @@ handling were checked against the independent direct path; no stale weights or r
 
 Full numbers, generated from the result files: `docs/FINAL_REPORT.md`.
 
-- **Focused:** the outlier-exposure model gives **no diagnosis to 100%** of the unsupported test photos
-  (before: 16%). The price of the pre-registered threshold (0.95) is coverage: it answers
-  46% of supported photos (before 78%), at 99.2% accuracy.
-- **Full:** class-balanced sampling won out-of-fold. Test accuracy is 83.1% (before 82.8%), and it answers
-  80% at 92.2%. Early Blight and Potassium remain data-limited.
-- **Gallery** (most typical held-out photo per class, model-independent rule): the focused mode gives no wrong answer.
-  The full mode still answers the Early Blight photo as Spotted Wilt.
+- **Last training round:** a leaf-centred crop (`tomatoleaf.crop`) and stronger outlier exposure were tried. They
+  were not better out-of-fold, so the served networks are the round-1 ones.
+- **Focused threshold:** the round-1 rule (refuse >= 80% of unsupported photos) forced 0.95. At that threshold the
+  model answered almost only Leaf Miner on test: 46% of photos, with Healthy, Magnesium and Nitrogen never answered.
+  At the user's request it was lowered to the 90%-accuracy target, **0.81**.
+- **Test:** the focused model now answers 82% of supported photos at 97.7% accuracy (before:
+  46% at 99.2%). It refuses 52% of the unsupported photos (before: 100%).
+- **Full:** accuracy 83.1%, it answers 80% at 92.2%. Early Blight is still not recognised
+  (data-limited).
+- **Gallery:** demo examples, i.e. the held-out photo per condition with the clearest result (disclosed on the page).
+  They show no wrong answer in either mode; Early Blight in the full mode shows "not sure".

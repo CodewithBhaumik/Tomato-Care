@@ -10,7 +10,7 @@
     "potassium_deficiency",
     "spotted_wilt_virus"
   ],
-  "created": "2026-11-19 15:55:52",
+  "created": "2026-11-19 18:37:04",
   "rules": "docs/AUDIT.md \u00a76 (fixed before training); see this script's docstring",
   "prior": [
     0.02978488692774407,
@@ -988,13 +988,496 @@
           "out_of_scope_answered": null
         }
       ]
+    },
+    "E": {
+      "arm": "E",
+      "recipe": "convnext_t_in1k_sampler_crop",
+      "label": "leaf crop + class-balanced sampling",
+      "photos": 1813,
+      "macro_f1_before_calibration": 0.6207697431830211,
+      "uncalibrated": {
+        "ece": 0.038945596776044554,
+        "nll": 0.5671271635304006,
+        "brier": 0.24139051057782812,
+        "classwise_ece": 0.04620923583928589
+      },
+      "calibration": {
+        "chosen": "vector",
+        "nll_temperature": 0.5669744115603728,
+        "nll_vector": 0.5499561670651252,
+        "fitted_on_all_folds": {
+          "a": [
+            0.8847541435992715,
+            1.0699257633091914,
+            0.9264854932862109,
+            0.9110269420433486,
+            1.1270541370035638,
+            1.1959753679885359,
+            1.2397131234419192,
+            0.8641938400810165
+          ],
+          "b": [
+            -0.22154461825218644,
+            -0.020142903640842473,
+            -0.004321473533929685,
+            0.3215846757970048,
+            0.11903091599256224,
+            -0.05468879266262359,
+            -0.06841400950874696,
+            -0.07150656911377838
+          ]
+        }
+      },
+      "oof": {
+        "accuracy": 0.8466629895201324,
+        "precision_macro": 0.6390413457016104,
+        "recall_macro": 0.6076820485723994,
+        "f1_macro": 0.6191694534241526,
+        "f1_weighted": 0.8399331504570163,
+        "balanced_accuracy": 0.6076820485723994,
+        "nll": 0.5499561670651252,
+        "brier": 0.24022167170496458,
+        "ece": 0.05060772983898091,
+        "classwise_ece": 0.02274179060405991
+      },
+      "threshold": 0.73,
+      "threshold_rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 90% (coverage of in-scope photos >= 50%)",
+      "operating_point": {
+        "threshold": 0.73,
+        "coverage": 0.8621070049641478,
+        "accuracy_kept": 0.9001919385796545,
+        "out_of_scope_answered": null
+      },
+      "out_of_scope_refusal": null,
+      "curve": [
+        {
+          "threshold": 0.3,
+          "coverage": 0.9977937120794264,
+          "accuracy_kept": 0.8485351022664456,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.31,
+          "coverage": 0.9972421400992829,
+          "accuracy_kept": 0.849004424778761,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.32,
+          "coverage": 0.9966905681191396,
+          "accuracy_kept": 0.8494742667404538,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.33,
+          "coverage": 0.9955874241588527,
+          "accuracy_kept": 0.8498614958448754,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.34,
+          "coverage": 0.9944842801985659,
+          "accuracy_kept": 0.8508042151968941,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.9939327082184225,
+          "accuracy_kept": 0.8507214206437292,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.36,
+          "coverage": 0.9922779922779923,
+          "accuracy_kept": 0.8515842134519177,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.37,
+          "coverage": 0.9917264202978489,
+          "accuracy_kept": 0.8520578420467185,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.38,
+          "coverage": 0.9900717043574186,
+          "accuracy_kept": 0.852924791086351,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.39,
+          "coverage": 0.9889685603971319,
+          "accuracy_kept": 0.8538761851645287,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.4,
+          "coverage": 0.9873138444567016,
+          "accuracy_kept": 0.8541899441340782,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.41,
+          "coverage": 0.9851075565361279,
+          "accuracy_kept": 0.85498320268757,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.42,
+          "coverage": 0.9840044125758411,
+          "accuracy_kept": 0.8559417040358744,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.43,
+          "coverage": 0.9829012686155544,
+          "accuracy_kept": 0.8557800224466892,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.44,
+          "coverage": 0.9823496966354109,
+          "accuracy_kept": 0.8562605277933745,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.45,
+          "coverage": 0.9806949806949807,
+          "accuracy_kept": 0.8571428571428571,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.46,
+          "coverage": 0.9768339768339769,
+          "accuracy_kept": 0.8571428571428571,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.47,
+          "coverage": 0.9751792608935466,
+          "accuracy_kept": 0.8585972850678733,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.48,
+          "coverage": 0.9713182570325427,
+          "accuracy_kept": 0.8597387847813742,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.49,
+          "coverage": 0.9674572531715389,
+          "accuracy_kept": 0.863169897377423,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.9641478212906784,
+          "accuracy_kept": 0.86441647597254,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.51,
+          "coverage": 0.9602868174296746,
+          "accuracy_kept": 0.8661688684663986,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.52,
+          "coverage": 0.9580805295091009,
+          "accuracy_kept": 0.8664363845710996,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.53,
+          "coverage": 0.9558742415885273,
+          "accuracy_kept": 0.8672821696480092,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.54,
+          "coverage": 0.9531163816878102,
+          "accuracy_kept": 0.8686342592592593,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.55,
+          "coverage": 0.9476006618863761,
+          "accuracy_kept": 0.8713620488940629,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.56,
+          "coverage": 0.9437396580253723,
+          "accuracy_kept": 0.8725891291642315,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.57,
+          "coverage": 0.9409817981246553,
+          "accuracy_kept": 0.8739742086752638,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.58,
+          "coverage": 0.9343629343629344,
+          "accuracy_kept": 0.8766233766233766,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.59,
+          "coverage": 0.9305019305019305,
+          "accuracy_kept": 0.8784825133372851,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 0.9249862107004965,
+          "accuracy_kept": 0.8801431127012522,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.61,
+          "coverage": 0.921676778819636,
+          "accuracy_kept": 0.8803111909036505,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.62,
+          "coverage": 0.9161610590182019,
+          "accuracy_kept": 0.8813967489464178,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.63,
+          "coverage": 0.9117484831770546,
+          "accuracy_kept": 0.8820326678765881,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.64,
+          "coverage": 0.9051296194153337,
+          "accuracy_kept": 0.8848263254113345,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.65,
+          "coverage": 0.9007170435741865,
+          "accuracy_kept": 0.8873239436619719,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.66,
+          "coverage": 0.8935466078323221,
+          "accuracy_kept": 0.8876543209876543,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.67,
+          "coverage": 0.8885824600110315,
+          "accuracy_kept": 0.888268156424581,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.68,
+          "coverage": 0.8869277440706013,
+          "accuracy_kept": 0.888681592039801,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.69,
+          "coverage": 0.8797573083287369,
+          "accuracy_kept": 0.8915360501567398,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.7,
+          "coverage": 0.8786541643684501,
+          "accuracy_kept": 0.8913998744507219,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.71,
+          "coverage": 0.8742415885273028,
+          "accuracy_kept": 0.894006309148265,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.72,
+          "coverage": 0.870380584666299,
+          "accuracy_kept": 0.8967046894803549,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.73,
+          "coverage": 0.8621070049641478,
+          "accuracy_kept": 0.9001919385796545,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.74,
+          "coverage": 0.8554881412024269,
+          "accuracy_kept": 0.900709219858156,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.75,
+          "coverage": 0.8532818532818532,
+          "accuracy_kept": 0.9017453135100194,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.76,
+          "coverage": 0.8450082735797021,
+          "accuracy_kept": 0.9040469973890339,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.77,
+          "coverage": 0.8383894098179813,
+          "accuracy_kept": 0.9046052631578947,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.78,
+          "coverage": 0.8290126861555432,
+          "accuracy_kept": 0.9055222887558216,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.79,
+          "coverage": 0.8251516822945394,
+          "accuracy_kept": 0.9070855614973262,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.8,
+          "coverage": 0.8157749586321015,
+          "accuracy_kept": 0.9087221095334685,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.81,
+          "coverage": 0.8075013789299503,
+          "accuracy_kept": 0.9098360655737705,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.82,
+          "coverage": 0.7942636514065086,
+          "accuracy_kept": 0.9145833333333333,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.83,
+          "coverage": 0.7837837837837838,
+          "accuracy_kept": 0.916256157635468,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.84,
+          "coverage": 0.7694429123000551,
+          "accuracy_kept": 0.9197132616487456,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.85,
+          "coverage": 0.7589630446773304,
+          "accuracy_kept": 0.9200581395348837,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.86,
+          "coverage": 0.7346938775510204,
+          "accuracy_kept": 0.924924924924925,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.87,
+          "coverage": 0.7109762824048539,
+          "accuracy_kept": 0.9309542280837859,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.88,
+          "coverage": 0.6811913954771097,
+          "accuracy_kept": 0.9319838056680162,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.89,
+          "coverage": 0.6497517926089355,
+          "accuracy_kept": 0.932937181663837,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.9,
+          "coverage": 0.6028681742967458,
+          "accuracy_kept": 0.9451052150045746,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.91,
+          "coverage": 0.5394373965802537,
+          "accuracy_kept": 0.9519427402862985,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.92,
+          "coverage": 0.4743519029233315,
+          "accuracy_kept": 0.958139534883721,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.93,
+          "coverage": 0.4186431329288472,
+          "accuracy_kept": 0.9749670619235836,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.94,
+          "coverage": 0.3028130170987314,
+          "accuracy_kept": 0.9890710382513661,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.95,
+          "coverage": 0.07004964147821291,
+          "accuracy_kept": 0.952755905511811,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.96,
+          "coverage": 0.007170435741864313,
+          "accuracy_kept": 0.8461538461538461,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.97,
+          "coverage": 0.0005515719801434088,
+          "accuracy_kept": 1.0,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.98,
+          "coverage": 0.0005515719801434088,
+          "accuracy_kept": 1.0,
+          "out_of_scope_answered": null
+        },
+        {
+          "threshold": 0.99,
+          "coverage": 0.0,
+          "accuracy_kept": null,
+          "out_of_scope_answered": null
+        }
+      ]
     }
   },
   "reference": {},
   "chosen": {
     "arm": "B",
     "recipe": "convnext_t_in1k_sampler",
-    "why": "highest out-of-fold macro-F1 (0.6290)",
+    "why": "macro-F1 within 0.01 of the best (B, E): lowest out-of-fold NLL",
     "per_class_oof": [
       {
         "key": "early_blight",

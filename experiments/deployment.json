@@ -6,8 +6,8 @@
     "8class": "full_8class"
   },
   "previous_defaults": {
-    "5class": "balanced_5class",
-    "8class": "balanced_8class"
+    "5class": "focused_5class_r1",
+    "8class": "full_8class_r1"
   },
   "confidence_threshold": 0.6,
   "models": [
@@ -79,20 +79,20 @@
       ],
       "tta_views": 1,
       "feature_set": "5-fold ensemble of ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure",
-      "description": "Imbalance: class-weighted loss. Calibration: vector scaling. One threshold (0.95) and a per-condition unusual-image gate, all fixed on out-of-fold data.",
-      "confidence_threshold": 0.95,
+      "description": "Imbalance: class-weighted loss. Calibration: vector scaling. One threshold (0.81) and a per-condition unusual-image gate, all fixed on out-of-fold data.",
+      "confidence_threshold": 0.81,
       "operating_point": {
-        "threshold": 0.95,
+        "threshold": 0.81,
         "chosen_on": "out-of-fold cross-validation predictions (cross-fitted)",
-        "rule": "target 95% not reachable at >= 50% coverage: best accuracy at >= 50% coverage",
+        "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 90% (coverage of in-scope photos >= 50%; answered out-of-scope photos count as errors)",
         "oof": {
-          "coverage": 0.5350665054413543,
-          "accuracy_kept": 0.9482948294829483,
-          "out_of_scope_answered": 0.1509433962264151
+          "coverage": 0.8875453446191052,
+          "accuracy_kept": 0.90234375,
+          "out_of_scope_answered": 0.4276729559748428
         },
         "test": {
-          "coverage": 0.4641509433962264,
-          "accuracy_kept": 0.991869918699187,
+          "coverage": 0.8150943396226416,
+          "accuracy_kept": 0.9768518518518519,
           "photos": 265
         }
       },
@@ -131,7 +131,7 @@
         "imbalance": "class-weighted loss",
         "arm": "A",
         "calibration": "vector",
-        "threshold": 0.95,
+        "threshold": 0.81,
         "unusual_gate": "knn",
         "outlier_exposure": true
       },
@@ -151,7 +151,7 @@
           0.9095848862078081
         ]
       },
-      "latency_ms": 143.45940000202972
+      "latency_ms": 137.19604999641888
     },
     {
       "key": "full_8class",
@@ -305,7 +305,7 @@
           0.620349651461235
         ]
       },
-      "latency_ms": 176.07889998180326
+      "latency_ms": 156.69324998452794
     }
   ]
 }
