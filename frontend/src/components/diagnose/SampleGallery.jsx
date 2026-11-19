@@ -35,7 +35,7 @@ export default function SampleGallery({ onPick, activeKey, disabled, scope, colu
     <div>
       <div className="mb-3 flex items-center gap-2 text-sm font-medium text-ink">
         <Images className="size-4 text-muted" aria-hidden /> Held-out test photos
-        <span className="text-xs font-normal text-muted">· true label shown, never seen in training</span>
+        <span className="text-xs font-normal text-muted">· the most typical of each condition, true label shown, never seen in training</span>
       </div>
       <div className={cx("grid gap-2", columns)}>
         {!state.samples &&

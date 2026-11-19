@@ -29,7 +29,16 @@ export default function ResultPanel({ result }) {
   const Icon = STATUS_ICON[status] || Info;
   const meta = classMeta(prediction.key);
   const answered = status === "Healthy" || status === "Diseased";
-  const correct = trueKey ? trueKey === prediction.key : null;
+  // Verdict against the known true label (gallery photos): a refusal ("Uncertain" / "Unusual image") is not a wrong
+  // answer — and for a condition outside the model's classes it is the right behaviour.
+  const inScope = trueKey ? (result.classes || []).includes(trueKey) : null;
+  const verdict = !trueKey ? null : answered ? (trueKey === prediction.key ? "correct" : "wrong") : inScope ? "refused" : "refused_outside";
+  const VERDICT = {
+    correct: { tone: "leaf", icon: CheckCircle2, text: "matches true label" },
+    wrong: { tone: "tomato", icon: XCircle, text: `wrong · true label: ${trueKey ? classMeta(trueKey).name : ""}` },
+    refused: { tone: "sun", icon: CircleHelp, text: `not answered · true label: ${trueKey ? classMeta(trueKey).name : ""}` },
+    refused_outside: { tone: "leaf", icon: CheckCircle2, text: `correctly not diagnosed: ${trueKey ? classMeta(trueKey).name : ""} is not one of this model's conditions` },
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex flex-col gap-5">
@@ -43,15 +52,20 @@ export default function ResultPanel({ result }) {
                 <Badge tone={style.tone} icon={Icon}>
                   {style.label}
                 </Badge>
-                {correct != null && (
-                  <Badge tone={correct ? "leaf" : "tomato"} icon={correct ? CheckCircle2 : XCircle}>
-                    {correct ? "matches true label" : `true label: ${classMeta(trueKey).name}`}
+                {verdict && (
+                  <Badge tone={VERDICT[verdict].tone} icon={VERDICT[verdict].icon}>
+                    {VERDICT[verdict].text}
                   </Badge>
                 )}
               </div>
               <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-ink sm:text-[28px]">
-                {answered ? meta.name : status === "Uncertain" ? `Possibly ${meta.name}` : "No diagnosis"}
+                {answered ? meta.name : status === "Uncertain" ? "Not sure" : "No diagnosis"}
               </h2>
+              {status === "Uncertain" && (
+                <p className="mt-0.5 text-sm text-ink-2">
+                  Best guess {meta.name} · {pct(prediction.confidence, 1)} (threshold {pct(thr, 0)})
+                </p>
+              )}
               <p className="mt-1.5 text-sm leading-relaxed text-muted">{style.description}</p>
               <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-muted">
                 <span>
