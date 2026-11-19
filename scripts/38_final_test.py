@@ -254,6 +254,7 @@ def latency(keys, n=30):
         out[key] = {"median_ms": float(np.median(times)), "p90_ms": float(np.quantile(times, 0.9)), "threads": 8,
                     "runtime": getattr(pred, "runtime", "pytorch"), "measured": time.strftime("%Y-%m-%d %H:%M")}
         reg.models.pop(key, None)
+        reg._members.clear()  # free this model's networks before the next one (CPU memory)
         print(f"latency {key}: {out[key]['median_ms']:.0f} ms", flush=True)
     return out
 
