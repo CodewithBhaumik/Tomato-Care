@@ -1,5 +1,6 @@
 import { CheckCircle2, ShieldAlert, ShieldCheck, Sparkles } from "lucide-react";
 import { Badge, Callout, Card, CardHeader } from "../ui/primitives.jsx";
+import { TASK } from "../../lib/analytics.js";
 import { ci, cx, num, pct, signedPct } from "../../lib/format.js";
 
 const STRESS_LABEL = {
@@ -15,6 +16,7 @@ const STRESS_LABEL = {
   four_leaves_same: "4 leaves, same condition",
   four_leaves_mixed: "4 leaves, mixed",
 };
+const GATE_NAME = { knn: "k-nearest-neighbour", maha: "Mahalanobis" };
 const OOD_LABEL = {
   other_crop: "Other crops (PlantVillage)",
   tomato_unsupported: "Tomato diseases not in the dataset",
@@ -51,25 +53,57 @@ function OutcomeBar({ o }) {
   );
 }
 
-/** The final round: the imbalance arms compared out-of-fold, the chosen pipeline, and before vs after on test. */
-export default function FinalPipeline({ final, task }) {
-  const t = final?.tasks?.[task];
+function PairedLine({ c, label }) {
+  if (!c?.f1_ci) return null;
+  return (
+    <p className="mt-2 text-xs text-muted">
+      Paired bootstrap, {label}: Δ accuracy {signedPct(c.accuracy_diff)}
+      {c.accuracy_ci ? ` (95% CI ${signedPct(c.accuracy_ci[0])} … ${signedPct(c.accuracy_ci[1])})` : ""}, Δ macro-F1 {signedPct(c.f1_diff)} ({signedPct(c.f1_ci[0])} …{" "}
+      {signedPct(c.f1_ci[1])}).
+    </p>
+  );
+}
+
+/**
+ * The final round of the five-condition app: the deep-learning arms and the classical ML arms compared out-of-fold, the
+ * chosen pipelines, and before vs after on the test photos with the served classical model alongside.
+ */
+export default function FinalPipeline({ final, classical, mlGate }) {
+  const t = final?.tasks?.[TASK];
   if (!t) return null;
   const finalRow = t.test?.find((r) => r.final);
-  const before = t.test?.find((r) => !r.final);
-  const pair = finalRow && before ? [before.key, finalRow.key] : [];
+  const mlRow = t.test?.find((r) => r.classical);
+  const before = t.test?.find((r) => !r.final && !r.classical);
+  const mlArms = [...(classical?.arms || [])].sort((a, b) => (b.oof?.f1_macro ?? 0) - (a.oof?.f1_macro ?? 0));
+  const mlChosen = mlArms.find((a) => a.chosen);
+  const mlChosenLabel = mlChosen ? `${mlChosen.classifier} · ${mlChosen.feature_set}` : classical?.chosen;
   const stressNames = Object.keys(t.stress?.[finalRow?.key] || {});
   const oodNames = Object.keys(OOD_LABEL).filter((k) => t.out_of_dataset?.[finalRow?.key]?.[k]);
+  const columns = [
+    before && { key: before.key, label: "Before" },
+    finalRow && { key: finalRow.key, label: "Final" },
+    mlRow && { key: mlRow.key, label: "Classical ML" },
+  ].filter(Boolean);
+  const stressCols = columns.filter((c) => t.stress?.[c.key]);
+  const oodCols = columns.filter((c) => t.out_of_dataset?.[c.key]);
+  const showChecks = Boolean(finalRow) && stressNames.length > 0 && stressCols.length > 1;
+  const steps = ["dl", mlArms.length > 0 && "ml", t.test && "test", showChecks && "stress", showChecks && "ood"].filter(Boolean);
+  const step = (s) => steps.indexOf(s) + 1;
+  const comparisons = t.comparisons || [];
+  const vsBefore = comparisons.find((c) => before && c.a === finalRow?.key && c.b === before.key) || comparisons.find((c) => !c.ml_vs_dl && c.a !== mlRow?.key && c.b !== mlRow?.key);
+  const vsMl = mlRow ? comparisons.find((c) => c.ml_vs_dl || c.a === mlRow.key || c.b === mlRow.key) : null;
+  const short = (key, name) => (key === mlRow?.key ? "classical ML" : key === finalRow?.key ? "deep learning" : name || key);
+
   return (
     <Card>
       <CardHeader
         icon={Sparkles}
-        title="Final pipeline — one validated model per mode"
-        subtitle="Imbalance handling, calibration, threshold and unusual-image limits chosen on out-of-fold data only; the test photos were scored once at the end"
+        title="Final pipeline — the two served models"
+        subtitle="Deep learning (imbalance handling) and classical ML (classifier and features): calibration, threshold and unusual-image limits chosen on out-of-fold data only; the test photos were scored once at the end"
       />
       <div className="flex flex-col gap-6 p-5">
         <div>
-          <p className="mb-2 text-sm font-semibold text-ink">1 · Imbalance arms (out-of-fold, cross-fitted)</p>
+          <p className="mb-2 text-sm font-semibold text-ink">{step("dl")} · Deep learning: imbalance arms (out-of-fold, cross-fitted)</p>
           <div className="overflow-x-auto scrollbar-thin rounded-xl border border-line">
             <table className="w-full min-w-[860px] text-sm">
               <thead className="bg-surface-2 text-left text-xs uppercase tracking-wide text-muted">
@@ -83,7 +117,7 @@ export default function FinalPipeline({ final, task }) {
                   <Th right>Threshold</Th>
                   <Th right>Answered</Th>
                   <Th right>Acc. answered</Th>
-                  {task === "5class" && <Th right>Unsupported refused</Th>}
+                  <Th right>Unsupported refused</Th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -104,20 +138,67 @@ export default function FinalPipeline({ final, task }) {
                     <Td>{num(a.threshold, 2)}</Td>
                     <Td>{pct(a.coverage)}</Td>
                     <Td>{pct(a.accuracy_kept)}</Td>
-                    {task === "5class" && <Td>{pct(a.out_of_scope_refusal)}</Td>}
+                    <Td>{pct(a.out_of_scope_refusal)}</Td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
           <p className="mt-2 text-xs text-muted">
-            Chosen: arm {t.chosen} — {t.why}. Unusual-image gate: {t.gate?.method} feature distance (out-of-fold AUROC {num(t.gate?.auroc_select, 3)}).
+            Chosen: arm {t.chosen} — {t.why}. Unusual-image gate: {GATE_NAME[t.gate?.method] || t.gate?.method} feature distance (out-of-fold AUROC {num(t.gate?.auroc_select, 3)}).
           </p>
         </div>
 
+        {mlArms.length > 0 && (
+          <div>
+            <p className="mb-2 text-sm font-semibold text-ink">{step("ml")} · Classical ML: classifier × handcrafted features (out-of-fold, same rules)</p>
+            <div className="overflow-x-auto scrollbar-thin rounded-xl border border-line">
+              <table className="w-full min-w-[860px] text-sm">
+                <thead className="bg-surface-2 text-left text-xs uppercase tracking-wide text-muted">
+                  <tr>
+                    <Th>Classifier · features</Th>
+                    <Th right>Macro-F1</Th>
+                    <Th right>Accuracy</Th>
+                    <Th right>NLL</Th>
+                    <Th right>ECE</Th>
+                    <Th>Calibration</Th>
+                    <Th right>Threshold</Th>
+                    <Th right>Answered</Th>
+                    <Th right>Acc. answered</Th>
+                    <Th right>Unsupported refused</Th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {mlArms.map((a) => (
+                    <tr key={a.arm} className={a.chosen ? "bg-leaf-500/5" : "bg-surface"}>
+                      <td className="px-3 py-2.5">
+                        <span className="font-medium text-ink">{a.classifier}</span> <span className="text-muted">· {a.feature_set}</span>
+                        {a.chosen && <Badge tone="leaf" icon={CheckCircle2} className="ml-2">chosen</Badge>}
+                      </td>
+                      <Td>{pct(a.oof?.f1_macro)}</Td>
+                      <Td>{pct(a.oof?.accuracy)}</Td>
+                      <Td>{num(a.oof?.nll, 3)}</Td>
+                      <Td>{num(a.oof?.ece, 3)}</Td>
+                      <td className="px-3 py-2.5 text-xs text-muted">{a.calibration ?? "—"}</td>
+                      <Td>{num(a.threshold, 2)}</Td>
+                      <Td>{pct(a.coverage)}</Td>
+                      <Td>{pct(a.accuracy_kept)}</Td>
+                      <Td>{pct(a.out_of_scope_refusal)}</Td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-2 text-xs text-muted">
+              {mlChosenLabel ? `Chosen: ${mlChosenLabel}${classical.why ? ` — ${classical.why}` : ""}.` : ""}
+              {mlGate?.method ? ` Unusual-image gate: ${GATE_NAME[mlGate.method] || mlGate.method} distance in the colour + texture feature space.` : ""} No neural network: features are computed from the same 256×256 image the network sees.
+            </p>
+          </div>
+        )}
+
         {t.test && (
           <div>
-            <p className="mb-2 text-sm font-semibold text-ink">2 · Before vs after on the held-out test photos</p>
+            <p className="mb-2 text-sm font-semibold text-ink">{step("test")} · Before vs after on the held-out test photos</p>
             <div className="overflow-x-auto scrollbar-thin rounded-xl border border-line">
               <table className="w-full min-w-[900px] text-sm">
                 <thead className="bg-surface-2 text-left text-xs uppercase tracking-wide text-muted">
@@ -130,15 +211,16 @@ export default function FinalPipeline({ final, task }) {
                     <Th right>Brier</Th>
                     <Th right>Threshold</Th>
                     <Th right>Answered → acc.</Th>
-                    {task === "5class" && <Th right>Unsupported: wrong answer</Th>}
+                    <Th right>Unsupported: wrong answer</Th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
                   {t.test.map((r) => (
-                    <tr key={r.key} className={r.final ? "bg-leaf-500/5" : "bg-surface"}>
+                    <tr key={r.key} className={r.final ? "bg-leaf-500/5" : r.classical ? "bg-sun-500/[0.05]" : "bg-surface"}>
                       <td className="px-3 py-2.5">
-                        <span className={cx("font-medium", r.final ? "text-ink" : "text-muted")}>{r.name}</span>
-                        {r.final && <Badge tone="leaf" className="ml-2">served</Badge>}
+                        <span className={cx("font-medium", r.final || r.classical ? "text-ink" : "text-muted")}>{r.name}</span>
+                        {r.final && <Badge tone="leaf" className="ml-2">served · deep learning</Badge>}
+                        {r.classical && <Badge tone="sun" className="ml-2">served · classical ML</Badge>}
                       </td>
                       <Td>
                         {pct(r.accuracy)} <span className="text-xs text-muted">({ci(r.accuracy_ci, 0)})</span>
@@ -151,44 +233,40 @@ export default function FinalPipeline({ final, task }) {
                       <Td>
                         {pct(r.coverage, 0)} → {pct(r.accuracy_kept)}
                       </Td>
-                      {task === "5class" && <Td>{pct(r.out_of_scope?.answered_wrong, 0)}</Td>}
+                      <Td>{pct(r.out_of_scope?.answered_wrong, 0)}</Td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            {t.comparisons?.length > 0 && (
-              <p className="mt-2 text-xs text-muted">
-                Paired bootstrap, final vs {t.comparisons[0].b_name}: Δ accuracy {signedPct(t.comparisons[0].accuracy_diff)} (95% CI{" "}
-                {signedPct(t.comparisons[0].accuracy_ci[0])} … {signedPct(t.comparisons[0].accuracy_ci[1])}), Δ macro-F1 {signedPct(t.comparisons[0].f1_diff)} (
-                {signedPct(t.comparisons[0].f1_ci[0])} … {signedPct(t.comparisons[0].f1_ci[1])}).
-              </p>
-            )}
+            <PairedLine c={vsBefore} label={`final vs ${vsBefore?.b_name || vsBefore?.b}`} />
+            {vsMl && vsMl !== vsBefore && <PairedLine c={vsMl} label={`${short(vsMl.a, vsMl.a_name)} vs ${short(vsMl.b, vsMl.b_name)}`} />}
           </div>
         )}
 
-        {pair.length === 2 && stressNames.length > 0 && (
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        {showChecks && (
+          <div className={cx("grid grid-cols-1 gap-6", stressCols.length < 3 && "xl:grid-cols-2")}>
             <div>
               <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-ink">
-                <ShieldCheck className="size-4 text-muted" aria-hidden /> 3 · Stress tests (test photos)
+                <ShieldCheck className="size-4 text-muted" aria-hidden /> {step("stress")} · Stress tests (test photos)
               </p>
               <div className="overflow-x-auto scrollbar-thin rounded-xl border border-line">
-                <table className="w-full min-w-[460px] text-sm">
+                <table className={cx("w-full text-sm", stressCols.length > 2 ? "min-w-[640px]" : "min-w-[460px]")}>
                   <thead className="bg-surface-2 text-left text-xs uppercase tracking-wide text-muted">
                     <tr>
                       <Th>Condition</Th>
-                      <Th>Before</Th>
-                      <Th>Final</Th>
+                      {stressCols.map((c) => (
+                        <Th key={c.key}>{c.label}</Th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-line">
                     {stressNames.map((n) => (
                       <tr key={n} className="bg-surface">
                         <td className="px-3 py-2 text-ink">{STRESS_LABEL[n] || n}</td>
-                        {pair.map((k) => (
-                          <td key={k} className="px-3 py-2">
-                            <OutcomeBar o={t.stress?.[k]?.[n]} />
+                        {stressCols.map((c) => (
+                          <td key={c.key} className="px-3 py-2">
+                            <OutcomeBar o={t.stress?.[c.key]?.[n]} />
                           </td>
                         ))}
                       </tr>
@@ -199,15 +277,18 @@ export default function FinalPipeline({ final, task }) {
             </div>
             <div>
               <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-ink">
-                <ShieldAlert className="size-4 text-muted" aria-hidden /> 4 · Out-of-dataset images: share refused
+                <ShieldAlert className="size-4 text-muted" aria-hidden /> {step("ood")} · Out-of-dataset images: share refused
               </p>
               <div className="overflow-x-auto scrollbar-thin rounded-xl border border-line">
-                <table className="w-full min-w-[420px] text-sm">
+                <table className={cx("w-full text-sm", oodCols.length > 2 ? "min-w-[520px]" : "min-w-[420px]")}>
                   <thead className="bg-surface-2 text-left text-xs uppercase tracking-wide text-muted">
                     <tr>
                       <Th>Images</Th>
-                      <Th right>Before</Th>
-                      <Th right>Final</Th>
+                      {oodCols.map((c) => (
+                        <Th key={c.key} right>
+                          {c.label}
+                        </Th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-line">
@@ -216,8 +297,8 @@ export default function FinalPipeline({ final, task }) {
                         <td className="px-3 py-2 text-ink">
                           {OOD_LABEL[n]} <span className="text-xs text-muted">({t.out_of_dataset[finalRow.key][n].photos})</span>
                         </td>
-                        {pair.map((k) => (
-                          <Td key={k}>{pct(t.out_of_dataset?.[k]?.[n]?.refused, 0)}</Td>
+                        {oodCols.map((c) => (
+                          <Td key={c.key}>{pct(t.out_of_dataset?.[c.key]?.[n]?.refused, 0)}</Td>
                         ))}
                       </tr>
                     ))}

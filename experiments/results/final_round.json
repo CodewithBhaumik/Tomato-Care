@@ -4,7 +4,7 @@
   "models": {
     "focused_5class": {
       "key": "focused_5class",
-      "name": "Tomato Care \u00b7 Focused (5 conditions)",
+      "name": "Tomato Care \u00b7 Deep learning (5 conditions)",
       "task": "5class",
       "photos": 265,
       "test": {
@@ -629,7 +629,7 @@
     },
     "focused_5class_r1": {
       "key": "focused_5class_r1",
-      "name": "Tomato Care \u00b7 Focused (5 conditions) (round 1)",
+      "name": "Tomato Care \u00b7 Deep learning (5 conditions) (round 1)",
       "task": "5class",
       "photos": 265,
       "test": {
@@ -5903,6 +5903,631 @@
           "accuracy_kept": null
         }
       ]
+    },
+    "classical_5class": {
+      "key": "classical_5class",
+      "name": "Tomato Care \u00b7 Classical ML (5 conditions)",
+      "task": "5class",
+      "photos": 265,
+      "test": {
+        "accuracy": 0.7811320754716982,
+        "precision_macro": 0.6777062978301368,
+        "recall_macro": 0.6134026112443378,
+        "f1_macro": 0.6342577872112407,
+        "f1_weighted": 0.7718184314279869,
+        "accuracy_ci": [
+          0.7210079983593108,
+          0.8390838404327248
+        ],
+        "f1_macro_ci": [
+          0.5259212086693037,
+          0.7312721243659968
+        ],
+        "balanced_accuracy": 0.6134026112443378,
+        "ece": 0.07372656219111486,
+        "classwise_ece": 0.057293058165411935,
+        "nll": 0.5845810726906233,
+        "brier": 0.31667383448537234
+      },
+      "per_class": [
+        {
+          "key": "healthy",
+          "name": "Healthy",
+          "precision": 0.5882352941176471,
+          "recall": 0.37037037037037035,
+          "f1": 0.45454545454545453,
+          "support": 27
+        },
+        {
+          "key": "leaf_miner",
+          "name": "Leaf Miner",
+          "precision": 0.7894736842105263,
+          "recall": 0.8633093525179856,
+          "f1": 0.8247422680412371,
+          "support": 139
+        },
+        {
+          "key": "magnesium_deficiency",
+          "name": "Magnesium Deficiency",
+          "precision": 0.6666666666666666,
+          "recall": 0.7142857142857143,
+          "f1": 0.6896551724137931,
+          "support": 14
+        },
+        {
+          "key": "nitrogen_deficiency",
+          "name": "Nitrogen Deficiency",
+          "precision": 0.5,
+          "recall": 0.2857142857142857,
+          "f1": 0.36363636363636365,
+          "support": 7
+        },
+        {
+          "key": "spotted_wilt_virus",
+          "name": "Spotted Wilt Virus",
+          "precision": 0.8441558441558441,
+          "recall": 0.8333333333333334,
+          "f1": 0.8387096774193549,
+          "support": 78
+        }
+      ],
+      "confusion": [
+        [
+          10,
+          17,
+          0,
+          0,
+          0
+        ],
+        [
+          7,
+          120,
+          2,
+          1,
+          9
+        ],
+        [
+          0,
+          0,
+          10,
+          1,
+          3
+        ],
+        [
+          0,
+          2,
+          3,
+          2,
+          0
+        ],
+        [
+          0,
+          13,
+          0,
+          0,
+          65
+        ]
+      ],
+      "reliability": [
+        {
+          "lo": 0.30000000000000004,
+          "hi": 0.4,
+          "count": 1,
+          "confidence": 0.39319717170066426,
+          "accuracy": 0.0
+        },
+        {
+          "lo": 0.4,
+          "hi": 0.5,
+          "count": 12,
+          "confidence": 0.47615464046495465,
+          "accuracy": 0.25
+        },
+        {
+          "lo": 0.5,
+          "hi": 0.6000000000000001,
+          "count": 18,
+          "confidence": 0.5537807372218407,
+          "accuracy": 0.7222222222222222
+        },
+        {
+          "lo": 0.6000000000000001,
+          "hi": 0.7000000000000001,
+          "count": 24,
+          "confidence": 0.6520468712747022,
+          "accuracy": 0.5416666666666666
+        },
+        {
+          "lo": 0.7000000000000001,
+          "hi": 0.8,
+          "count": 32,
+          "confidence": 0.7548854133687035,
+          "accuracy": 0.6875
+        },
+        {
+          "lo": 0.8,
+          "hi": 0.9,
+          "count": 41,
+          "confidence": 0.852623669628083,
+          "accuracy": 0.7073170731707317
+        },
+        {
+          "lo": 0.9,
+          "hi": 1.0,
+          "count": 137,
+          "confidence": 0.9587191656453877,
+          "accuracy": 0.927007299270073
+        }
+      ],
+      "threshold": 0.84,
+      "selective": {
+        "threshold": 0.84,
+        "coverage": 0.5886792452830188,
+        "accuracy_kept": 0.9166666666666666,
+        "accuracy_rejected": 0.5871559633027523
+      },
+      "flagged_unusual": 0.045283018867924525,
+      "label_differs_from_tallest_bar": 0.0,
+      "per_condition": {
+        "early_blight": {
+          "photos": 8,
+          "answered": 0.625,
+          "uncertain": 0.375,
+          "unusual": 0.0,
+          "refused": 0.375,
+          "answered_correct": 0.0,
+          "answered_wrong": 0.625,
+          "accuracy_all": 0.0,
+          "accuracy_answered": 0.0
+        },
+        "healthy": {
+          "photos": 27,
+          "answered": 0.4444444444444444,
+          "uncertain": 0.5555555555555556,
+          "unusual": 0.0,
+          "refused": 0.5555555555555556,
+          "answered_correct": 0.14814814814814814,
+          "answered_wrong": 0.2962962962962963,
+          "accuracy_all": 0.37037037037037035,
+          "accuracy_answered": 0.3333333333333333
+        },
+        "late_blight": {
+          "photos": 15,
+          "answered": 0.8666666666666667,
+          "uncertain": 0.06666666666666667,
+          "unusual": 0.06666666666666667,
+          "refused": 0.13333333333333333,
+          "answered_correct": 0.0,
+          "answered_wrong": 0.8666666666666667,
+          "accuracy_all": 0.0,
+          "accuracy_answered": 0.0
+        },
+        "leaf_miner": {
+          "photos": 139,
+          "answered": 0.6330935251798561,
+          "uncertain": 0.33093525179856115,
+          "unusual": 0.03597122302158273,
+          "refused": 0.3669064748201439,
+          "answered_correct": 0.6187050359712231,
+          "answered_wrong": 0.014388489208633094,
+          "accuracy_all": 0.8633093525179856,
+          "accuracy_answered": 0.9772727272727273
+        },
+        "magnesium_deficiency": {
+          "photos": 14,
+          "answered": 0.42857142857142855,
+          "uncertain": 0.5,
+          "unusual": 0.07142857142857142,
+          "refused": 0.5714285714285714,
+          "answered_correct": 0.35714285714285715,
+          "answered_wrong": 0.07142857142857142,
+          "accuracy_all": 0.7142857142857143,
+          "accuracy_answered": 0.8333333333333334
+        },
+        "nitrogen_deficiency": {
+          "photos": 7,
+          "answered": 0.42857142857142855,
+          "uncertain": 0.42857142857142855,
+          "unusual": 0.14285714285714285,
+          "refused": 0.5714285714285714,
+          "answered_correct": 0.2857142857142857,
+          "answered_wrong": 0.14285714285714285,
+          "accuracy_all": 0.2857142857142857,
+          "accuracy_answered": 0.6666666666666666
+        },
+        "potassium_deficiency": {
+          "photos": 2,
+          "answered": 0.0,
+          "uncertain": 1.0,
+          "unusual": 0.0,
+          "refused": 1.0,
+          "answered_correct": 0.0,
+          "answered_wrong": 0.0,
+          "accuracy_all": 0.0,
+          "accuracy_answered": null
+        },
+        "spotted_wilt_virus": {
+          "photos": 78,
+          "answered": 0.6025641025641025,
+          "uncertain": 0.3333333333333333,
+          "unusual": 0.0641025641025641,
+          "refused": 0.3974358974358974,
+          "answered_correct": 0.5897435897435898,
+          "answered_wrong": 0.01282051282051282,
+          "accuracy_all": 0.8333333333333334,
+          "accuracy_answered": 0.9787234042553191
+        }
+      },
+      "out_of_scope": {
+        "photos": 25,
+        "answered": 0.72,
+        "uncertain": 0.24,
+        "unusual": 0.04,
+        "refused": 0.28,
+        "answered_correct": 0.0,
+        "answered_wrong": 0.72,
+        "accuracy_all": 0.0,
+        "accuracy_answered": 0.0,
+        "confidence_mean": 0.8824505161241977
+      },
+      "same_leaf_consistency": {
+        "groups": 22,
+        "pairs": 42,
+        "pairwise_agreement": 0.7857142857142857,
+        "groups_all_agree": 0.8181818181818182
+      },
+      "risk_coverage": [
+        {
+          "threshold": 0.3,
+          "coverage": 1.0,
+          "accuracy_kept": 0.7811320754716982
+        },
+        {
+          "threshold": 0.31,
+          "coverage": 1.0,
+          "accuracy_kept": 0.7811320754716982
+        },
+        {
+          "threshold": 0.32,
+          "coverage": 1.0,
+          "accuracy_kept": 0.7811320754716982
+        },
+        {
+          "threshold": 0.33,
+          "coverage": 1.0,
+          "accuracy_kept": 0.7811320754716982
+        },
+        {
+          "threshold": 0.34,
+          "coverage": 1.0,
+          "accuracy_kept": 0.7811320754716982
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 1.0,
+          "accuracy_kept": 0.7811320754716982
+        },
+        {
+          "threshold": 0.36,
+          "coverage": 1.0,
+          "accuracy_kept": 0.7811320754716982
+        },
+        {
+          "threshold": 0.37,
+          "coverage": 1.0,
+          "accuracy_kept": 0.7811320754716982
+        },
+        {
+          "threshold": 0.38,
+          "coverage": 1.0,
+          "accuracy_kept": 0.7811320754716982
+        },
+        {
+          "threshold": 0.39,
+          "coverage": 1.0,
+          "accuracy_kept": 0.7811320754716982
+        },
+        {
+          "threshold": 0.4,
+          "coverage": 0.9962264150943396,
+          "accuracy_kept": 0.7840909090909091
+        },
+        {
+          "threshold": 0.41,
+          "coverage": 0.9962264150943396,
+          "accuracy_kept": 0.7840909090909091
+        },
+        {
+          "threshold": 0.42,
+          "coverage": 0.9962264150943396,
+          "accuracy_kept": 0.7840909090909091
+        },
+        {
+          "threshold": 0.43,
+          "coverage": 0.9962264150943396,
+          "accuracy_kept": 0.7840909090909091
+        },
+        {
+          "threshold": 0.44,
+          "coverage": 0.9924528301886792,
+          "accuracy_kept": 0.7870722433460076
+        },
+        {
+          "threshold": 0.45,
+          "coverage": 0.9924528301886792,
+          "accuracy_kept": 0.7870722433460076
+        },
+        {
+          "threshold": 0.46,
+          "coverage": 0.9811320754716981,
+          "accuracy_kept": 0.7923076923076923
+        },
+        {
+          "threshold": 0.47,
+          "coverage": 0.9735849056603774,
+          "accuracy_kept": 0.7984496124031008
+        },
+        {
+          "threshold": 0.48,
+          "coverage": 0.9735849056603774,
+          "accuracy_kept": 0.7984496124031008
+        },
+        {
+          "threshold": 0.49,
+          "coverage": 0.969811320754717,
+          "accuracy_kept": 0.8015564202334631
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.9509433962264151,
+          "accuracy_kept": 0.8095238095238095
+        },
+        {
+          "threshold": 0.51,
+          "coverage": 0.9509433962264151,
+          "accuracy_kept": 0.8095238095238095
+        },
+        {
+          "threshold": 0.52,
+          "coverage": 0.9433962264150944,
+          "accuracy_kept": 0.808
+        },
+        {
+          "threshold": 0.53,
+          "coverage": 0.9358490566037736,
+          "accuracy_kept": 0.8104838709677419
+        },
+        {
+          "threshold": 0.54,
+          "coverage": 0.9283018867924528,
+          "accuracy_kept": 0.8130081300813008
+        },
+        {
+          "threshold": 0.55,
+          "coverage": 0.9245283018867925,
+          "accuracy_kept": 0.8122448979591836
+        },
+        {
+          "threshold": 0.56,
+          "coverage": 0.9132075471698113,
+          "accuracy_kept": 0.8099173553719008
+        },
+        {
+          "threshold": 0.57,
+          "coverage": 0.9018867924528302,
+          "accuracy_kept": 0.8117154811715481
+        },
+        {
+          "threshold": 0.58,
+          "coverage": 0.8943396226415095,
+          "accuracy_kept": 0.810126582278481
+        },
+        {
+          "threshold": 0.59,
+          "coverage": 0.8867924528301887,
+          "accuracy_kept": 0.8127659574468085
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 0.8830188679245283,
+          "accuracy_kept": 0.8162393162393162
+        },
+        {
+          "threshold": 0.61,
+          "coverage": 0.879245283018868,
+          "accuracy_kept": 0.8197424892703863
+        },
+        {
+          "threshold": 0.62,
+          "coverage": 0.8754716981132076,
+          "accuracy_kept": 0.8232758620689655
+        },
+        {
+          "threshold": 0.63,
+          "coverage": 0.8641509433962264,
+          "accuracy_kept": 0.834061135371179
+        },
+        {
+          "threshold": 0.64,
+          "coverage": 0.8490566037735849,
+          "accuracy_kept": 0.8444444444444444
+        },
+        {
+          "threshold": 0.65,
+          "coverage": 0.8339622641509434,
+          "accuracy_kept": 0.8461538461538461
+        },
+        {
+          "threshold": 0.66,
+          "coverage": 0.8301886792452831,
+          "accuracy_kept": 0.8454545454545455
+        },
+        {
+          "threshold": 0.67,
+          "coverage": 0.8188679245283019,
+          "accuracy_kept": 0.847926267281106
+        },
+        {
+          "threshold": 0.68,
+          "coverage": 0.8113207547169812,
+          "accuracy_kept": 0.8465116279069768
+        },
+        {
+          "threshold": 0.69,
+          "coverage": 0.8,
+          "accuracy_kept": 0.8490566037735849
+        },
+        {
+          "threshold": 0.7,
+          "coverage": 0.7924528301886793,
+          "accuracy_kept": 0.8476190476190476
+        },
+        {
+          "threshold": 0.71,
+          "coverage": 0.7773584905660378,
+          "accuracy_kept": 0.8543689320388349
+        },
+        {
+          "threshold": 0.72,
+          "coverage": 0.769811320754717,
+          "accuracy_kept": 0.8578431372549019
+        },
+        {
+          "threshold": 0.73,
+          "coverage": 0.7584905660377359,
+          "accuracy_kept": 0.8606965174129353
+        },
+        {
+          "threshold": 0.74,
+          "coverage": 0.7471698113207547,
+          "accuracy_kept": 0.8636363636363636
+        },
+        {
+          "threshold": 0.75,
+          "coverage": 0.7471698113207547,
+          "accuracy_kept": 0.8636363636363636
+        },
+        {
+          "threshold": 0.76,
+          "coverage": 0.7283018867924528,
+          "accuracy_kept": 0.8601036269430051
+        },
+        {
+          "threshold": 0.77,
+          "coverage": 0.720754716981132,
+          "accuracy_kept": 0.8586387434554974
+        },
+        {
+          "threshold": 0.78,
+          "coverage": 0.7018867924528301,
+          "accuracy_kept": 0.8602150537634409
+        },
+        {
+          "threshold": 0.79,
+          "coverage": 0.6867924528301886,
+          "accuracy_kept": 0.8681318681318682
+        },
+        {
+          "threshold": 0.8,
+          "coverage": 0.6716981132075471,
+          "accuracy_kept": 0.8764044943820225
+        },
+        {
+          "threshold": 0.81,
+          "coverage": 0.660377358490566,
+          "accuracy_kept": 0.8857142857142857
+        },
+        {
+          "threshold": 0.82,
+          "coverage": 0.6528301886792452,
+          "accuracy_kept": 0.8901734104046243
+        },
+        {
+          "threshold": 0.83,
+          "coverage": 0.6415094339622641,
+          "accuracy_kept": 0.9
+        },
+        {
+          "threshold": 0.84,
+          "coverage": 0.6150943396226415,
+          "accuracy_kept": 0.9141104294478528
+        },
+        {
+          "threshold": 0.85,
+          "coverage": 0.6,
+          "accuracy_kept": 0.9119496855345912
+        },
+        {
+          "threshold": 0.86,
+          "coverage": 0.5924528301886792,
+          "accuracy_kept": 0.910828025477707
+        },
+        {
+          "threshold": 0.87,
+          "coverage": 0.5735849056603773,
+          "accuracy_kept": 0.9210526315789473
+        },
+        {
+          "threshold": 0.88,
+          "coverage": 0.5433962264150943,
+          "accuracy_kept": 0.9236111111111112
+        },
+        {
+          "threshold": 0.89,
+          "coverage": 0.5320754716981132,
+          "accuracy_kept": 0.9219858156028369
+        },
+        {
+          "threshold": 0.9,
+          "coverage": 0.5169811320754717,
+          "accuracy_kept": 0.927007299270073
+        },
+        {
+          "threshold": 0.91,
+          "coverage": 0.5018867924528302,
+          "accuracy_kept": 0.924812030075188
+        },
+        {
+          "threshold": 0.92,
+          "coverage": 0.4867924528301887,
+          "accuracy_kept": 0.9302325581395349
+        },
+        {
+          "threshold": 0.93,
+          "coverage": 0.45660377358490567,
+          "accuracy_kept": 0.9338842975206612
+        },
+        {
+          "threshold": 0.94,
+          "coverage": 0.4075471698113208,
+          "accuracy_kept": 0.9351851851851852
+        },
+        {
+          "threshold": 0.95,
+          "coverage": 0.3433962264150943,
+          "accuracy_kept": 0.945054945054945
+        },
+        {
+          "threshold": 0.96,
+          "coverage": 0.3018867924528302,
+          "accuracy_kept": 0.9375
+        },
+        {
+          "threshold": 0.97,
+          "coverage": 0.22264150943396227,
+          "accuracy_kept": 0.9491525423728814
+        },
+        {
+          "threshold": 0.98,
+          "coverage": 0.0,
+          "accuracy_kept": null
+        },
+        {
+          "threshold": 0.99,
+          "coverage": 0.0,
+          "accuracy_kept": null
+        }
+      ]
     }
   },
   "comparisons": [
@@ -5910,8 +6535,8 @@
       "task": "5class",
       "a": "focused_5class",
       "b": "focused_5class_r1",
-      "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
-      "b_name": "Tomato Care \u00b7 Focused (5 conditions) (round 1)",
+      "a_name": "Tomato Care \u00b7 Deep learning (5 conditions)",
+      "b_name": "Tomato Care \u00b7 Deep learning (5 conditions) (round 1)",
       "final_round": true,
       "f1_diff": 0.0,
       "f1_ci": [
@@ -5929,7 +6554,7 @@
       "task": "5class",
       "a": "focused_5class",
       "b": "balanced_5class",
-      "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
+      "a_name": "Tomato Care \u00b7 Deep learning (5 conditions)",
       "b_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
       "final_round": true,
       "f1_diff": 0.01255537770950399,
@@ -5948,7 +6573,7 @@
       "task": "5class",
       "a": "focused_5class",
       "b": "calibrated_5class",
-      "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
+      "a_name": "Tomato Care \u00b7 Deep learning (5 conditions)",
       "b_name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
       "final_round": true,
       "f1_diff": 0.0074808647407308415,
@@ -5967,7 +6592,7 @@
       "task": "5class",
       "a": "focused_5class",
       "b": "ensemble_5class",
-      "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
+      "a_name": "Tomato Care \u00b7 Deep learning (5 conditions)",
       "b_name": "Ensemble ConvNeXt-T + EfficientNet-B0 (original 5-class default)",
       "final_round": true,
       "f1_diff": 0.002840198601116839,
@@ -6038,6 +6663,25 @@
         0.006873444720938473
       ],
       "share_a_not_better_f1": 0.8905
+    },
+    {
+      "task": "5class",
+      "a": "classical_5class",
+      "b": "focused_5class",
+      "a_name": "Tomato Care \u00b7 Classical ML (5 conditions)",
+      "b_name": "Tomato Care \u00b7 Deep learning (5 conditions)",
+      "ml_vs_dl": true,
+      "f1_diff": -0.204012767142709,
+      "f1_ci": [
+        -0.31798884082253026,
+        -0.09548712956788259
+      ],
+      "accuracy_diff": -0.1283018867924528,
+      "accuracy_ci": [
+        -0.18918918918918914,
+        -0.07168501980796353
+      ],
+      "share_a_not_better_f1": 1.0
     }
   ],
   "stress": {
@@ -6516,6 +7160,125 @@
         "unusual": 0.475,
         "refused": 0.55
       }
+    },
+    "classical_5class": {
+      "blur_sigma2": {
+        "photos": 265,
+        "answered": 0.01509433962264151,
+        "uncertain": 0.026415094339622643,
+        "unusual": 0.9584905660377359,
+        "refused": 0.9849056603773585,
+        "answered_correct": 0.01509433962264151,
+        "answered_wrong": 0.0,
+        "accuracy_all": 0.6415094339622641,
+        "accuracy_answered": 1.0
+      },
+      "blur_sigma4": {
+        "photos": 265,
+        "answered": 0.0,
+        "uncertain": 0.0,
+        "unusual": 1.0,
+        "refused": 1.0,
+        "answered_correct": 0.0,
+        "answered_wrong": 0.0,
+        "accuracy_all": 0.6,
+        "accuracy_answered": null
+      },
+      "dark_x0.35": {
+        "photos": 265,
+        "answered": 0.0,
+        "uncertain": 0.0,
+        "unusual": 1.0,
+        "refused": 1.0,
+        "answered_correct": 0.0,
+        "answered_wrong": 0.0,
+        "accuracy_all": 0.5283018867924528,
+        "accuracy_answered": null
+      },
+      "overexposed_x1.7": {
+        "photos": 265,
+        "answered": 0.03773584905660377,
+        "uncertain": 0.052830188679245285,
+        "unusual": 0.909433962264151,
+        "refused": 0.9622641509433962,
+        "answered_correct": 0.018867924528301886,
+        "answered_wrong": 0.018867924528301886,
+        "accuracy_all": 0.7018867924528301,
+        "accuracy_answered": 0.5
+      },
+      "jpeg_q15": {
+        "photos": 265,
+        "answered": 0.06037735849056604,
+        "uncertain": 0.03018867924528302,
+        "unusual": 0.909433962264151,
+        "refused": 0.939622641509434,
+        "answered_correct": 0.04905660377358491,
+        "answered_wrong": 0.011320754716981131,
+        "accuracy_all": 0.6981132075471698,
+        "accuracy_answered": 0.8125
+      },
+      "background_black": {
+        "photos": 265,
+        "answered": 0.0,
+        "uncertain": 0.0,
+        "unusual": 1.0,
+        "refused": 1.0,
+        "answered_correct": 0.0,
+        "answered_wrong": 0.0,
+        "accuracy_all": 0.5132075471698113,
+        "accuracy_answered": null
+      },
+      "background_wood": {
+        "photos": 265,
+        "answered": 0.16981132075471697,
+        "uncertain": 0.2792452830188679,
+        "unusual": 0.5509433962264151,
+        "refused": 0.8301886792452831,
+        "answered_correct": 0.14339622641509434,
+        "answered_wrong": 0.026415094339622643,
+        "accuracy_all": 0.6,
+        "accuracy_answered": 0.8444444444444444
+      },
+      "background_grass": {
+        "photos": 265,
+        "answered": 0.045283018867924525,
+        "uncertain": 0.06415094339622641,
+        "unusual": 0.8905660377358491,
+        "refused": 0.9547169811320755,
+        "answered_correct": 0.03018867924528302,
+        "answered_wrong": 0.01509433962264151,
+        "accuracy_all": 0.5509433962264151,
+        "accuracy_answered": 0.6666666666666666
+      },
+      "background_fabric": {
+        "photos": 265,
+        "answered": 0.0,
+        "uncertain": 0.0,
+        "unusual": 1.0,
+        "refused": 1.0,
+        "answered_correct": 0.0,
+        "answered_wrong": 0.0,
+        "accuracy_all": 0.5547169811320755,
+        "accuracy_answered": null
+      },
+      "four_leaves_same": {
+        "photos": 63,
+        "answered": 0.49206349206349204,
+        "uncertain": 0.2698412698412698,
+        "unusual": 0.23809523809523808,
+        "refused": 0.5079365079365079,
+        "answered_correct": 0.4444444444444444,
+        "answered_wrong": 0.047619047619047616,
+        "accuracy_all": 0.6666666666666666,
+        "accuracy_answered": 0.9032258064516129
+      },
+      "four_leaves_mixed": {
+        "photos": 40,
+        "answered": 0.375,
+        "uncertain": 0.325,
+        "unusual": 0.3,
+        "refused": 0.625
+      }
     }
   },
   "out_of_dataset": {
@@ -6806,6 +7569,78 @@
         "unusual": 1.0,
         "refused": 1.0
       }
+    },
+    "classical_5class": {
+      "probes": {
+        "photos": 30,
+        "answered": 0.0,
+        "uncertain": 0.0,
+        "unusual": 1.0,
+        "refused": 1.0
+      },
+      "empty_paper": {
+        "photos": 60,
+        "answered": 0.0,
+        "uncertain": 0.0,
+        "unusual": 1.0,
+        "refused": 1.0
+      },
+      "other_crop": {
+        "photos": 96,
+        "answered": 0.0,
+        "uncertain": 0.0,
+        "unusual": 1.0,
+        "refused": 1.0
+      },
+      "tomato_unsupported": {
+        "photos": 56,
+        "answered": 0.0,
+        "uncertain": 0.0,
+        "unusual": 1.0,
+        "refused": 1.0
+      },
+      "tomato_known_shift": {
+        "early_blight": {
+          "photos": 12,
+          "answered": 0.0,
+          "uncertain": 0.0,
+          "unusual": 1.0,
+          "refused": 1.0,
+          "answered_correct": 0.0,
+          "answered_wrong": 0.0,
+          "accuracy_all": 0.0,
+          "accuracy_answered": null
+        },
+        "healthy": {
+          "photos": 12,
+          "answered": 0.0,
+          "uncertain": 0.0,
+          "unusual": 1.0,
+          "refused": 1.0,
+          "answered_correct": 0.0,
+          "answered_wrong": 0.0,
+          "accuracy_all": 0.0,
+          "accuracy_answered": null
+        },
+        "late_blight": {
+          "photos": 12,
+          "answered": 0.0,
+          "uncertain": 0.0,
+          "unusual": 1.0,
+          "refused": 1.0,
+          "answered_correct": 0.0,
+          "answered_wrong": 0.0,
+          "accuracy_all": 0.0,
+          "accuracy_answered": null
+        }
+      },
+      "everyday": {
+        "photos": 69,
+        "answered": 0.0,
+        "uncertain": 0.0,
+        "unusual": 1.0,
+        "refused": 1.0
+      }
     }
   },
   "latency": {
@@ -6836,6 +7671,13 @@
       "threads": 8,
       "runtime": "onnxruntime",
       "measured": "2026-11-19 18:48"
+    },
+    "classical_5class": {
+      "median_ms": 48.97984999115579,
+      "p90_ms": 60.196379997069016,
+      "threads": 8,
+      "runtime": "scikit-learn",
+      "measured": "2026-11-19 23:55"
     }
   },
   "probe_names": [
@@ -6869,5 +7711,6 @@
     "noise_green",
     "checker_colour",
     "stripes"
-  ]
+  ],
+  "classical_note": "Classical model (scripts/43) scored once on the test photos by scripts/44, 2026-11-19 23:55."
 }

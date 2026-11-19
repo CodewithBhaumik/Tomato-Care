@@ -39,7 +39,7 @@ export default function SampleGallery({ onPick, activeKey, disabled, scope, colu
       </div>
       <div className={cx("grid gap-2", columns)}>
         {!state.samples &&
-          Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="aspect-square rounded-xl" />)}
+          Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="aspect-square rounded-xl" />)}
         {state.samples?.map((s) => {
           const meta = classMeta(s.key);
           const out = scope && !scope.includes(s.key);

@@ -22,7 +22,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from backend.services.predictor import ModelRegistry  # noqa: E402
-from tomatoleaf.config import CLASS_KEYS, EXPERIMENTS_DIR, RESULTS_DIR  # noqa: E402
+from tomatoleaf.config import EXPERIMENTS_DIR, RESULTS_DIR  # noqa: E402
 from tomatoleaf.data import load_splits  # noqa: E402
 from tomatoleaf.features import leaf_mask  # noqa: E402
 from tomatoleaf.gradcam import heatmap_png, overlay  # noqa: E402
@@ -32,7 +32,9 @@ from tomatoleaf.utils import load_json, save_json  # noqa: E402
 
 FRONT = ROOT / "frontend" / "public"
 FIVE = ["healthy", "leaf_miner", "magnesium_deficiency", "nitrogen_deficiency", "spotted_wilt_virus"]
-TASK_LABEL = {"5class": "Focused · 5 classes", "8class": "Full · 8 classes"}
+TASKS = ("5class",)  # the apps diagnose five conditions; eight-condition results are no longer exported
+TASK_LABEL = {"5class": "5 conditions"}
+CLASSICAL = "classical_5class"  # the served classical ML model (scripts/43-44)
 SHORT_RECIPE = {
     "convnext_t_in1k_base": "ConvNeXt-T 1k · orig.",
     "convnext_t_in1k_robust": "ConvNeXt-T 1k · robust",
@@ -61,10 +63,10 @@ def gradcam_for(predictor, rgb, class_index):
     return getattr(predictor, "members", [predictor])[0].gradcam(rgb, class_index)
 
 
-def build_gallery(defaults, previous, bench_models):
+def build_gallery(defaults, bench_models):
     manifest = load_json(FRONT / "test-samples" / "manifest.json")
     reg = ModelRegistry(EXPERIMENTS_DIR / "deployment.json", device="cuda" if torch.cuda.is_available() else "cpu", lazy=True)
-    models = [defaults["5class"], defaults["8class"]]  # the apps serve only the version-2 models
+    models = [defaults["5class"]]  # Grad-CAM needs a network: the served deep-learning model
     names = {m["key"]: m["name"] for m in bench_models}
     items, hero = [], None
     for s in manifest["samples"]:
@@ -99,9 +101,9 @@ def build_gallery(defaults, previous, bench_models):
     return {"items": items, "models": models, "summary": summary, "on_leaf_share": shares}, hero
 
 
-def final_round_block(final_pipe, final_round, final_keys):
+def final_round_block(final_pipe, final_round, final_keys, classical):
     """What the apps show about the final round: the compared arms (out-of-fold), the chosen pipeline, and the
-    before/after comparison on the test photos with stress and out-of-dataset checks."""
+    before/after comparison on the test photos (with the served classical model) and stress / out-of-dataset checks."""
     if not final_pipe:
         return None
     out = {"rules": "docs/AUDIT.md §6 (fixed before training)", "tasks": {}}
@@ -121,14 +123,13 @@ def final_round_block(final_pipe, final_round, final_keys):
                             if k.startswith(("auroc", "flagged", "out_of_scope"))}},
                 "reference": fp.get("reference") or None}
         if final_round:
-            before = {"5class": ["focused_5class_r1", "balanced_5class", "calibrated_5class", "ensemble_5class"],
-                      "8class": ["full_8class_r1", "balanced_8class", "convnext_tiny_v2_tta"]}[t]
+            before = ["focused_5class_r1", "balanced_5class", "calibrated_5class", "ensemble_5class"]
             rows = []
-            for key in [final_keys[t]] + before:
+            for key in [final_keys[t], classical] + before:
                 r = final_round["models"].get(key)
                 if r is None:
                     continue
-                rows.append({"key": key, "name": r["name"], "final": key == final_keys[t],
+                rows.append({"key": key, "name": r["name"], "final": key == final_keys[t], "classical": key == classical,
                              **{k: r["test"][k] for k in keep if k in r["test"]},
                              "accuracy_ci": r["test"].get("accuracy_ci"), "threshold": r["threshold"],
                              "coverage": r["selective"]["coverage"], "accuracy_kept": r["selective"]["accuracy_kept"],
@@ -137,7 +138,7 @@ def final_round_block(final_pipe, final_round, final_keys):
                              "out_of_scope": r.get("out_of_scope"), "per_condition": r.get("per_condition")})
             task["test"] = rows
             task["comparisons"] = [c for c in final_round["comparisons"] if c["task"] == t]
-            pair = [final_keys[t], before[0]]
+            pair = [final_keys[t], before[0], classical]
             task["stress"] = {k: final_round["stress"].get(k) for k in pair}
             task["out_of_dataset"] = {k: final_round["out_of_dataset"].get(k) for k in pair}
             task["latency"] = {k: final_round["latency"].get(k) for k in pair}
@@ -173,18 +174,21 @@ def main():
     defaults, previous = bench["defaults"], bench["previous_defaults"]  # defaults: the version-2 networks
     deployment = load_json(EXPERIMENTS_DIR / "deployment.json")
     served = deployment["defaults_by_task"]  # what the apps answer with (calibrated / bias-corrected variants)
-    sel = {t: load_json(RESULTS_DIR / f"selection_{t}.json") for t in ("5class", "8class")}
+    sel = {t: load_json(RESULTS_DIR / f"selection_{t}.json") for t in TASKS}
     variant_oof = {}
-    for t in ("5class", "8class"):
+    for t in TASKS:
         bal = RESULTS_DIR / f"balance_{t}.json"
         if bal.exists():
             variant_oof.update({k: v["oof"] for k, v in load_json(bal)["variants"].items()})
     # final round (scripts/36 + 38): one validated pipeline per task
-    FINAL_KEYS = {"5class": "focused_5class", "8class": "full_8class"}
-    final_pipe = {t: load_json(RESULTS_DIR / f"final_pipeline_{t}.json") for t in ("5class", "8class")
+    FINAL_KEYS = {"5class": "focused_5class"}
+    final_pipe = {t: load_json(RESULTS_DIR / f"final_pipeline_{t}.json") for t in TASKS
                   if (RESULTS_DIR / f"final_pipeline_{t}.json").exists()}
+    classical = load_json(RESULTS_DIR / "classical_pipeline.json")
+    ml_arm = classical["arms"][classical["chosen"]["arm"]]
     final_round = load_json(RESULTS_DIR / "final_round.json") if (RESULTS_DIR / "final_round.json").exists() else None
     final_oof = {FINAL_KEYS[t]: fp["arms"][fp["chosen"]["arm"]]["oof"] for t, fp in final_pipe.items()}
+    final_oof[CLASSICAL] = ml_arm["oof"]
     old = load_json(EXPERIMENTS_DIR / "analytics.json")
     final8 = load_json(RESULTS_DIR / "final_results.json")
     five = load_json(RESULTS_DIR / "five_class_results.json")
@@ -215,13 +219,15 @@ def main():
     legacy_val = {m["key"]: m["val"] for m in final8["models"]}
     legacy_val.update({m["key"]: m["val"] for m in five["models"]})
     rec_oof = {}
-    for t in ("5class", "8class"):
+    for t in TASKS:
         for c in sel[t]["candidates"]:
             if len(c["members"]) == 1:
                 r, v = c["members"][0]
                 rec_oof[(t, r, v)] = c["oof"]
     models = []
     for r in bench["models"]:
+        if r["task"] not in TASKS:
+            continue
         m = meta[r["key"]]
         recipes = m.get("recipes")
         cv = None
@@ -254,7 +260,7 @@ def main():
                             "ece_after": r["test"]["ece"], "reliability_after": r["reliability"], "fitted_on":
                                 "out-of-fold predictions" if r["generation"] == "upgrade" else "the validation split"},
             "latency_ms": lat, "flagged_unusual": r.get("flagged_unusual"), "out_of_scope": r.get("out_of_scope")})
-    for t in ("5class", "8class"):  # OOF reliability before/after for the upgrade defaults
+    for t in TASKS:  # OOF reliability before/after for the upgrade defaults
         d = next(m for m in models if m["key"] == defaults[t])
         d["calibration"].update({"reliability_before": sel[t]["chosen"]["reliability_oof_raw"],
                                  "reliability_after": sel[t]["chosen"]["reliability_oof"],
@@ -271,10 +277,19 @@ def main():
                                      "method": arm["calibration"]["chosen"] + " scaling",
                                      "fitted_on": "out-of-fold predictions, cross-fitted (diagram: out-of-fold, "
                                                   "before vs after)"})
+    d = next((m for m in models if m["key"] == CLASSICAL), None)
+    if d is not None:  # the classical model: same calibration rules (scripts/43)
+        d["calibration"].update({"reliability_before": classical["chosen"]["reliability_oof_raw"],
+                                 "reliability_after": classical["chosen"]["reliability_oof"],
+                                 "ece_before": ml_arm["uncalibrated"]["ece"] if "uncalibrated" in ml_arm else None,
+                                 "ece_after": ml_arm["oof"]["ece"], "method": ml_arm["calibration"]["chosen"] + " scaling",
+                                 "fitted_on": "out-of-fold predictions, cross-fitted (diagram: out-of-fold, before vs "
+                                              "after)"})
+        d["feature_importance"] = classical["chosen"].get("feature_importance")
 
     # ---- cross-validation recipes
     recipes_out = []
-    for t in ("5class", "8class"):
+    for t in TASKS:
         for rname, info in sel[t]["recipes"].items():
             summ = load_json(EXPERIMENTS_DIR / "cv" / t / rname / "summary.json")
             recipes_out.append({
@@ -288,7 +303,7 @@ def main():
                 "curves": curves_for(t, rname), "chosen": rname in [m["recipe"] for m in sel[t]["chosen"]["members"]]})
     recipes_out.sort(key=lambda r: (r["task"], -r["f1_8"]))
     screening = []  # fold-0 results of EVERY recipe tried (including ones stopped after fold 0)
-    for t in ("8class", "5class"):
+    for t in TASKS:
         for rname, rec in RECIPES.items():
             p = EXPERIMENTS_DIR / "cv" / t / rname / "fold0.json"
             if p.exists():
@@ -307,7 +322,7 @@ def main():
             pre.append({"condition": k, "label": "Dataset file (reference)" if k == "clean" else PERTURBATION_LABEL[k],
                         "accuracy": a[k]["accuracy"], "f1_macro": a[k]["f1_macro"], "flip_rate": a[k].get("flip_rate", 0.0)})
     robustness = {}
-    for t in ("5class", "8class"):
+    for t in TASKS:
         rb = bench["robustness"][t]
         names = list(PERTURBATION_LABEL)
         robustness[t] = {"rows": [{"label": PERTURBATION_LABEL[n], **{key: rb[key][n]["flip_rate"] for key in rb}} for n in names
@@ -318,10 +333,10 @@ def main():
     if "dryrun" in bench_file:  # pipeline check only: never score test photos (the gallery uses held-out samples)
         gallery, hero = {"items": [], "models": [], "summary": "dry run", "on_leaf_share": {}}, None
     else:
-        gallery, hero = build_gallery(served, previous, bench_models)
+        gallery, hero = build_gallery(served, bench_models)
 
     selective = {}
-    for t in ("5class", "8class"):
+    for t in TASKS:
         rc = bench.get("risk_coverage_variants", {}).get(served[t]) or bench["risk_coverage"][t]
         d = next(m for m in models if m["key"] == rc["model"])
         rule = (final_pipe[t]["arms"][final_pipe[t]["chosen"]["arm"]]["threshold_rule"]
@@ -333,43 +348,60 @@ def main():
     ood = {"method": f"{sel['5class']['ood']['method']} distance in the networks' feature space",
            "keep": sel["5class"]["ood"]["keep"],
            "oof": {t: {k: v for k, v in sel[t]["ood"]["evaluation_oof"][sel[t]["ood"]["method"]].items() if k != "probe_ratios"}
-                   for t in ("5class", "8class")},
+                   for t in TASKS},
            "test": {"flagged_in": bench["ood"]["5class"]["flagged_in"], "flagged_near": bench["ood"]["5class"].get("flagged_near"),
-                    "flagged_far": bench["ood"]["5class"]["flagged_far_B"], "by_task": bench["ood"]}}
+                    "flagged_far": bench["ood"]["5class"]["flagged_far_B"],
+                    "by_task": {t: bench["ood"][t] for t in TASKS}}}
 
     if final_pipe:
         ood["final"] = {t: {"method": fp["unusual_gate"]["method"], "keep": fp["unusual_gate"]["keep"],
                             "oof": {k: v for k, v in
                                     fp["unusual_gate"]["evaluation_oof"][fp["unusual_gate"]["method"]].items()
                                     if k != "member_thresholds"}} for t, fp in final_pipe.items()}
+        gate = classical["unusual_gate"]
+        ood["final"][CLASSICAL] = {"method": gate["method"], "keep": gate["keep"],
+                                   "oof": {k: v for k, v in gate["evaluation_oof"][gate["method"]].items()
+                                           if k != "fold_thresholds"}}
 
     limitations = [
         "One phone model, two districts of Rajasthan, single leaves on paper: accuracy on field photos, other cameras or regions is unknown.",
-        "Potassium Deficiency has 9 photographs in total (2 in the test set) and Nitrogen Deficiency 45: their per-class scores are very uncertain.",
-        "The test set is small (290 photos, 265 in the focused scope); differences of a few points are within noise — read the confidence intervals and paired tests.",
+        "Five conditions only: the dataset's Early Blight (62 photos), Late Blight and Potassium Deficiency (9 photos) were too hard to recognise reliably and are not diagnosed.",
+        "Nitrogen Deficiency has 45 photographs (8 in the test set): its per-class scores are very uncertain.",
+        f"The test set is small ({bench['test_photos_5class']} photos of the five conditions); differences of a few points are within noise — read the confidence intervals and paired tests.",
         "The same test photos were used to report the original study, so they are not perfectly fresh; no upgrade decision used them.",
-        "Temperatures and thresholds were fitted on out-of-fold predictions of the fold models, which are also the deployed models; coverage on new photos can still differ.",
-        "Early Blight (62 photos) and Potassium Deficiency (9 photos) stay hard for the full model: their recall is low even after the final round.",
-        "The focused model learned to refuse Early/Late Blight and Potassium from photos of those three conditions (outlier exposure); diseases it has never seen may still receive a diagnosis.",
+        "Calibration and thresholds were fitted on out-of-fold predictions; coverage on new photos can still differ.",
+        "The deep-learning model learned to refuse the dataset's other three conditions (outlier exposure); diseases it has never seen may still receive a diagnosis. The classical model had no such training.",
         "Out-of-dataset checks used PlantVillage leaves (another lab), everyday photos and synthetic stress tests; field photos with complex backgrounds were not available.",
-        "Grad-CAM shows where the network looked, not why a leaf is diseased.",
+        "Grad-CAM shows where the network looked, not why a leaf is diseased; the classical model has no Grad-CAM.",
     ]
     env = {"python": platform.python_version(), "torch": torch.__version__,
            "timm": __import__("timm").__version__, "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None}
 
     doc = {"version": 2, "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
            "project": {"name": "Tomato Care"}, "dataset": dataset,
-           "tasks": {t: {"label": TASK_LABEL[t], "classes": FIVE if t == "5class" else list(CLASS_KEYS),
-                         "test_photos": bench["test_photos_5class"] if t == "5class" else bench["test_photos"],
+           "tasks": {t: {"label": TASK_LABEL[t], "classes": FIVE, "test_photos": bench["test_photos_5class"],
                          "default_model": served[t], "network_model": defaults[t], "previous_default": previous[t],
+                         "classical_model": CLASSICAL,
                          "served_models": [e["key"] for e in deployment["models"] if e["task"] == t]}
-                     for t in ("5class", "8class")},
-           "models": models, "comparisons": bench["comparisons"],
-           "cv": {"selection_rule": sel["8class"]["selection_rule"], "recipes": recipes_out, "screening": screening,
+                     for t in TASKS},
+           "models": models, "comparisons": [c for c in bench["comparisons"] if c["task"] in TASKS],
+           "cv": {"selection_rule": sel["5class"]["selection_rule"], "recipes": recipes_out, "screening": screening,
                   "chosen": {t: sel[t]["chosen"]["key"] for t in sel}},
            "audit": {"preprocessing": pre, "robustness": robustness, "dihedral": {k: v.get("dihedral_views") for k, v in audit["models"].items() if v.get("dihedral_views")}},
            "selective": selective, "ood": ood, "gradcam": gallery, "hero": hero, "limitations": limitations,
-           "final_round": final_round_block(final_pipe, final_round, FINAL_KEYS),
+           "final_round": final_round_block(final_pipe, final_round, FINAL_KEYS, CLASSICAL),
+           "classical": {"rules": "scripts/43_classical_model.py docstring (fixed before training)",
+                         "arms": [{"arm": a["arm"], "classifier": a["classifier"], "feature_set": a["feature_set"],
+                                   "oof": {k: a["oof"][k] for k in ("accuracy", "f1_macro", "balanced_accuracy", "nll",
+                                                                    "ece")},
+                                   "calibration": a["calibration"]["chosen"], "threshold": a["threshold"],
+                                   "coverage": a["operating_point"]["coverage"],
+                                   "accuracy_kept": a["operating_point"]["accuracy_kept"],
+                                   "out_of_scope_refusal": a["out_of_scope_refusal"],
+                                   "chosen": a["arm"] == classical["chosen"]["arm"]} for a in classical["arms"].values()],
+                         "chosen": classical["chosen"]["arm"], "why": classical["chosen"]["why"],
+                         "params": classical["chosen"]["final_params"],
+                         "feature_importance": classical["chosen"].get("feature_importance")},
            "environment": env}
     save_json(doc, EXPERIMENTS_DIR / "platform.json")
     (FRONT / "data").mkdir(parents=True, exist_ok=True)

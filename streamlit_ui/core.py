@@ -37,13 +37,7 @@ BRAND = ROOT / "assets" / "brand"
 REPO_URL = "https://github.com/CodewithBhaumik/Tomato-Care"
 DOI_URL = "https://doi.org/10.1007/s00530-023-01158-y"
 CLASS_NAME = {c["key"]: c["name"] for c in CLASSES}
-TASK_LABEL = {"5class": "Focused · 5 conditions", "8class": "Full · 8 conditions"}
-TASK_HELP = {
-    "5class": "Healthy, Leaf Miner, Magnesium and Nitrogen Deficiency, Spotted Wilt Virus — the conditions the "
-              "models recognise most reliably. Recommended.",
-    "8class": "All eight classes of the dataset, including Early Blight, Late Blight and Potassium Deficiency, "
-              "which are much harder (few training photos).",
-}
+TASK = "5class"  # the app diagnoses five conditions; both served models (deep learning, classical ML) cover them
 UPLOAD_TYPES = ["jpg", "jpeg", "png", "webp", "bmp", "tif", "tiff"]
 
 
@@ -168,16 +162,34 @@ def model_entry(key: str) -> dict:
     return next(e for e in deployment()["models"] if e["key"] == key)
 
 
-def task_models(task: str) -> list[dict]:
-    """Served models of a task, default first."""
-    default = deployment()["defaults_by_task"][task]
-    entries = [e for e in deployment()["models"] if e.get("task") == task]
-    return sorted(entries, key=lambda e: e["key"] != default)
+def served_models() -> list[dict]:
+    """The served models, default (deep learning) first."""
+    default = deployment()["default_model"]
+    return sorted(deployment()["models"], key=lambda e: e["key"] != default)
+
+
+def scope() -> list[str]:
+    """The conditions the app diagnoses (the default model's classes)."""
+    return list(model_entry(deployment()["default_model"])["class_keys"])
+
+
+def scope_text() -> str:
+    names = [CLASS_NAME[k] for k in scope()]
+    return f"{', '.join(names[:-1])} and {names[-1]}: the {len(names)} conditions the app diagnoses."
+
+
+def is_classical(entry: dict) -> bool:
+    return entry.get("type") == "sklearn"
+
+
+def family_label(entry: dict) -> str:
+    return "Classical ML" if is_classical(entry) else "Deep learning"
 
 
 def short_name(entry: dict) -> str:
-    n = len(entry.get("members") or [1])
-    return f"{TASK_LABEL[entry['task']].split(' · ')[0]} · {n} ConvNeXt-T networks"
+    if is_classical(entry):
+        return f"Classical ML · {(entry.get('pipeline') or {}).get('classifier', 'handcrafted features')}"
+    return f"Deep learning · {len(entry.get('members') or [1])} ConvNeXt-T networks"
 
 
 def model_help(entry: dict) -> str:
@@ -185,11 +197,14 @@ def model_help(entry: dict) -> str:
     p = entry.get("pipeline")
     if not p:
         return entry.get("description") or ""
+    tail = (f"; {p['calibration']} scaling; answers at ≥ {pct(p['threshold'], 0)} confidence. "
+            "All chosen on cross-validation data before the test photos were scored.")
+    if is_classical(entry):
+        feats = p["features"].replace("Color", "colour").replace("Texture", "texture")
+        return f"{p['classifier']} on handcrafted {feats} features of the leaf (no deep learning)" + tail
     return (f"{p['imbalance'][0].upper() + p['imbalance'][1:]}"
-            + (" + outlier exposure (learned to be unsure on the 3 conditions it does not cover)"
-               if p.get("outlier_exposure") else "")
-            + f"; {p['calibration']} scaling; answers at ≥ {pct(p['threshold'], 0)} confidence. "
-              "All chosen on cross-validation data before the test photos were scored.")
+            + (" + outlier exposure (learned to be unsure on conditions outside the five)"
+               if p.get("outlier_exposure") else "") + tail)
 
 
 # ---------------------------------------------------------------------------------------------------- inference
@@ -258,15 +273,16 @@ def blend(rgb: np.ndarray, heat_rgba: np.ndarray, opacity: float) -> np.ndarray:
 # ------------------------------------------------------------------------------------------------------ samples
 @st.cache_data(show_spinner=False)
 def samples() -> list[dict]:
-    """Demo photos shipped with the app (Tomato-Village dataset, cited): one held-out test photo per class first,
-    then three more per class."""
-    out = []
+    """Demo photos shipped with the app (Tomato-Village dataset, cited): one held-out test photo per diagnosed
+    condition first, then three more per condition."""
+    out, keys = [], set(scope())
     manifest = json.loads((PUBLIC / "test-samples" / "manifest.json").read_text(encoding="utf-8"))
     for s in manifest["samples"]:
-        out.append({"key": s["key"], "name": s["name"], "path": PUBLIC / s["file"].lstrip("/"), "held_out": True})
+        if s["key"] in keys:
+            out.append({"key": s["key"], "name": s["name"], "path": PUBLIC / s["file"].lstrip("/"), "held_out": True})
     for p in sorted((PUBLIC / "samples").glob("*.jpg")):
         key = p.stem.rsplit("-", 1)[0]
-        if key in CLASS_NAME:
+        if key in keys:
             out.append({"key": key, "name": CLASS_NAME[key], "path": p, "held_out": False})
     return out
 
@@ -280,12 +296,17 @@ def model_result(key: str) -> dict | None:
     return next((m for m in platform()["models"] if m["key"] == key), None)
 
 
-def task_defaults(task: str) -> tuple[dict, dict]:
+def task_defaults(task: str = TASK) -> tuple[dict, dict]:
     t = platform()["tasks"][task]
     return model_result(t["default_model"]), model_result(t["previous_default"])
 
 
-def headline_comparison(task: str) -> dict | None:
+def classical_result() -> dict | None:
+    """Test results of the served classical model."""
+    return next((model_result(e["key"]) for e in served_models() if is_classical(e)), None)
+
+
+def headline_comparison(task: str = TASK) -> dict | None:
     t = platform()["tasks"][task]
     return next((c for c in platform()["comparisons"]
                  if c["task"] == task and c["a"] == t["default_model"] and c["b"] == t["previous_default"]), None)

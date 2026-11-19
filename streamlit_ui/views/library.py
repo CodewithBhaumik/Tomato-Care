@@ -1,12 +1,9 @@
-"""Disease library: the eight leaf conditions — what they look like, what to do, and how well each model knows them."""
+"""Disease library: the five leaf conditions the app diagnoses — what they look like, what to do, and how well each
+model knows them."""
 import pandas as pd
 import streamlit as st
 
-from tomatoleaf.config import CLASS_KEYS
-
 from .. import core, theme
-
-FOCUSED = {"healthy", "leaf_miner", "magnesium_deficiency", "nitrogen_deficiency", "spotted_wilt_virus"}
 
 
 def _photos(key: str) -> list:
@@ -15,12 +12,11 @@ def _photos(key: str) -> list:
 
 def _scores(key: str) -> pd.DataFrame:
     rows = []
-    for task in ("5class", "8class"):
-        m, _ = core.task_defaults(task)
-        c = next((c for c in m["per_class"] if c["key"] == key), None)
+    for label, m in (("Deep learning", core.task_defaults()[0]), ("Classical ML", core.classical_result())):
+        c = next((c for c in (m or {}).get("per_class", []) if c["key"] == key), None)
         if c:
-            rows.append({"Model": core.TASK_LABEL[task], "Precision": c["precision"], "Recall": c["recall"],
-                         "F1": c["f1"], "Test photos": c["support"]})
+            rows.append({"Model": label, "Precision": c["precision"], "Recall": c["recall"], "F1": c["f1"],
+                         "Test photos": c["support"]})
     return pd.DataFrame(rows)
 
 
@@ -46,9 +42,7 @@ def _detail(key: str) -> None:
                           caption=f"{o['model_name']}: {core.CLASS_NAME.get(o['pred_key'], o['pred_key'])} "
                                   f"{100 * o['confidence']:.0f}% {verdict}")
     with right:
-        chips = theme.chip(info.get("category", ""), "g" if info.get("is_healthy") else "r")
-        chips += theme.chip("In the focused model" if key in FOCUSED else "Full model only", "c" if key in FOCUSED else "a")
-        st.html(chips)
+        st.html(theme.chip(info.get("category", ""), "g" if info.get("is_healthy") else "r"))
         if info.get("cause"):
             st.markdown(f"**Cause:** {info['cause']}")
         st.markdown(info["summary"])
@@ -66,12 +60,13 @@ def _detail(key: str) -> None:
 
 
 def render() -> None:
-    theme.section("Disease library", "The eight conditions in the Tomato-Village dataset: symptoms, what they look like "
-                  "in a photo, management, and how reliably each model recognises them.", kicker="Learn")
+    theme.section("Disease library", "The five conditions Tomato Care diagnoses: symptoms, what they look like in a "
+                  "photo, management, and how reliably each model recognises them.", kicker="Learn")
     info = core.disease_info()
+    keys = core.scope()
     picked = st.session_state.get("lib_key", "leaf_miner")
-    for row in (CLASS_KEYS[:4], CLASS_KEYS[4:]):
-        cols = st.columns(4)
+    for row in (keys[:3], keys[3:]):
+        cols = st.columns(3)
         for col, key in zip(cols, row):
             c = info[key]
             with col, st.container(border=True):

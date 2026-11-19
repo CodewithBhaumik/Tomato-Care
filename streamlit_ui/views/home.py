@@ -21,13 +21,13 @@ def _hero_figure(hero: dict | None) -> str:
     name = core.CLASS_NAME.get(hero["pred_key"], hero["pred_key"])
     return (f'<div class="tc-hero-figure"><img src="{src}" alt="Grad-CAM heat map on a tomato leaf">'
             f'<div class="tc-hero-badge"><div><b>{theme.esc(name)}</b><br><span style="opacity:.75">Held-out test photo · '
-            f'Grad-CAM of the focused model</span></div><div class="p">{100 * hero["confidence"]:.0f}%</div></div></div>')
+            f'Grad-CAM of the deep-learning model</span></div><div class="p">{100 * hero["confidence"]:.0f}%</div></div></div>')
 
 
 def render() -> None:
     data = core.platform()
-    new5, _ = core.task_defaults("5class")
-    new8, _ = core.task_defaults("8class")
+    new5, _ = core.task_defaults()
+    ml = core.classical_result()
 
     with st.container(key="hero"):
         left, right = st.columns([1.25, 1], gap="large", vertical_alignment="center")
@@ -48,24 +48,27 @@ def render() -> None:
 
     st.space("medium")
     theme.section("Measured, not claimed",
-                  "Every number below comes from held-out test photos (290; 265 in the focused scope), scored once "
-                  "after the models had been chosen on cross-validation data. Brackets: 95% confidence intervals.",
+                  f"Every number below comes from the {data['tasks'][core.TASK]['test_photos']} held-out test photos of the "
+                  "five conditions, "
+                  "scored once after the models had been chosen on cross-validation data. Brackets: 95% confidence "
+                  "intervals.",
                   kicker="Results")
     c1, c2, c3, c4 = st.columns(4)
-    ci5, ci8 = new5["test"]["accuracy_ci"], new8["test"]["accuracy_ci"]
-    c1.metric("Focused · accuracy", core.pct(new5["test"]["accuracy"]),
+    ci5 = new5["test"]["accuracy_ci"]
+    c1.metric("Deep learning · accuracy", core.pct(new5["test"]["accuracy"]),
               delta=f"[{core.pct(ci5[0])} – {core.pct(ci5[1])}]", delta_color="off", border=True,
-              help="Five conditions — Healthy, Leaf Miner, Magnesium and Nitrogen Deficiency, Spotted Wilt Virus "
-                   f"(the app's default task); macro-F1 {new5['test']['f1_macro']:.3f}.")
+              help=f"{core.scope_text()} Macro-F1 {new5['test']['f1_macro']:.3f}.")
     sel = new5["selective"]
-    c2.metric("Focused · when it answers", core.pct(sel["accuracy_kept"]),
+    c2.metric("Deep learning · when it answers", core.pct(sel["accuracy_kept"]),
               delta=f"answers {core.pct(sel['coverage'], 0)} of photos", delta_color="off", border=True,
               help="Below its confidence threshold, or for an unusual photo, the app says 'not sure' instead of "
                    "guessing; this is its accuracy on the photos it does answer.")
-    c3.metric("8 conditions · accuracy", core.pct(new8["test"]["accuracy"]),
-              delta=f"[{core.pct(ci8[0])} – {core.pct(ci8[1])}]", delta_color="off", border=True,
-              help="Includes the three hard classes (Early Blight, Late Blight, Potassium Deficiency), which have "
-                   f"few training photos; macro-F1 {new8['test']['f1_macro']:.3f}.")
+    if ml:
+        ci = ml["test"]["accuracy_ci"]
+        c3.metric("Classical ML · accuracy", core.pct(ml["test"]["accuracy"]),
+                  delta=f"[{core.pct(ci[0])} – {core.pct(ci[1])}]", delta_color="off", border=True,
+                  help=f"{ml['name']}: handcrafted colour / texture features, no deep learning; macro-F1 "
+                       f"{ml['test']['f1_macro']:.3f}. Same photos, same rules.")
     fr5 = ((data.get("final_round") or {}).get("tasks") or {}).get("5class") or {}
     od = (fr5.get("out_of_dataset") or {}).get(new5["key"]) or {}
     if "everyday" in od:  # final round: real unrelated photos (scripts/37-38)
@@ -82,7 +85,7 @@ def render() -> None:
                   help="Held-out non-leaf probe images (photos, textures, drawings) answered with 'Unusual image' "
                        "instead of a diagnosis — and the price: normal leaf photos sent there as well.")
     bal = new5["test"].get("balanced_accuracy")
-    st.caption((f"Focused model: balanced accuracy {core.pct(bal)} — the mean of the per-condition "
+    st.caption((f"Deep-learning model: balanced accuracy {core.pct(bal)} — the mean of the per-condition "
                 "recalls, so rare conditions count as much as common ones. " if bal else "")
                + "How these models were chosen, how they compare with the original study's models and where they fail: "
                  "see the Model lab and How it works.")
@@ -97,11 +100,11 @@ def render() -> None:
           "Five-fold cross-validation on 1,813 photos, leaf groups never split, and a selection rule fixed before "
           "the test photos were scored."),
          ("groups", "Fair to rare conditions",
-          "One imbalance correction per model — class-weighted loss, balanced sampling or a logit adjustment, "
-          "compared by cross-validation — never two stacked, and calibrated confidence for every condition.")],
+          "One imbalance correction per model (class-weighted loss for the network, class-balanced weights for the "
+          "classical model), and calibrated confidence for every condition.")],
         [("help", "Says “not sure”",
           "Calibrated confidence and one threshold per model, chosen on cross-validation data: below it, no "
-          "diagnosis. The focused model also learned to be unsure about the conditions it does not cover."),
+          "diagnosis. The deep-learning model also learned to be unsure about conditions outside the five."),
          ("image_not_supported", "Flags unusual photos",
           "Feature-space distance to the training photos, with a limit per condition so rare conditions are not "
           "flagged more often. Tested on other crops, everyday photos and stress tests (Model lab)."),

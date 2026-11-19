@@ -77,7 +77,7 @@ F1_TIE, NLL_TIE = 0.01, 0.005
 GRID = np.round(np.arange(0.30, 0.991, 0.01), 2)
 OOD_KEEP, SHRINK_N, CLAMP = 0.95, 30, (0.5, 2.0)
 PAPER_PER_FOLD = 30
-NAMES = {"5class": ("focused_5class", "Tomato Care · Focused (5 conditions)"),
+NAMES = {"5class": ("focused_5class", "Tomato Care · Deep learning (5 conditions)"),
          "8class": ("full_8class", "Tomato Care · Full (8 conditions)")}
 
 

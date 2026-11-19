@@ -11,7 +11,7 @@ import { Badge, Button, Callout, Card, CardHeader, ErrorState, InfoTip, PageHead
 import { SERIES } from "../components/charts/theme.js";
 import { useData } from "../context/DataContext.jsx";
 import { usePrediction } from "../context/PredictionContext.jsx";
-import { comparisonsFor, defaultModel, modelColor, modelsFor, recipesFor, taskClasses, taskInfo } from "../lib/analytics.js";
+import { TASK, comparisonsFor, defaultModel, isClassicalModel, modelColor, modelName, modelsFor, recipesFor, taskClasses, taskInfo, taskPhotos } from "../lib/analytics.js";
 import { ci, compactParams, cx, ms, num, pct, signedPct } from "../lib/format.js";
 
 const COLUMNS = [
@@ -23,7 +23,7 @@ const COLUMNS = [
   { key: "latency", label: "CPU", get: (m) => m.latency_ms, fmt: (v) => ms(v), lowerBetter: true },
 ];
 
-function Leaderboard({ models, sort, setSort, selected, toggle, highlight }) {
+function Leaderboard({ models, sort, setSort, selected, toggle, highlight, served = [] }) {
   const col = COLUMNS.find((c) => c.key === sort.key);
   const rows = [...models].sort((a, b) => {
     const va = col.get(a);
@@ -71,6 +71,7 @@ function Leaderboard({ models, sort, setSort, selected, toggle, highlight }) {
                     <span className="size-2 rounded-full" style={{ background: modelColor(m) }} />
                     <span className="font-medium text-ink">{m.name}</span>
                     {m.key === highlight && <Badge tone="leaf">default</Badge>}
+                    {m.key !== highlight && served.includes(m.key) && <Badge tone="sun">served</Badge>}
                     {m.generation === "upgrade" && <Sparkles className="size-3.5 text-leaf-600" aria-label="upgraded" />}
                   </div>
                   <p className="mt-0.5 text-xs text-muted">
@@ -95,13 +96,13 @@ function Leaderboard({ models, sort, setSort, selected, toggle, highlight }) {
   );
 }
 
-function LiveBench({ task, online, classes }) {
+function LiveBench({ online, classes }) {
   const { file, choose, comparison, compareStatus, compareError, runCompare } = usePrediction();
   const { models } = useData();
   const [sample, setSample] = useState(null);
   return (
     <Card>
-      <CardHeader icon={Play} title="Live bench" subtitle="Run every model of this scope on one photo, right now" />
+      <CardHeader icon={Play} title="Live bench" subtitle="Run both served models — deep learning and classical ML — on one photo, right now" />
       <div className="grid grid-cols-1 gap-6 p-5 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
         <div className="flex flex-col gap-4">
           <UploadPanel
@@ -122,8 +123,8 @@ function LiveBench({ task, online, classes }) {
             scope={classes}
             columns="grid-cols-4"
           />
-          <Button icon={FlaskConical} onClick={() => runCompare({ task })} disabled={!file || !online} loading={compareStatus === "running"}>
-            Run all {task === "5class" ? "5-class" : "8-class"} models
+          <Button icon={FlaskConical} onClick={() => runCompare()} disabled={!file || !online} loading={compareStatus === "running"}>
+            Run both models
           </Button>
         </div>
         <div className="min-w-0">
@@ -132,7 +133,7 @@ function LiveBench({ task, online, classes }) {
             <CompareTable results={comparison.results} trueKey={sample?.key} models={models} />
           ) : (
             <div className="grid h-full min-h-48 place-items-center rounded-xl border border-dashed border-line-strong p-6 text-center text-sm text-muted">
-              {online ? "Pick a photo and run the bench. Every model sees exactly the same preprocessed image." : "The live bench needs the diagnosis server (offline now)."}
+              {online ? "Pick a photo and run the bench. Both models see exactly the same preprocessed image." : "The live bench needs the diagnosis server (offline now)."}
             </div>
           )}
         </div>
@@ -144,26 +145,33 @@ function LiveBench({ task, online, classes }) {
 export default function LabPage() {
   useDocumentTitle("Model lab");
   const { analytics, analyticsLoading, analyticsError, reloadAnalytics, online } = useData();
-  const [task, setTask] = useState("5class");
+  const task = TASK;
   const [family, setFamily] = useState("all");
   const [sort, setSort] = useState({ key: "f1_macro", dir: 1 });
   const [selected, setSelected] = useState([]);
 
   const def = defaultModel(analytics, task);
-  const models = useMemo(() => modelsFor(analytics, task).filter((m) => family === "all" || (family === "dl" ? m.family === "Deep learning" : m.family === "Classical ML")), [analytics, task, family]);
+  const info = taskInfo(analytics, task);
+  const models = useMemo(() => modelsFor(analytics, task).filter((m) => family === "all" || (family === "dl" ? !isClassicalModel(m) : isClassicalModel(m))), [analytics, task, family]);
 
+  // Start with the two served models (deep learning, classical ML) and the original study's default.
   useEffect(() => {
     if (!analytics) return;
-    const info = taskInfo(analytics, task);
-    setSelected([info?.default_model, info?.previous_default].filter(Boolean));
+    const i = taskInfo(analytics, task);
+    setSelected([...new Set([i?.default_model, i?.classical_model, i?.previous_default].filter(Boolean))]);
   }, [analytics, task]);
 
   const toggle = (key) => setSelected((s) => (s.includes(key) ? s.filter((k) => k !== key) : [...s, key].slice(-3)));
   const chosen = selected.map((k) => modelsFor(analytics, task).find((m) => m.key === k)).filter(Boolean);
   const classes = taskClasses(analytics, task);
-  const comps = comparisonsFor(analytics, task);
+  // The machine-learning vs deep-learning test comes first; names fall back to the model list when a row has none.
+  const comps = comparisonsFor(analytics, task)
+    .filter((c) => c.f1_ci)
+    .sort((x, y) => Boolean(y.ml_vs_dl) - Boolean(x.ml_vs_dl));
   const recipes = recipesFor(analytics, task);
   const robustness = analytics?.audit?.robustness?.[task];
+  const screening = (analytics?.cv?.screening || []).filter((s) => s.task === task);
+  const cvPhotos = taskPhotos(analytics, task, "cv") ?? analytics?.dataset?.cv?.photos;
 
   if (analyticsError && !analytics) return <ErrorState title="Could not load results" error={analyticsError} onRetry={reloadAnalytics} />;
 
@@ -172,8 +180,7 @@ export default function LabPage() {
       <PageHeader
         eyebrow="Model comparison laboratory"
         title="Model lab"
-        description="Every model — classical machine learning, the original study's networks and the upgraded ones — scored on exactly the same held-out test photos. Select up to three models to compare them class by class."
-        actions={<Segmented options={[{ value: "5class", label: "5 classes" }, { value: "8class", label: "8 classes" }]} value={task} onChange={setTask} label="Task" />}
+        description="Every model for the five conditions — classical machine learning, the original study's networks and the upgraded ones — scored on exactly the same held-out test photos. Select up to three models to compare them class by class."
       />
 
       {analyticsLoading && !analytics && <Skeleton className="h-96 rounded-2xl" />}
@@ -182,7 +189,7 @@ export default function LabPage() {
           <Card>
             <CardHeader
               icon={Gauge}
-              title={`Leaderboard · ${taskInfo(analytics, task)?.test_photos} test photos`}
+              title={`Leaderboard · ${info?.test_photos ?? "—"} test photos`}
               subtitle="95% confidence intervals from 2,000 bootstrap resamples of whole leaf groups"
               action={
                 <Segmented
@@ -198,10 +205,10 @@ export default function LabPage() {
                 />
               }
             />
-            <Leaderboard models={models} sort={sort} setSort={setSort} selected={selected} toggle={toggle} highlight={def?.key} />
+            <Leaderboard models={models} sort={sort} setSort={setSort} selected={selected} toggle={toggle} highlight={def?.key} served={info?.served_models || []} />
           </Card>
 
-          <FinalPipeline final={analytics.final_round} task={task} />
+          <FinalPipeline final={analytics.final_round} classical={analytics.classical} mlGate={analytics.ood?.final?.[info?.classical_model]} />
 
           {chosen.length > 0 && (
             <>
@@ -239,9 +246,14 @@ export default function LabPage() {
                     {comps.map((c) => {
                       const reliable = c.f1_ci[0] > 0 || c.f1_ci[1] < 0;
                       return (
-                        <tr key={`${c.a}-${c.b}`}>
+                        <tr key={`${c.a}-${c.b}`} className={c.ml_vs_dl ? "bg-sun-500/[0.04]" : undefined}>
                           <td className="px-5 py-3">
-                            <span className="font-medium text-ink">{c.a_name}</span> <span className="text-muted">vs</span> {c.b_name}
+                            <span className="font-medium text-ink">{c.a_name || modelName(analytics, c.a)}</span> <span className="text-muted">vs</span> {c.b_name || modelName(analytics, c.b)}
+                            {c.ml_vs_dl && (
+                              <Badge tone="sun" className="ml-2">
+                                classical ML vs deep learning
+                              </Badge>
+                            )}
                           </td>
                           <td className="px-3 py-3 text-right font-mono tabular">{signedPct(c.accuracy_diff)}</td>
                           <td className="px-3 py-3 text-right font-mono tabular">{signedPct(c.f1_diff)}</td>
@@ -284,13 +296,17 @@ export default function LabPage() {
                 </div>
               </Card>
             ) : (
-              <Card className="p-5 text-sm text-muted">Robustness audit not available for this task.</Card>
+              <Card className="p-5 text-sm text-muted">Robustness audit not available in this results file.</Card>
             )}
           </div>
 
           {recipes.length > 0 && (
             <Card>
-              <CardHeader icon={Beaker} title="Training recipes (5-fold cross-validation)" subtitle={`Out-of-fold macro-F1 on ${analytics.dataset.cv.photos.toLocaleString()} train+validation photos — how the upgrade was chosen without touching the test set`} />
+              <CardHeader
+                icon={Beaker}
+                title="Training recipes (5-fold cross-validation)"
+                subtitle={`Out-of-fold macro-F1 on ${cvPhotos != null ? `the ${cvPhotos.toLocaleString()} ` : "the "}train+validation photos of the five conditions — how the upgrade was chosen without touching the test set`}
+              />
               <div className="grid grid-cols-1 gap-6 p-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                 <div className="overflow-x-auto scrollbar-thin">
                   <table className="w-full min-w-[460px] text-sm">
@@ -319,7 +335,7 @@ export default function LabPage() {
                 </div>
                 <FoldStrip recipes={recipes.map((r) => ({ label: r.label, short: r.short, pooled: r.f1_8, per_fold: r.per_fold.map((f) => ({ fold: f.fold, value: f.f1_8 })) }))} />
               </div>
-              {analytics.cv?.screening?.some((s) => s.task === task) && (
+              {screening.length > 0 && (
                 <div className="px-5 pb-5">
                   <p className="mb-2 text-sm font-semibold text-ink">Every recipe tried — screening on fold 0</p>
                   <div className="overflow-x-auto scrollbar-thin rounded-xl border border-line">
@@ -334,23 +350,25 @@ export default function LabPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-line">
-                        {analytics.cv.screening
-                          .filter((s) => s.task === task)
-                          .map((s) => (
-                            <tr key={s.recipe} className="bg-surface">
-                              <td className="px-4 py-2 text-ink">{s.label}</td>
-                              <td className="px-3 py-2 text-right font-mono tabular">{pct(s.f1_1)}</td>
-                              <td className="px-3 py-2 text-right font-mono tabular">{pct(s.f1_8)}</td>
-                              <td className="px-3 py-2 text-right font-mono tabular">{pct(s.acc_8)}</td>
-                              <td className="px-4 py-2">
-                                <Badge tone={s.full_cv ? "leaf" : "slate"}>{s.full_cv ? "full 5-fold CV" : "fold 0 only"}</Badge>
-                              </td>
-                            </tr>
-                          ))}
+                        {screening.map((s) => (
+                          <tr key={s.recipe} className="bg-surface">
+                            <td className="px-4 py-2 text-ink">{s.label}</td>
+                            <td className="px-3 py-2 text-right font-mono tabular">{pct(s.f1_1)}</td>
+                            <td className="px-3 py-2 text-right font-mono tabular">{pct(s.f1_8)}</td>
+                            <td className="px-3 py-2 text-right font-mono tabular">{pct(s.acc_8)}</td>
+                            <td className="px-4 py-2">
+                              <Badge tone={s.full_cv ? "leaf" : "slate"}>{s.full_cv ? "full 5-fold CV" : "fold 0 only"}</Badge>
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
-                  <p className="mt-2 text-xs text-muted">Fold 0 holds out 354 photos but only one Potassium photo, so single-fold macro-F1 is noisy; only recipes that looked competitive were run on all five folds.</p>
+                  <p className="mt-2 text-xs text-muted">
+                    {screening.some((s) => !s.full_cv)
+                      ? "A single fold holds out only a few photos of the rarest condition, so its macro-F1 is noisy; only recipes that looked competitive were run on all five folds."
+                      : "Every recipe tried was then run on all five folds."}
+                  </p>
                 </div>
               )}
               {analytics.cv?.selection_rule && (
@@ -363,7 +381,7 @@ export default function LabPage() {
             </Card>
           )}
 
-          <LiveBench task={task} online={online} classes={classes} />
+          <LiveBench online={online} classes={classes} />
         </div>
       )}
     </div>

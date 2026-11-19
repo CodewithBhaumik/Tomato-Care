@@ -9,9 +9,8 @@ from PIL import Image, UnidentifiedImageError
 from .. import charts, core, nav, theme
 
 # ------------------------------------------------------------------------------------------------------------ input
-SHORT = {"early_blight": "Early blight", "healthy": "Healthy", "late_blight": "Late blight", "leaf_miner": "Leaf miner",
-         "magnesium_deficiency": "Magnesium", "nitrogen_deficiency": "Nitrogen", "potassium_deficiency": "Potassium",
-         "spotted_wilt_virus": "Spotted wilt"}
+SHORT = {"healthy": "Healthy", "leaf_miner": "Leaf miner", "magnesium_deficiency": "Magnesium",
+         "nitrogen_deficiency": "Nitrogen", "spotted_wilt_virus": "Spotted wilt"}
 
 
 def _examples():
@@ -29,9 +28,10 @@ def _examples():
                          help=s["name"]):
                 st.session_state["example"] = str(s["path"])
                 st.rerun()
-    st.caption("Tomato-Village dataset (Gehlot et al., 2023). The first eight are demo examples: held-out test photos "
-               "(never used for training) on which the models give a clear result — they show how the app works, not "
-               "how often it is right (see Model lab). The three more per condition are training photos.")
+    st.caption(f"Tomato-Village dataset (Gehlot et al., 2023). The first {sum(s['held_out'] for s in items)} are demo "
+               "examples: held-out test photos (never used for training) on which the models give a clear result — "
+               "they show how the app works, not how often it is right (see Model lab). The three more per condition "
+               "are training photos.")
     if current:
         name = next((s["name"] for s in items if str(s["path"]) == current), "example")
         return core.sample_bytes(current), f"Example · {name}"
@@ -77,17 +77,19 @@ def _input_panel():
 def _model_panel():
     with st.container(border=True):
         st.markdown("**2 · Model**")
-        task = st.segmented_control("Task", ["5class", "8class"], format_func=lambda t: core.TASK_LABEL[t],
-                                    default="5class", key="task", required=True, label_visibility="collapsed")
-        st.caption(core.TASK_HELP[task])
-        entry = core.task_models(task)[0]  # one validated model per scope
+        entries = core.served_models()
+        key = st.segmented_control("Model", [e["key"] for e in entries], default=entries[0]["key"], key="model",
+                                   format_func=lambda k: core.family_label(core.model_entry(k)), required=True,
+                                   label_visibility="collapsed")
+        entry = core.model_entry(key)
+        st.caption(core.scope_text())
         st.caption(core.model_help(entry))
         acc = (entry.get("test_metrics") or {}).get("accuracy")
         st.html(theme.chip(core.short_name(entry), "g")
                 + (theme.chip(f"{100 * acc:.1f}% on held-out test photos", "c") if acc is not None else ""))
-        key = entry["key"]
-        explain = st.toggle("Show where it looked (Grad-CAM)", value=True, key="explain")
-    return task, key, explain
+        explain = not core.is_classical(entry) and st.toggle("Show where it looked (Grad-CAM)", value=True,
+                                                             key="explain")
+    return key, explain
 
 
 # ----------------------------------------------------------------------------------------------------------- result
@@ -150,16 +152,19 @@ def _details(r: dict, label: str):
     with b:
         st.markdown("**Model**")
         gen = "version 2 (upgrade)" if entry.get("generation") == "upgrade" else "version 1 (original study)"
-        st.markdown(f"- {entry['name']} — {gen}\n- Runs: {len(entry.get('members') or [1])} network(s), "
-                    f"{r['model'].get('family', '')}\n- Answer threshold: {core.pct(r['confidence_threshold'], 0)}\n"
+        runs = (f"{entry['pipeline']['classifier']} on handcrafted features" if core.is_classical(entry)
+                else f"{len(entry.get('members') or [1])} network(s)")
+        st.markdown(f"- {entry['name']} — {gen}\n- Runs: {runs}, {r['model'].get('family', '')}\n"
+                    f"- Answer threshold: {core.pct(r['confidence_threshold'], 0)}\n"
                     f"- Analysis time on this server: {r['total_ms']:.0f} ms")
     if ood:
         st.markdown("**Unusual-image check**")
         ratio = float(ood["ratio"])
         st.progress(min(ratio / 2, 1.0), text=f"Distance to the training photos: {ratio:.2f} × the limit "
                                               f"({'over' if ratio > 1 else 'within'} the limit)")
-        st.caption("Measured in the network's feature space and divided by a limit chosen so that 95% of held-out "
-                   "training-like photos stay below it.")
+        space = "colour + texture feature space" if core.is_classical(entry) else "network's feature space"
+        st.caption(f"Measured in the {space} and divided by a limit chosen so that 95% of held-out training-like "
+                   "photos stay below it.")
     report = {k: v for k, v in r.items() if k not in ("canonical", "heatmap_rgba", "explanation")}
     st.download_button("Download the report (JSON)", json.dumps(report, indent=2, default=float), "tomato-care-report.json",
                        "application/json", icon=":material/download:")
@@ -173,7 +178,7 @@ def _compare(data: bytes):
     for r in rows:
         e = core.model_entry(r["model"]["key"])
         p = r["prediction"]
-        table.append({"Model": core.short_name(e).rsplit(" · ", 1)[0], "Networks": len(e.get("members") or [1]),
+        table.append({"Model": core.short_name(e),
                       "Answer": p["name"] if p["status"] in ("Healthy", "Diseased") else p["status"],
                       "Top class": p["name"], "Confidence": p["confidence"], "Status": p["status"],
                       "Time (ms)": round(r["total_ms"])})
@@ -183,10 +188,9 @@ def _compare(data: bytes):
         "Answer": st.column_config.TextColumn(help="What the app would show: the condition, or Uncertain / Unusual image"),
     })
     agree = df["Top class"].nunique() == 1
-    st.caption("All models agree on the condition." if agree else
-               "The models disagree — a hint that this photo is hard. The focused models are the more reliable ones "
-               "for their five conditions; the full model also knows Early Blight, Late Blight and Potassium "
-               "Deficiency, but recognises them poorly.")
+    st.caption("Both models agree on the condition." if agree else
+               "The models disagree — a hint that this photo is hard. The deep-learning model is the more accurate "
+               "one on the test photos (see Model lab).")
 
 
 def _history_add(r: dict, label: str):
@@ -231,7 +235,8 @@ def _result(data: bytes, label: str, key: str, explain: bool):
               help="Calibrated: among photos given this confidence, about this share were right (out-of-fold data).")
     c2.metric("Threshold", core.pct(r["confidence_threshold"], 0), border=True,
               help="Chosen on out-of-fold data: " + (r.get("operating_point") or {}).get("rule", "see the Model lab") + ".")
-    c3.metric("Time", f"{r['total_ms'] / 1000:.1f} s", border=True, help="Including Grad-CAM, on this server's CPU.")
+    c3.metric("Time", f"{r['total_ms'] / 1000:.1f} s", border=True,
+              help="Including Grad-CAM (deep learning), on this server's CPU.")
     tabs = st.tabs(["Probabilities", "Where it looked", "The condition", "Details"])
     with tabs[0]:
         st.altair_chart(charts.probabilities(r["probabilities"], p["key"], r["confidence_threshold"]), width="stretch")
@@ -248,8 +253,8 @@ def _result(data: bytes, label: str, key: str, explain: bool):
         _details(r, label)
     _history_add(r, label)
     st.space("small")
-    if st.toggle("Ask the other models too", key="compare_on",
-                 help="Runs both Tomato Care models — focused (5 conditions) and full (8 conditions) — on this photo."):
+    if st.toggle("Ask the other model too", key="compare_on",
+                 help="Runs both Tomato Care models — deep learning and classical ML — on this photo."):
         _compare(data)
 
 
@@ -259,7 +264,7 @@ def render() -> None:
     left, right = st.columns([1, 1.3], gap="large")
     with left:
         data, label = _input_panel()
-        task, key, explain = _model_panel()
+        key, explain = _model_panel()
     with right:
         if data is None:
             _empty_state()

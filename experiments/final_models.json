@@ -2,7 +2,7 @@
   "models": [
     {
       "key": "focused_5class",
-      "name": "Tomato Care \u00b7 Focused (5 conditions)",
+      "name": "Tomato Care \u00b7 Deep learning (5 conditions)",
       "task": "5class",
       "generation": "upgrade",
       "round": "final",
@@ -250,6 +250,64 @@
         "threshold": 0.76,
         "unusual_gate": "maha",
         "outlier_exposure": false
+      }
+    },
+    {
+      "key": "classical_5class",
+      "name": "Tomato Care \u00b7 Classical ML (5 conditions)",
+      "task": "5class",
+      "generation": "upgrade",
+      "round": "final",
+      "family": "Machine learning",
+      "kind": "classical",
+      "type": "sklearn",
+      "path": "ml/classical_5class.joblib",
+      "class_keys": [
+        "healthy",
+        "leaf_miner",
+        "magnesium_deficiency",
+        "nitrogen_deficiency",
+        "spotted_wilt_virus"
+      ],
+      "feature_set": "Color + Texture",
+      "temperature": 2.630797874198493,
+      "description": "Gradient boosting on handcrafted colour + texture features (no deep learning). Calibration: temperature scaling. One threshold (0.84) and a per-condition unusual-image gate, all fixed on out-of-fold data.",
+      "confidence_threshold": 0.84,
+      "operating_point": {
+        "threshold": 0.84,
+        "chosen_on": "out-of-fold cross-validation predictions (cross-fitted)",
+        "rule": "target 90% not reachable at >= 50% coverage: best accuracy at >= 50% coverage",
+        "oof": {
+          "coverage": 0.5205562273276905,
+          "accuracy_kept": 0.8223615464994776,
+          "out_of_scope_answered": 0.6037735849056604
+        }
+      },
+      "ood": {
+        "method": "maha distance in the standardised colour + texture feature space (training photos)",
+        "keep": 0.95,
+        "per_condition": true
+      },
+      "adjust": {
+        "ood_class_scale": [
+          0.5584746992122722,
+          0.6725576873494822,
+          1.025846457642757,
+          2.0,
+          2.0
+        ],
+        "fitted_on": "out-of-fold predictions of the train+val photos (cross-fitted)"
+      },
+      "pipeline": {
+        "classifier": "Gradient boosting",
+        "features": "Color + Texture",
+        "params": {
+          "learning_rate": 0.1,
+          "max_leaf_nodes": 31
+        },
+        "calibration": "temperature",
+        "threshold": 0.84,
+        "unusual_gate": "maha"
       }
     }
   ]

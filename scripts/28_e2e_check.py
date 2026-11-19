@@ -101,16 +101,16 @@ def main():
             checks["ui_heading"] = shown
             expected = api["prediction"]["name"]
             if api["prediction"]["status"] not in ("Healthy", "Diseased"):
-                expected = "No diagnosis" if api["prediction"]["status"] == "Unusual image" else f"Possibly {expected}"
+                expected = "No diagnosis" if api["prediction"]["status"] == "Unusual image" else "Not sure"
             if shown.strip() != expected:
                 problems.append(f"UI shows '{shown}', API says '{expected}'")
             expect(page.get_by_alt_text("Grad-CAM heat map").first).to_be_visible()
-            page.get_by_role("button", name="Ask all models").click()
+            page.get_by_role("button", name="Ask both models").click()
             expect(page.get_by_text("Votes:")).to_be_visible(timeout=180000)
             page.screenshot(path=str(SHOTS / "desktop_diagnose_result.png"), full_page=True)
             checks["compare_rows"] = page.locator("table tbody tr").count()
             served = len(httpx.get(BASE + "/api/models", timeout=30).json()["models"])
-            if checks["compare_rows"] != served:  # every served (version-2) model
+            if checks["compare_rows"] != served:  # both served models
                 problems.append(f"comparison shows {checks['compare_rows']} rows, expected {served}")
 
             # ---- invalid upload is rejected with a message

@@ -1,8 +1,9 @@
-"""Final round, step 5 — docs/FINAL_REPORT.md, generated from the result files (no number is typed by hand).
+"""docs/FINAL_REPORT.md — the two served models for the five conditions (deep learning, classical ML), generated from
+the result files (no number is typed by hand).
 
-Inputs: experiments/results/final_pipeline_<task>.json (scripts/36, out-of-fold), final_round.json (scripts/38, test,
-stress, out-of-dataset, latency), audit_examples_before.json / audit_examples.json (scripts/34 before and after the
-final round), audit_behaviour_before.json / audit_behaviour.json (scripts/35).
+Inputs: experiments/results/final_pipeline_5class.json (scripts/36, deep model, out-of-fold),
+classical_pipeline.json (scripts/43, classical model, out-of-fold), final_round.json (scripts/38 and 44: test, stress,
+out-of-dataset, latency), audit_examples.json (scripts/34, gallery through the HTTP API).
 """
 import sys
 from pathlib import Path
@@ -14,9 +15,10 @@ from tomatoleaf.utils import load_json  # noqa: E402
 
 NAME = {c["key"]: c["name"] for c in CLASSES}
 FIVE = ["healthy", "leaf_miner", "magnesium_deficiency", "nitrogen_deficiency", "spotted_wilt_virus"]
-FINAL = {"5class": "focused_5class", "8class": "full_8class"}
-BEFORE = {"5class": "focused_5class_r1", "8class": "full_8class_r1"}  # live before the last round
-TASK = {"5class": "Focused model (5 conditions)", "8class": "Full model (8 conditions)"}
+DL, ML = "focused_5class", "classical_5class"  # the served models
+BEFORE = "focused_5class_r1"  # deep model live before the last round
+EARLIER = ["focused_5class_r1", "balanced_5class", "calibrated_5class", "ensemble_5class"]
+LABEL = {DL: "Deep learning", ML: "Classical ML", BEFORE: "Deep learning · before"}
 STRESS = {"blur_sigma2": "Blur (σ 2)", "blur_sigma4": "Strong blur (σ 4)", "dark_x0.35": "Very dark (×0.35)",
           "overexposed_x1.7": "Over-exposed (×1.7)", "jpeg_q15": "Heavy JPEG (quality 15)",
           "background_black": "Leaf on black", "background_wood": "Leaf on wood", "background_grass": "Leaf on grass",
@@ -35,6 +37,8 @@ def f(x, d=3):
 
 
 def outcome_text(o):
+    if not o:
+        return "—"
     return (f"{p(o.get('answered_correct'), 0)} right · {p(o.get('answered_wrong', o['answered']), 0)} wrong · "
             f"{p(o['refused'], 0)} refused")
 
@@ -45,237 +49,205 @@ def table(head, rows):
     return "\n".join(out)
 
 
-def _cell(true, model_classes, pred, conf, status):
-    answered = status in ("Healthy", "Diseased")
-    if answered:
+def _cell(true, pred, conf, status):
+    if status in ("Healthy", "Diseased"):
         return f"{NAME[pred]} {p(conf)} — " + ("✓" if pred == true else "✗ wrong")
-    verdict = "refused (correct: not one of its conditions)" if true not in model_classes else "refused"
-    return f"{status} (best guess {NAME[pred]} {p(conf)}) — {verdict}"
+    return f"{status} (best guess {NAME[pred]} {p(conf)}) — refused"
 
 
 def gallery_rows(path, models):
     """Gallery outcomes of the served models, from scripts/34 (HTTP API)."""
-    rows = [r for r in load_json(path)["rows"] if r["set"] == "gallery" and r["model"] in models]
     out = {}
-    for r in rows:
-        classes = FIVE if r["model"].endswith("5class") else list(NAME)
-        out.setdefault(r["true"], {})[r["model"]] = _cell(r["true"], classes, r["predicted"], r["confidence"],
-                                                          r["status"])
+    for r in load_json(path)["rows"]:
+        if r["set"] == "gallery" and r["model"] in models:
+            out.setdefault(r["true"], {})[r["model"]] = _cell(r["true"], r["predicted"], r["confidence"], r["status"])
     return out
 
 
-def gallery_rows_direct(keys):
-    """The previously served models on the CURRENT gallery files (same photos as the final models), through the same
-    upload preprocessing and predictor code as the API (direct inference equals the API to 1e-6, docs/AUDIT.md §8)."""
-    sys.path[:0] = [str(ROOT)]
-    from backend.services.predictor import ModelRegistry
-    from tomatoleaf.config import EXPERIMENTS_DIR
-    from tomatoleaf.preprocessing import prepare_upload
-
-    reg = ModelRegistry(EXPERIMENTS_DIR / "benchmark_models.json", device="cpu", lazy=True)
-    manifest = load_json(ROOT / "frontend" / "public" / "test-samples" / "manifest.json")
-    out = {}
-    for s in manifest["samples"]:
-        rgb, _ = prepare_upload((ROOT / "frontend" / "public" / s["file"].lstrip("/")).read_bytes())
-        for key in keys:
-            r = reg.predict(rgb, key)
-            out.setdefault(s["key"], {})[key] = _cell(s["key"], r["classes"], r["prediction"]["key"],
-                                                      r["prediction"]["confidence"], r["prediction"]["status"])
-    return out
+def model_row(r, bold=False):
+    te = r["test"]
+    name = ("**" + r["name"] + "**") if bold else r["name"]
+    return [name, f"{p(te['accuracy'])} ({p(te['accuracy_ci'][0])}–{p(te['accuracy_ci'][1])})", f(te["f1_macro"]),
+            f(te["f1_weighted"]), p(te["balanced_accuracy"]), f(te["ece"]), f(te["brier"]), f(te["nll"]),
+            f(r["threshold"], 2), p(r["selective"]["coverage"]), p(r["selective"]["accuracy_kept"]),
+            p((r.get("out_of_scope") or {}).get("answered_wrong"))]
 
 
 def main():
     fr = load_json(RESULTS_DIR / "final_round.json")
-    fp = {t: load_json(RESULTS_DIR / f"final_pipeline_{t}.json") for t in ("5class", "8class")}
-    L = ["# Final report — two validated models (focused 5-class, full 8-class)", "",
+    dl = load_json(RESULTS_DIR / "final_pipeline_5class.json")
+    ml = load_json(RESULTS_DIR / "classical_pipeline.json")
+    models = fr["models"]
+    L = ["# Final report — Tomato Care: two models for five conditions", "",
+         "Tomato Care diagnoses five tomato-leaf conditions (Healthy, Leaf Miner, Magnesium Deficiency, Nitrogen "
+         "Deficiency, Spotted Wilt Virus) with two independently validated models: a **deep-learning** model (5 "
+         "ConvNeXt-Tiny networks) and a **classical machine-learning** model (handcrafted colour and texture features, "
+         "no neural network). Both were chosen on out-of-fold cross-validation data with the same rules and scored "
+         "once on the same held-out test photos.", "",
          "Generated by `scripts/39_final_report.py` from the result files; every number below is copied from "
-         "`experiments/results/`. Root-cause audit: `docs/AUDIT.md`. Method: `docs/METHODOLOGY.md` §6c.", "",
-         f"> {fr['note']}", ""]
+         "`experiments/results/`. Method: `docs/METHODOLOGY.md` §6c–6e. Audit history: `docs/AUDIT.md`.", "",
+         f"> {fr['note']} {fr.get('classical_note', '')}", ""]
 
     # 1. headline
-    L += ["## 1. Before vs after (held-out test photos)", ""]
+    L += ["## 1. Test results (held-out photos of the five conditions)", ""]
     head = ["Model", "Accuracy (95% CI)", "Macro-F1", "Weighted F1", "Balanced acc.", "ECE", "Brier", "NLL",
             "Threshold", "Answered", "Accuracy when answering", "Unsupported photos: confident wrong answer"]
-    rows = []
-    for t in ("5class", "8class"):
-        for key in [FINAL[t]] + [k for k in ("focused_5class_r1", "full_8class_r1", "balanced_5class", "calibrated_5class",
-                                             "ensemble_5class", "balanced_8class", "convnext_tiny_v2_tta")
-                                 if fr["models"].get(k, {}).get("task") == t]:
-            r = fr["models"][key]
-            te = r["test"]
-            rows.append([("**" + r["name"] + "**") if key == FINAL[t] else r["name"],
-                         f"{p(te['accuracy'])} ({p(te['accuracy_ci'][0])}–{p(te['accuracy_ci'][1])})",
-                         f(te["f1_macro"]), f(te["f1_weighted"]), p(te["balanced_accuracy"]), f(te["ece"]),
-                         f(te["brier"]), f(te["nll"]), f(r["threshold"], 2), p(r["selective"]["coverage"]),
-                         p(r["selective"]["accuracy_kept"]),
-                         p((r.get("out_of_scope") or {}).get("answered_wrong")) if t == "5class" else "n/a"])
-    L += [table(head, rows), ""]
-    L += ["Paired bootstrap over the same test leaf groups (2,000 resamples):", ""]
-    L += [table(["Task", "Final vs", "Δ accuracy (95% CI)", "Δ macro-F1 (95% CI)"],
-                [[TASK[c["task"]], c["b_name"],
+    rows = [model_row(models[DL], True), model_row(models[ML], True)]
+    rows += [model_row(models[k]) for k in EARLIER if k in models]
+    L += [table(head, rows), "",
+          "The first two rows are the served models; the others are earlier deep-learning versions on the same photos. "
+          "“Unsupported photos” are the test photos of the dataset's three other conditions (Early Blight, Late "
+          "Blight, Potassium Deficiency), which the app does not diagnose.", ""]
+    comps = [c for c in fr["comparisons"] if c["task"] == "5class" and (c.get("ml_vs_dl") or c["a"] == DL)]
+    L += ["Paired bootstrap over the same test leaf groups (2,000 resamples):", "",
+          table(["Comparison", "Δ accuracy (95% CI)", "Δ macro-F1 (95% CI)"],
+                [[f"{c['a_name']} − {c['b_name']}",
                   f"{100 * c['accuracy_diff']:+.1f} pts ({100 * c['accuracy_ci'][0]:+.1f} … {100 * c['accuracy_ci'][1]:+.1f})",
-                  f"{c['f1_diff']:+.3f} ({c['f1_ci'][0]:+.3f} … {c['f1_ci'][1]:+.3f})"] for c in fr["comparisons"]]), ""]
+                  f"{c['f1_diff']:+.3f} ({c['f1_ci'][0]:+.3f} … {c['f1_ci'][1]:+.3f})"] for c in comps]), ""]
 
     # 2. examples
-    L += ["## 2. Example-image verification (Diagnose gallery, through `POST /api/predict`)", "",
-          load_json(ROOT / "frontend" / "public" / "test-samples" / "manifest.json")["note"]
-          + " The before models are run on the same photos. "
-          "“Refused” = Uncertain or Unusual image (no diagnosis).", ""]
-    before = gallery_rows_direct(list(BEFORE.values()))
-    after = gallery_rows(RESULTS_DIR / "audit_examples.json", set(FINAL.values()))
-    rows = [[NAME[k], before.get(k, {}).get(BEFORE["5class"], "—"), after.get(k, {}).get(FINAL["5class"], "—"),
-             before.get(k, {}).get(BEFORE["8class"], "—"), after.get(k, {}).get(FINAL["8class"], "—")]
-            for k in sorted(after, key=lambda k: NAME[k])]
-    L += [table(["True condition", "Focused · before", "Focused · final", "Full · before", "Full · final"], rows), ""]
-    summ = load_json(RESULTS_DIR / "audit_examples.json")["summary"]
-    L += ["Summary of all example sets after the final round (correct / wrong / uncertain / unusual):", ""]
-    L += [table(["Set · model", "Correct", "Wrong", "Uncertain", "Unusual", "Wrong (outside scope)"],
-                [[k, v["correct"], v["WRONG"], v["uncertain"], v["unusual image"], v["wrong_out_of_scope"]]
-                 for k, v in summ.items()]), ""]
+    manifest = load_json(ROOT / "frontend" / "public" / "test-samples" / "manifest.json")
+    after = gallery_rows(RESULTS_DIR / "audit_examples.json", {DL, ML})
+    L += ["## 2. Example photos (Diagnose gallery, through `POST /api/predict`)", "", manifest["note"],
+          "“Refused” = Uncertain or Unusual image (no diagnosis).", "",
+          table(["True condition", "Deep learning", "Classical ML"],
+                [[NAME[k], after.get(k, {}).get(DL, "—"), after.get(k, {}).get(ML, "—")]
+                 for k in sorted(after, key=lambda k: NAME[k])]), ""]
 
-    # 3. arms
-    L += ["## 3. How each pipeline was chosen (out-of-fold, cross-fitted)", ""]
-    for t in ("5class", "8class"):
-        d = fp[t]
-        head = ["Arm", "Training", "Macro-F1", "Accuracy", "Weighted F1", "NLL", "Brier", "ECE", "Calibration "
-                "(NLL temp. / vector)", "Threshold", "Answered", "Accuracy when answering"]
-        if t == "5class":
-            head.append("Unsupported refused")
-        rows = []
-        for a in d["arms"].values():
-            row = [("**" + a["arm"] + "**") if a["arm"] == d["chosen"]["arm"] else a["arm"],
-                   a["label"] + (f" (τ {a['tau']['deployed']:.2f})" if a.get("tau") else ""), f(a["oof"]["f1_macro"]),
-                   p(a["oof"]["accuracy"]), f(a["oof"]["f1_weighted"]), f(a["oof"]["nll"]), f(a["oof"]["brier"]),
-                   f(a["oof"]["ece"]), f"{a['calibration']['chosen']} ({f(a['calibration']['nll_temperature'])} / "
-                   f"{f(a['calibration']['nll_vector'])})", f(a["threshold"], 2), p(a["operating_point"]["coverage"]),
-                   p(a["operating_point"]["accuracy_kept"])]
-            if t == "5class":
-                row.append(p(a["out_of_scope_refusal"]))
-            rows.append(row)
-        L += [f"### {TASK[t]}", "", table(head, rows), "",
-              f"Chosen: **arm {d['chosen']['arm']}** ({d['chosen']['recipe']}) — {d['chosen']['why']}.", ""]
-        ref = d.get("reference")
-        if ref:
-            L += [f"Reference (not a candidate): {ref['label']} — OOF macro-F1 {f(ref['oof']['f1_macro'])}, accuracy "
-                  f"{p(ref['oof']['accuracy'])}; at its own threshold ({f(ref['threshold'], 2)}) it refuses "
-                  f"{p(ref['out_of_scope_refusal'])} of OOF out-of-scope photos.", ""]
-        thr_rule = d["arms"][d["chosen"]["arm"]]["threshold_rule"]
-        L += [f"Threshold rule: {thr_rule}.", ""]
+    # 3. how each pipeline was chosen
+    L += ["## 3. How each model was chosen (out-of-fold, cross-fitted)", "",
+          "### Deep learning", ""]
+    head = ["Arm", "Training", "Macro-F1", "Accuracy", "Weighted F1", "NLL", "Brier", "ECE",
+            "Calibration (NLL temp. / vector)", "Threshold", "Answered", "Accuracy when answering", "Unsupported refused"]
+    rows = []
+    for a in dl["arms"].values():
+        rows.append([("**" + a["arm"] + "**") if a["arm"] == dl["chosen"]["arm"] else a["arm"], a["label"],
+                     f(a["oof"]["f1_macro"]), p(a["oof"]["accuracy"]), f(a["oof"]["f1_weighted"]), f(a["oof"]["nll"]),
+                     f(a["oof"]["brier"]), f(a["oof"]["ece"]),
+                     f"{a['calibration']['chosen']} ({f(a['calibration']['nll_temperature'])} / "
+                     f"{f(a['calibration']['nll_vector'])})", f(a["threshold"], 2), p(a["operating_point"]["coverage"]),
+                     p(a["operating_point"]["accuracy_kept"]), p(a["out_of_scope_refusal"])])
+    L += [table(head, rows), "",
+          f"Chosen: **arm {dl['chosen']['arm']}** ({dl['chosen']['recipe']}) — {dl['chosen']['why']}.", "",
+          f"Threshold rule: {dl['arms'][dl['chosen']['arm']]['threshold_rule']}.", "",
+          "### Classical ML", "",
+          "Handcrafted features of the same 256×256 image: colour (HSV histograms + L\\*a\\*b\\* moments over leaf "
+          "pixels, 73 values), texture (uniform LBP histograms + GLCM properties over leaf pixels, 43) and HOG (64 "
+          "principal components). Four class-balanced classifiers on three feature sets, hyperparameters tuned by "
+          "nested grouped cross-validation (`scripts/43_classical_model.py`).", ""]
+    head[1] = "Classifier · features"
+    rows = []
+    for a in ml["arms"].values():
+        rows.append([("**chosen**") if a["arm"] == ml["chosen"]["arm"] else "", f"{a['classifier']} · {a['feature_set']}",
+                     f(a["oof"]["f1_macro"]), p(a["oof"]["accuracy"]), f(a["oof"]["f1_weighted"]), f(a["oof"]["nll"]),
+                     f(a["oof"]["brier"]), f(a["oof"]["ece"]),
+                     f"{a['calibration']['chosen']} ({f(a['calibration']['nll_temperature'])} / "
+                     f"{f(a['calibration']['nll_vector'])})", f(a["threshold"], 2), p(a["operating_point"]["coverage"]),
+                     p(a["operating_point"]["accuracy_kept"]), p(a["out_of_scope_refusal"])])
+    chosen_ml = ml["arms"][ml["chosen"]["arm"]]
+    L += [table(head, rows), "",
+          f"Chosen: **{chosen_ml['classifier']} on {chosen_ml['feature_set'].replace('Color', 'colour').replace('Texture', 'texture')} features** — {ml['chosen']['why']}. "
+          f"Final hyperparameters (re-tuned on all five folds): `{ml['chosen']['final_params']}`.", "",
+          f"Threshold rule: {chosen_ml['threshold_rule']}.", ""]
+    if ml["chosen"].get("feature_importance"):
+        L += ["Most important features of the final classical model (impurity-based importance):", "",
+              table(["Feature", "Importance"], [[x["feature"], f(x["importance"])]
+                                                for x in ml["chosen"]["feature_importance"][:10]]), ""]
 
     # 4. calibration
     L += ["## 4. Calibration (probability reliability)", "",
-          "Calibration is judged by Brier score, expected calibration error (ECE, 15 bins), class-wise ECE and NLL; it "
-          "is not expected to raise accuracy. Reliability diagrams: `reports/figures/final/reliability.png`.", ""]
+          "Judged by Brier score, expected calibration error (ECE, 15 bins), class-wise ECE and NLL; calibration is not "
+          "expected to raise accuracy.", ""]
     rows = []
-    for t in ("5class", "8class"):
-        a = fp[t]["arms"][fp[t]["chosen"]["arm"]]
-        r = fr["models"][FINAL[t]]
-        rows.append([TASK[t], a["calibration"]["chosen"], f(a["uncalibrated"]["ece"]), f(a["oof"]["ece"]),
-                     f(a["uncalibrated"]["nll"]), f(a["oof"]["nll"]), f(a["uncalibrated"]["brier"]), f(a["oof"]["brier"]),
-                     f(r["test"]["ece"]), f(r["test"]["classwise_ece"]), f(r["test"]["brier"]), f(r["test"]["nll"])])
+    for key, a in ((DL, dl["arms"][dl["chosen"]["arm"]]), (ML, chosen_ml)):
+        r, u = models[key], a.get("uncalibrated") or {}
+        rows.append([LABEL[key], a["calibration"]["chosen"], f(u.get("ece")), f(a["oof"]["ece"]), f(u.get("nll")),
+                     f(a["oof"]["nll"]), f(r["test"]["ece"]), f(r["test"]["classwise_ece"]), f(r["test"]["brier"]),
+                     f(r["test"]["nll"])])
     L += [table(["Model", "Calibrator", "OOF ECE before", "OOF ECE after", "OOF NLL before", "OOF NLL after",
-                 "OOF Brier before", "OOF Brier after", "Test ECE", "Test class-wise ECE", "Test Brier", "Test NLL"], rows),
-          ""]
+                 "Test ECE", "Test class-wise ECE", "Test Brier", "Test NLL"], rows), ""]
 
     # 5. per class
-    L += ["## 5. Per-class precision and recall (test)", ""]
-    for t in ("5class", "8class"):
-        a, b = fr["models"][FINAL[t]], fr["models"][BEFORE[t]]
-        rows = [[c["name"], c["support"], f(o["precision"]), f(c["precision"]), f(o["recall"]), f(c["recall"]),
-                 f(o["f1"]), f(c["f1"])] for c, o in zip(a["per_class"], b["per_class"])]
-        L += [f"### {TASK[t]}", "", table(["Condition", "Test photos", "Precision before", "Precision final",
-                                            "Recall before", "Recall final", "F1 before", "F1 final"], rows), ""]
+    a, b = models[DL], models[ML]
+    rows = [[c["name"], c["support"], f(c["precision"]), f(o["precision"]), f(c["recall"]), f(o["recall"]),
+             f(c["f1"]), f(o["f1"])] for c, o in zip(a["per_class"], b["per_class"])]
+    L += ["## 5. Per-condition precision and recall (test)", "",
+          table(["Condition", "Test photos", "Precision DL", "Precision ML", "Recall DL", "Recall ML", "F1 DL", "F1 ML"],
+                rows), ""]
 
     # 6. confusion
-    L += ["## 6. Confusion matrices (test; rows = true, columns = predicted, before any refusal)", "",
-          "Figure: `reports/figures/final/confusion_before_after.png`.", ""]
-    for t in ("5class", "8class"):
-        for key in (BEFORE[t], FINAL[t]):
-            r = fr["models"][key]
-            labels = [c["name"] for c in r["per_class"]]
-            L += [f"**{r['name']}**", "", table([""] + labels, [[labels[i]] + row for i, row in enumerate(r["confusion"])]),
-                  ""]
+    L += ["## 6. Confusion matrices (test; rows = true, columns = predicted, before any refusal)", ""]
+    for key in (DL, ML):
+        r = models[key]
+        labels = [c["name"] for c in r["per_class"]]
+        L += [f"**{r['name']}**", "", table([""] + labels, [[labels[i]] + row for i, row in enumerate(r["confusion"])]),
+              ""]
 
     # 7. per condition outcomes
-    L += ["## 7. What happens to each condition's test photos (at the model's threshold)", ""]
-    for t in ("5class", "8class"):
-        rows = []
-        for k, o in fr["models"][FINAL[t]]["per_condition"].items():
-            b = fr["models"][BEFORE[t]]["per_condition"][k]
-            rows.append([NAME[k], o["photos"], p(b["answered_correct"]), p(o["answered_correct"]), p(b["answered_wrong"]),
-                         p(o["answered_wrong"]), p(b["refused"]), p(o["refused"])])
-        L += [f"### {TASK[t]}", "", table(["True condition", "Photos", "Correct before", "Correct final", "Wrong before",
-                                            "Wrong final", "Refused before", "Refused final"], rows), ""]
-
-    # 8. thresholds
-    L += ["## 8. Final thresholds and unusual-image gate", ""]
     rows = []
-    for t in ("5class", "8class"):
-        d = fp[t]
-        a = d["arms"][d["chosen"]["arm"]]
-        g = d["unusual_gate"]["evaluation_oof"][d["unusual_gate"]["method"]]
-        r = fr["models"][FINAL[t]]
-        rows.append([TASK[t], f(a["threshold"], 2), f"{p(a['operating_point']['coverage'])} → {p(a['operating_point']['accuracy_kept'])}",
-                     f"{p(r['selective']['coverage'])} → {p(r['selective']['accuracy_kept'])}", d["unusual_gate"]["method"],
+    for k, o in models[DL]["per_condition"].items():
+        m = models[ML]["per_condition"][k]
+        name = NAME[k] + ("" if k in FIVE else " (not diagnosed)")
+        rows.append([name, o["photos"], p(o["answered_correct"]), p(m["answered_correct"]), p(o["answered_wrong"]),
+                     p(m["answered_wrong"]), p(o["refused"]), p(m["refused"])])
+    L += ["## 7. What happens to each condition's test photos (at each model's threshold)", "",
+          table(["True condition", "Photos", "Correct DL", "Correct ML", "Wrong DL", "Wrong ML", "Refused DL",
+                 "Refused ML"], rows), ""]
+
+    # 8. thresholds and gates
+    rows = []
+    for key, a, gate in ((DL, dl["arms"][dl["chosen"]["arm"]], dl["unusual_gate"]),
+                         (ML, chosen_ml, ml["unusual_gate"])):
+        g, r = gate["evaluation_oof"][gate["method"]], models[key]
+        rows.append([LABEL[key], f(a["threshold"], 2),
+                     f"{p(a['operating_point']['coverage'])} → {p(a['operating_point']['accuracy_kept'])}",
+                     f"{p(r['selective']['coverage'])} → {p(r['selective']['accuracy_kept'])}", gate["method"],
                      f(g["auroc_select"]), p(g["flagged_in_scope"]), p(r["flagged_unusual"])])
-    L += [table(["Model", "Threshold", "OOF: answered → accuracy", "Test: answered → accuracy", "Gate",
-                 "OOF AUROC (gate)", "OOF genuine photos flagged", "Test genuine photos flagged"], rows), ""]
+    L += ["## 8. Thresholds and unusual-image gates", "",
+          table(["Model", "Threshold", "OOF: answered → accuracy", "Test: answered → accuracy", "Gate",
+                 "OOF AUROC (gate)", "OOF genuine photos flagged", "Test genuine photos flagged"], rows), "",
+          "Deep learning: distance in the networks' feature space; classical ML: distance in the standardised colour + "
+          "texture feature space. Limits: 95% of out-of-fold genuine photos pass, per answered condition.", ""]
 
     # 9. OOD + stress
+    keys = [BEFORE, DL, ML]
+    od = fr["out_of_dataset"]
+    rows = [[label, od[DL][s]["photos"]] + [p(od[k][s]["refused"]) for k in keys] for s, label in OOD.items()
+            if s in od[DL] and all(s in od[k] for k in keys)]
     L += ["## 9. Out-of-dataset images and stress tests", "",
-          "Share **refused** (Uncertain or Unusual image) — higher is better for images that are not a supported "
-          "leaf condition. Figures: `reports/figures/final/out_of_dataset.png`, `stress_5class.png`, `stress_8class.png`.",
-          ""]
-    keys = [BEFORE["5class"], FINAL["5class"], BEFORE["8class"], FINAL["8class"]]
-    rows = []
-    for s, label in OOD.items():
-        if s in fr["out_of_dataset"][FINAL["8class"]]:
-            rows.append([label, fr["out_of_dataset"][FINAL["8class"]][s]["photos"]]
-                        + [p(fr["out_of_dataset"][k][s]["refused"]) for k in keys])
-    L += [table(["Images", "Count", "Focused before", "Focused final", "Full before", "Full final"], rows), ""]
-    shift = {k: fr["out_of_dataset"][k].get("tomato_known_shift") for k in keys}
-    if shift[FINAL["8class"]]:
-        rows = []
-        for c in sorted(shift[FINAL["8class"]]):
-            row = [NAME[c], shift[FINAL["8class"]][c]["photos"]]
-            for k in keys:
-                o = shift[k][c]
-                row.append(f"{p(o['answered_correct'], 0)} right · {p(o['answered_wrong'], 0)} wrong · {p(o['refused'], 0)} refused")
-            rows.append(row)
-        L += ["Tomato photos of known conditions from another lab (PlantVillage: different camera, background and "
+          "Share **refused** (Uncertain or Unusual image) — higher is better for images that are not a supported leaf "
+          "condition.", "", table(["Images", "Count", LABEL[BEFORE], LABEL[DL], LABEL[ML]], rows), ""]
+    shift = {k: od[k].get("tomato_known_shift") for k in keys}
+    if all(shift.values()):
+        rows = [[NAME[c], shift[DL][c]["photos"]] + [outcome_text(shift[k][c]) for k in keys] for c in sorted(shift[DL])]
+        L += ["Tomato photos of the five conditions from another lab (PlantVillage: different camera, background and "
               "leaf preparation — a domain-shift check):", "",
-              table(["Condition", "Photos", "Focused before", "Focused final", "Full before", "Full final"], rows), ""]
-    for t in ("5class", "8class"):
-        rows = []
-        for s, label in STRESS.items():
-            b, a = fr["stress"][BEFORE[t]].get(s), fr["stress"][FINAL[t]].get(s)
-            if not a:
-                continue
-            rows.append([label, a["photos"], outcome_text(b), outcome_text(a)])
-        L += [f"Stress tests — {TASK[t]} (in-scope test photos changed on purpose; mixed collages have no single right "
-              "answer, so any answer counts as wrong):", "", table(["Change", "Photos", "Before", "Final"], rows), ""]
+              table(["Condition", "Photos", LABEL[BEFORE], LABEL[DL], LABEL[ML]], rows), ""]
+    rows = [[label, fr["stress"][DL][s]["photos"]] + [outcome_text(fr["stress"][k].get(s)) for k in keys]
+            for s, label in STRESS.items() if s in fr["stress"][DL]]
+    L += ["Stress tests (in-scope test photos changed on purpose; mixed collages have no single right answer, so any "
+          "answer counts as wrong):", "", table(["Change", "Photos", LABEL[BEFORE], LABEL[DL], LABEL[ML]], rows), ""]
 
     # 10. latency
-    if fr.get("latency"):
-        L += ["## 10. CPU time per photo (same laptop, same run)", "",
+    lat = {k: v for k, v in (fr.get("latency") or {}).items() if k in (DL, ML, BEFORE)}
+    if lat:
+        L += ["## 10. CPU time per photo (same laptop)", "",
               table(["Model", "Median", "90th percentile", "Runtime"],
-                    [[fr["models"].get(k, {}).get("name", k), f"{v['median_ms']:.0f} ms", f"{v['p90_ms']:.0f} ms",
-                      v["runtime"]] for k, v in fr["latency"].items()]), ""]
+                    [[models.get(k, {}).get("name", k), f"{v['median_ms']:.0f} ms", f"{v['p90_ms']:.0f} ms", v["runtime"]]
+                     for k, v in lat.items()]), ""]
 
     # 11. limitations
-    L += ["## 11. Remaining limitations", "",
-          "- **Early Blight and Potassium Deficiency stay data-limited.** 62 and 9 photographs in the whole dataset; "
-          "their test support is 8 and 2 photos, so their per-class scores have very wide uncertainty.",
-          "- **Outlier exposure covers known unknowns.** The focused model learned to refuse the three dataset conditions "
-          "it does not cover; a tomato disease it has never seen may still receive a diagnosis (see the PlantVillage "
-          "rows above for how often this happens).",
+    L += ["## 11. Limitations", "",
+          "- **Five conditions only.** The dataset's Early Blight (62 photographs), Late Blight and Potassium "
+          "Deficiency (9) were too hard to recognise reliably in the earlier eight-condition study, so the app does not "
+          "diagnose them; their test photos are used only to check that they are refused (sections 1 and 7).",
+          "- **Outlier exposure covers known unknowns.** The deep model learned to refuse the dataset's other three "
+          "conditions; a tomato disease it has never seen may still receive a diagnosis. The classical model had no "
+          "such training and relies on its threshold and its feature-distance gate.",
           "- **Domain shift.** All training photos come from one phone, two districts and leaves on paper. PlantVillage "
           "photos (another lab) and stress tests probe this, but field photos with complex backgrounds were not available.",
-          "- **Calibration of the ensemble** is fitted on single-network out-of-fold predictions and applied to the "
-          "5-network average; the test ECE above shows how well that transfers.",
-          "- **Test-set reuse.** The 290 test photos were reported in v1, v2 and v2.1 (never used for a choice). This "
-          "round's choices were fixed on out-of-fold data with rules written before training; the test score above is "
-          "a repeated look, not a first one.",
+          "- **Test-set reuse.** The test photos were reported in v1, v2 and v2.1 (never used for a choice). Every choice "
+          "here was fixed on out-of-fold data with rules written before training; the test score is a repeated look.",
           "- **Small test set.** Differences of a few points are within the bootstrap intervals; read the paired "
           "comparisons, not single numbers.", ""]
     out = Path(sys.argv[sys.argv.index("--out") + 1]) if "--out" in sys.argv else ROOT / "docs" / "FINAL_REPORT.md"

@@ -1,8 +1,9 @@
-import { AlertTriangle, BookMarked, Brain, Camera, CheckCircle2, Crop, Database, FlaskConical, Gauge, Microscope, Palette, ScanEye, Split, Target } from "lucide-react";
+import { Link } from "react-router-dom";
+import { AlertTriangle, BookMarked, Brain, Camera, CheckCircle2, Crop, Database, FlaskConical, Gauge, Layers3, Microscope, Palette, ScanEye, Split, Target } from "lucide-react";
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
 import { Badge, Callout, Card, CardHeader, PageHeader, Skeleton } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
-import { defaultModel, recipesFor } from "../lib/analytics.js";
+import { TASK, classicalModel, comparisonsFor, defaultModel, modelName, recipesFor, taskClasses, taskPhotos } from "../lib/analytics.js";
 import { pct, signedPct } from "../lib/format.js";
 
 const TOC = [
@@ -11,6 +12,7 @@ const TOC = [
   ["preprocessing", "Preprocessing audit"],
   ["protocol", "Model selection protocol"],
   ["models", "Models and training"],
+  ["classical-ml", "Classical ML model"],
   ["uncertainty", "Calibration & uncertainty"],
   ["evaluation", "Final evaluation"],
   ["limitations", "Limitations"],
@@ -27,6 +29,9 @@ function Section({ id, icon: Icon, title, children }) {
     </section>
   );
 }
+
+const andList = (xs) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
+const GATE_NAME = { knn: "k-nearest-neighbour", maha: "Mahalanobis" };
 
 function Table({ head, rows }) {
   return (
@@ -62,10 +67,19 @@ export default function MethodologyPage() {
   const { analytics } = useData();
   const ds = analytics?.dataset;
   const audit = analytics?.audit;
-  const r8 = recipesFor(analytics, "8class");
-  const d5 = defaultModel(analytics, "5class");
-  const d8 = defaultModel(analytics, "8class");
+  const recipes = recipesFor(analytics, TASK);
+  const dl = defaultModel(analytics, TASK);
+  const ml = classicalModel(analytics, TASK);
   const ood = analytics?.ood;
+  const keys = taskClasses(analytics, TASK);
+  const diagnosed = (ds?.classes || []).filter((c) => keys.includes(c.key)).map((c) => c.name);
+  const notDiagnosed = (ds?.classes || []).filter((c) => keys.length && !keys.includes(c.key)).map((c) => c.name);
+  const cvPhotos = taskPhotos(analytics, TASK, "cv");
+  const cl = analytics?.classical;
+  const chosenArm = cl?.arms?.find((a) => a.chosen) || cl?.arms?.find((a) => a.arm === cl?.chosen);
+  const mlGate = ood?.final?.[ml?.key]?.method;
+  const dlGate = ood?.final?.[TASK];
+  const headline = comparisonsFor(analytics, TASK).filter((c) => (c.headline || c.ml_vs_dl) && c.f1_ci);
 
   return (
     <div>
@@ -101,6 +115,12 @@ export default function MethodologyPage() {
             <p>
               Classes are very unbalanced — from {ds?.classes ? Math.max(...ds.classes.map((c) => c.photos)) : "1,020"} Leaf Miner photos down to {ds?.classes ? Math.min(...ds.classes.map((c) => c.photos)) : 9} Potassium Deficiency photos — so we report <strong>macro-F1</strong> (every class weighted equally) next to accuracy, and use class-weighted losses.
             </p>
+            {diagnosed.length > 0 && (
+              <p>
+                Tomato Care diagnoses <strong>{diagnosed.length} of these classes</strong>: {andList(diagnosed)}.
+                {notDiagnosed.length > 0 && ` ${andList(notDiagnosed)} were too hard to recognise reliably and are not diagnosed: the models should refuse such photos, and their test photos check that they do.`}
+              </p>
+            )}
           </Section>
 
           <Section id="leakage" icon={Split} title="2 · A leakage-free split">
@@ -146,12 +166,13 @@ export default function MethodologyPage() {
 
           <Section id="protocol" icon={Target} title="4 · Model selection without touching the test set">
             <p>
-              The original study chose models on one validation split of 311 photos — with a single Potassium and six Nitrogen photos, one photo moves validation macro-F1 by up to 0.125, so the choice was largely noise. The upgrade uses <strong>grouped, stratified 5-fold cross-validation</strong> on all {analytics?.dataset?.cv?.photos?.toLocaleString() ?? "1,813"} train+validation photos.
+              The original study chose models on one validation split of 311 photos — with a single Potassium and six Nitrogen photos, one photo moves validation macro-F1 by up to 0.125, so the choice was largely noise. The upgrade uses <strong>grouped, stratified 5-fold cross-validation</strong> on all {analytics?.dataset?.cv?.photos?.toLocaleString() ?? "1,813"} train+validation photos
+              {cvPhotos != null ? ` (${cvPhotos.toLocaleString()} of them show the five diagnosed conditions)` : ""}.
             </p>
             <ul className="space-y-2">
               {[
                 "Every recipe trains for a fixed number of epochs — no early stopping — so no epoch is chosen by looking at the held-out fold.",
-                "Each photo gets an out-of-fold prediction from a model that never saw its leaf group; recipes and ensembles are ranked on these 1,813 predictions.",
+                `Each photo gets an out-of-fold prediction from a model that never saw its leaf group; recipes, ensembles and classical classifiers are ranked on the ${cvPhotos != null ? `${cvPhotos.toLocaleString()} ` : ""}out-of-fold predictions for the five conditions.`,
                 "Temperatures, the selective-prediction threshold and the out-of-distribution threshold are fitted on out-of-fold outputs as well.",
                 "The chosen models are retrained on all train+validation photos and the 290 test photos are scored once, at the end.",
               ].map((t) => (
@@ -174,20 +195,38 @@ export default function MethodologyPage() {
             <p>
               The <strong>robust recipe</strong> adds: all eight flips/rotations during training (so every test-time-augmentation view is in-distribution), aspect-ratio jitter, JPEG re-compression and mild blur (uploads differ from the dataset files), layer-wise learning-rate decay, an exponential moving average of the weights, and gradient clipping. Hue is never jittered: colour is the diagnostic signal for nutrient deficiencies.
             </p>
-            {r8.length > 0 && (
+            {recipes.length > 0 && (
               <Table
-                head={["Recipe (8 classes)", "OOF macro-F1", "+ TTA", "OOF accuracy + TTA"]}
-                rows={r8.map((r) => [r.label, pct(r.f1_1), pct(r.f1_8), pct(r.acc_8)])}
+                head={["Recipe (5 conditions)", "OOF macro-F1", "+ TTA", "OOF accuracy + TTA"]}
+                rows={recipes.map((r) => [r.label, pct(r.f1_1), pct(r.f1_8), pct(r.acc_8)])}
               />
             )}
+            <div id="classical-ml" className="scroll-mt-24 rounded-xl bg-surface-2 p-4">
+              <p className="flex items-center gap-2 font-semibold text-ink">
+                <Layers3 className="size-4 text-sun-600" aria-hidden /> The classical ML model — no neural network
+              </p>
+              <p className="mt-2 text-sm leading-relaxed">
+                The second served model diagnoses the same five conditions from handcrafted features of the same 256×256 image: <strong>colour</strong> (HSV histograms and L*a*b* mean, spread and skewness over the leaf pixels), <strong>texture</strong> (LBP histograms and GLCM statistics such as contrast and homogeneity) and <strong>shape</strong> (HOG, reduced by PCA inside each training fold). Logistic regression, an RBF-kernel SVM, a random forest and gradient boosting were each tried on three feature sets (colour; colour + texture; HOG + colour + texture), tuned by nested grouped cross-validation, then selected, calibrated and given a threshold on the same five folds with the same pre-registered rules as the network. The test photos were scored once, at the end.
+              </p>
+              {chosenArm && (
+                <p className="mt-2 text-sm leading-relaxed">
+                  Chosen{cl.arms.length > 1 ? ` from ${cl.arms.length} classifier × feature-set combinations` : ""}: <strong>{chosenArm.classifier} · {chosenArm.feature_set}</strong>
+                  {cl.why ? ` — ${cl.why}; out-of-fold accuracy ${pct(chosenArm.oof?.accuracy)}.` : ` — out-of-fold macro-F1 ${pct(chosenArm.oof?.f1_macro)}, accuracy ${pct(chosenArm.oof?.accuracy)}.`}{" "}
+                  <Link to="/lab" className="font-medium text-leaf-700 hover:underline dark:text-leaf-300">
+                    Every combination is in the Model lab.
+                  </Link>
+                </p>
+              )}
+            </div>
           </Section>
 
           <Section id="uncertainty" icon={ScanEye} title="6 · Calibration, “Uncertain” and “Unusual image”">
             <p>
-              <strong>Temperature scaling</strong> divides the logits by one number T fitted on out-of-fold predictions, so a stated 90% confidence is right about 90% of the time. Below a <strong>confidence threshold</strong> — the lowest threshold whose out-of-fold accuracy on answered photos reaches the target — the app answers “Uncertain”.
+              <strong>Calibration</strong> rescales each model's log-probabilities — one temperature T, or a scale and bias per class (vector scaling), whichever has the lower out-of-fold log-loss — so a stated 90% confidence is right about 90% of the time. Below a <strong>confidence threshold</strong> — the lowest threshold whose out-of-fold accuracy on answered photos reaches the target — the app answers “Uncertain”. Both models follow these rules, each on its own out-of-fold predictions.
             </p>
             <p>
-              Photos far from every training photo in the network's feature space (k-nearest-neighbour distance{ood?.method ? `, ${ood.method}` : ""}) are reported as <strong>“Unusual image”</strong>. The threshold keeps {ood?.keep ? pct(ood.keep, 0) : "95%"} of in-distribution out-of-fold photos; it is tested on photos of conditions the focused model was not trained on and on 30 non-leaf images.
+              Photos far from every training photo in the network's feature space ({dlGate?.method ? `${GATE_NAME[dlGate.method] || dlGate.method} distance` : ood?.method || "k-nearest-neighbour distance"}) are reported as <strong>“Unusual image”</strong>. The threshold keeps {pct(dlGate?.keep ?? ood?.keep ?? 0.95, 0)} of in-distribution out-of-fold photos; it is tested on photos of the dataset's conditions that the app does not diagnose and on 30 non-leaf images.
+              {mlGate && ` The classical model uses the same rule with ${GATE_NAME[mlGate] || mlGate} distance in its own colour + texture feature space.`}
             </p>
             {ood?.test && (
               <Table
@@ -205,22 +244,27 @@ export default function MethodologyPage() {
             <p>
               All models — classical ML, the original networks and the upgrade — are scored by the same code that serves the API (CPU, float32) on identical test photos. Confidence intervals resample whole leaf groups (2,000 bootstrap resamples); differences between models use a paired bootstrap on the same resamples.
             </p>
-            {d5 && d8 && (
+            {dl && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {[d5, d8].map((m) => (
-                  <div key={m.key} className="rounded-xl bg-surface-2 p-4">
-                    <Badge tone="leaf">{m.task === "5class" ? "Focused · 5 classes" : "Full · 8 classes"}</Badge>
-                    <p className="mt-2 font-semibold text-ink">{m.name}</p>
-                    <p className="mt-1 text-sm text-muted">
-                      accuracy {pct(m.test.accuracy)} · macro-F1 {pct(m.test.f1_macro)} · ECE {m.test.ece?.toFixed(3)}
-                    </p>
-                  </div>
-                ))}
+                {[
+                  [dl, "Deep learning · default", "leaf"],
+                  [ml, "Classical ML · no neural network", "sun"],
+                ]
+                  .filter(([m]) => m?.test)
+                  .map(([m, label, tone]) => (
+                    <div key={m.key} className="rounded-xl bg-surface-2 p-4">
+                      <Badge tone={tone}>{label}</Badge>
+                      <p className="mt-2 font-semibold text-ink">{m.name}</p>
+                      <p className="mt-1 text-sm text-muted">
+                        accuracy {pct(m.test.accuracy)} · macro-F1 {pct(m.test.f1_macro)} · ECE {m.test.ece?.toFixed(3) ?? "—"}
+                      </p>
+                    </div>
+                  ))}
               </div>
             )}
-            {analytics?.comparisons?.filter((c) => c.headline).map((c) => (
+            {headline.map((c) => (
               <p key={`${c.a}-${c.b}`} className="text-sm">
-                <strong>{c.a_name}</strong> vs <strong>{c.b_name}</strong>: macro-F1 {signedPct(c.f1_diff)} (95% CI {signedPct(c.f1_ci[0])} to {signedPct(c.f1_ci[1])}), accuracy {signedPct(c.accuracy_diff)}.
+                <strong>{c.a_name || modelName(analytics, c.a)}</strong> vs <strong>{c.b_name || modelName(analytics, c.b)}</strong>: macro-F1 {signedPct(c.f1_diff)} (95% CI {signedPct(c.f1_ci[0])} to {signedPct(c.f1_ci[1])}), accuracy {signedPct(c.accuracy_diff)}.
               </p>
             ))}
           </Section>
@@ -229,8 +273,8 @@ export default function MethodologyPage() {
             <ul className="space-y-2">
               {(analytics?.limitations || [
                 "One phone, two districts, leaves on paper: performance on field photos, other cameras or other regions is unknown.",
-                "Potassium Deficiency has 9 photographs in total; its scores are essentially anecdotal.",
-                "The test set is small (290 photos), so differences of a few points are within noise — see the confidence intervals.",
+                "Five conditions only: Early Blight, Late Blight and Potassium Deficiency are in the dataset but are not diagnosed.",
+                "The test set is small (265 photos of the five conditions), so differences of a few points are within noise — see the confidence intervals.",
               ]).map((t) => (
                 <li key={t} className="flex gap-2.5">
                   <AlertTriangle className="mt-0.5 size-4 shrink-0 text-sun-600" aria-hidden />
@@ -242,7 +286,7 @@ export default function MethodologyPage() {
 
           <Section id="reproduce" icon={BookMarked} title="9 · Reproducibility">
             <p>
-              Every number comes from versioned scripts with fixed seeds (<code className="font-mono text-sm">scripts/01…27</code>); results are written to <code className="font-mono text-sm">experiments/</code> and this page reads them directly. See the documentation for the exact command sequence, hardware and software versions.
+              Every number comes from versioned scripts with fixed seeds (<code className="font-mono text-sm">scripts/01…44</code>); results are written to <code className="font-mono text-sm">experiments/</code> and this page reads them directly. See the documentation for the exact command sequence, hardware and software versions.
             </p>
             <div className="flex flex-wrap gap-2">
               <Badge tone="slate" icon={FlaskConical}>PyTorch {analytics?.environment?.torch || "2.7"}</Badge>

@@ -69,24 +69,24 @@ def test_health(client):
     assert body["analytics_available"]
 
 
-def test_models_have_one_default_per_task(client):
+def test_two_five_condition_models_are_served(client):
+    """Deep learning (default) and classical ML, both for the same five conditions; no eight-condition model."""
     body = client.get("/api/models").json()
-    defaults = body["defaults_by_task"]
-    assert set(defaults) == {"5class", "8class"} and body["default_model"] == defaults["5class"]
+    assert body["defaults_by_task"] == {"5class": body["default_model"]}
     by_key = {m["key"]: m for m in body["models"]}
-    assert by_key[defaults["5class"]]["classes"] == FIVE and by_key[defaults["8class"]]["classes"] == CLASS_KEYS
+    assert {m["kind"] for m in body["models"]} == {"ensemble", "classical"}
+    assert by_key[body["default_model"]]["kind"] == "ensemble"
+    assert all(m["task"] == "5class" and m["classes"] == FIVE for m in body["models"])
     assert all(m["loaded"] for m in body["models"]), [m["key"] for m in body["models"] if not m["loaded"]]
-    assert set(by_key) == set(defaults.values())  # one served model per mode (no balanced/calibrated choice)
     assert {m["generation"] for m in body["models"]} == {"upgrade"}
-    for key in defaults.values():
-        m = by_key[key]
+    for m in body["models"]:
         assert m["operating_point"]["chosen_on"].startswith("out-of-fold")
         assert m["test_metrics"]["accuracy"] > 0.5 and m["latency_ms"] > 0
 
 
-def test_classes_follow_contract_order(client):
+def test_library_lists_the_diagnosed_conditions(client):
     body = client.get("/api/classes").json()
-    assert [c["key"] for c in body["classes"]] == CLASS_KEYS
+    assert [c["key"] for c in body["classes"]] == FIVE
     for c in body["classes"]:
         assert c["symptoms"] and c["management"] and c["references"]
 
@@ -120,30 +120,32 @@ def test_default_prediction_is_a_calibrated_distribution(client, test_photo):
     assert body["image"]["format"] == "JPEG" and body["image"]["colour"] == "Display P3 (unchanged)"
 
 
-def test_one_validated_model_per_mode_answers_the_tallest_bar(client):
-    """Final round: one served model per task, and its answer is always the most probable class (no separate
-    decision rule that could disagree with the probability chart). Checked on every gallery photo."""
+def test_served_models_answer_the_tallest_bar(client):
+    """Each served model's answer is always the most probable class (no separate decision rule that could disagree
+    with the probability chart). Checked on every gallery photo."""
     from pathlib import Path
 
     info = client.get("/api/models").json()
-    by_task = {}
-    for m in info["models"]:
-        by_task.setdefault(m["task"], []).append(m["key"])
-    assert all(len(v) == 1 for v in by_task.values()), by_task
     gallery = Path(__file__).resolve().parents[2] / "frontend" / "public" / "test-samples"
     for f in sorted(gallery.glob("*.jpg")):
-        for key in info["defaults_by_task"].values():
+        for key in (m["key"] for m in info["models"]):
             body = post(client, f.read_bytes(), f"?model={key}").json()
             top = max(body["probabilities"], key=lambda p: p["probability"])
             assert body["prediction"]["key"] == top["key"], (f.name, key)
             assert body["prediction"]["confidence"] == pytest.approx(top["probability"])
 
 
-def test_eight_class_default_returns_all_classes(client, test_photo):
+def test_classical_model_is_calibrated_and_gated(client, test_photo):
+    """The classical model: five calibrated probabilities, its own unusual-image ratio, and no Grad-CAM."""
     _, data = test_photo
-    key = client.get("/api/models").json()["defaults_by_task"]["8class"]
-    body = post(client, data, f"?model={key}").json()
-    assert [p["key"] for p in body["probabilities"]] == CLASS_KEYS
+    key = next(m["key"] for m in client.get("/api/models").json()["models"] if m["kind"] == "classical")
+    body = post(client, data, f"?model={key}&explain=true").json()
+    probs = [p["probability"] for p in body["probabilities"]]
+    assert [p["key"] for p in body["probabilities"]] == FIVE and abs(sum(probs) - 1) < 1e-6
+    assert body["ood"] is not None and body["ood"]["ratio"] > 0
+    assert body["explanation"]["overlay"] is None and "neural network" in body["explanation"]["note"]
+    noise = Image.fromarray(np.random.default_rng(1).integers(0, 255, (400, 300, 3), dtype=np.uint8))
+    assert post(client, image_bytes(noise), f"?model={key}").json()["ood"]["ratio"] > body["ood"]["ratio"]
 
 
 def test_api_matches_offline_pipeline(client, test_photo):
@@ -355,6 +357,6 @@ def test_lazy_registry_loads_on_first_use(test_photo):
     lazy = ModelRegistry(lazy=True)
     assert list(lazy.models) == [lazy.default_key]  # only the default is loaded up front
     rgb, _ = prepare_upload(data)
-    other = next(k for k in lazy.meta["defaults_by_task"].values() if k != lazy.default_key)
+    other = next(e["key"] for e in lazy.entries if e["key"] != lazy.default_key)
     out = lazy.predict(rgb, other)
     assert other in lazy.models and out["model"]["key"] == other

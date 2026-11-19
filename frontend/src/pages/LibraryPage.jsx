@@ -4,7 +4,7 @@ import { ArrowUpRight, BookOpenText, Search } from "lucide-react";
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
 import { Badge, Card, EmptyState, ErrorState, PageHeader, Segmented, Skeleton } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
-import { defaultModel } from "../lib/analytics.js";
+import { TASK, defaultModel } from "../lib/analytics.js";
 import { classMeta } from "../lib/classes.js";
 import { pct } from "../lib/format.js";
 
@@ -15,7 +15,12 @@ export default function LibraryPage() {
   const { library, libraryError, libraryLoading, analytics } = useData();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("All");
-  const d8 = defaultModel(analytics, "8class");
+  const model = defaultModel(analytics, TASK);
+  // Only the categories of the conditions in the library (the five diagnosed ones), so no filter can come up empty.
+  const categories = useMemo(() => {
+    const present = new Set((library?.classes || []).map((c) => classMeta(c.key).category));
+    return CATEGORIES.filter((c) => c === "All" || present.has(c));
+  }, [library]);
 
   const items = useMemo(() => {
     const list = library?.classes || [];
@@ -33,7 +38,7 @@ export default function LibraryPage() {
       <PageHeader
         eyebrow="Knowledge base"
         title="Disease library"
-        description="The eight leaf conditions in the dataset: how to recognise them, what causes them and how they are managed — with references to extension services and the model's own reliability for each class."
+        description="The five leaf conditions Tomato Care diagnoses: how to recognise them, what causes them and how they are managed — with references to extension services and the models' own reliability for each condition."
       />
       <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <label className="relative block w-full max-w-md">
@@ -48,17 +53,17 @@ export default function LibraryPage() {
           />
         </label>
         <div className="overflow-x-auto scrollbar-thin">
-          <Segmented size="sm" options={CATEGORIES.map((c) => ({ value: c, label: c }))} value={cat} onChange={setCat} label="Category" />
+          <Segmented size="sm" options={categories.map((c) => ({ value: c, label: c }))} value={cat} onChange={setCat} label="Category" />
         </div>
       </div>
 
       {libraryError && <ErrorState title="Library unavailable" error={libraryError} />}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {libraryLoading && !library && Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
+        {libraryLoading && !library && Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
         {items.map((c) => {
           const meta = classMeta(c.key);
           const Icon = meta.icon;
-          const perf = d8?.per_class?.find((p) => p.key === c.key);
+          const perf = model?.per_class?.find((p) => p.key === c.key);
           return (
             <Card key={c.key} as={Link} to={`/library/${c.key}`} interactive className="group flex flex-col overflow-hidden">
               <div className="relative aspect-[4/3] overflow-hidden bg-surface-3">

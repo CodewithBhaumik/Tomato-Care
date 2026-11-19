@@ -1,41 +1,6 @@
 {
   "classes": [
     {
-      "index": 0,
-      "key": "early_blight",
-      "folder": "Early_blight",
-      "name": "Early Blight",
-      "category": "Fungal disease",
-      "is_healthy": false,
-      "cause": "Fungus Alternaria solani",
-      "summary": "Early blight is a common fungal leaf disease of tomato that usually starts on older, lower leaves as brown spots with concentric rings. Heavy infection can yellow and strip foliage, exposing fruit to sunscald. Warm weather with rain, heavy dew or overhead irrigation favours infection.",
-      "symptoms": [
-        "Brown to black leaf spots, roughly 1 cm across, appearing first on older (lower) leaves",
-        "Spots are leathery and often show concentric rings (a 'target' pattern)",
-        "A yellow halo may surround the spots",
-        "Heavily infected leaves turn yellow and drop, which can expose fruit to sunscald",
-        "Similar dark spots can also form on stems and fruit"
-      ],
-      "visual_characteristics": [
-        "Rounded brown-to-black spots with concentric rings ('target spots') on the leaf blade",
-        "Yellow halo or yellowed tissue around the spots",
-        "Several spots scattered over otherwise green leaf tissue",
-        "Severely affected leaves appear largely yellow with multiple lesions"
-      ],
-      "management": [
-        "Rotate away from tomato, potato and other solanaceous crops for at least two years",
-        "Use resistant varieties and pathogen-free seed or transplants",
-        "Avoid overhead irrigation; water at the base of plants so leaves stay dry",
-        "Remove volunteer host plants and weeds, and keep plants vigorous through good soil fertility",
-        "If disease is severe, fungicide programmes may be needed; confirm product choice and timing with your local agricultural extension service (e.g., Krishi Vigyan Kendra in India)"
-      ],
-      "images": ["/samples/early_blight-1.jpg", "/samples/early_blight-2.jpg", "/samples/early_blight-3.jpg"],
-      "references": [
-        {"title": "Early Blight on Tomatoes", "publisher": "University of California Statewide IPM Program (UC IPM)", "url": "https://ipm.ucanr.edu/home-and-landscape/early-blight-on-tomatoes/"},
-        {"title": "Early Blight (Utah Vegetable Production Guide: Tomato, Pepper & Eggplant)", "publisher": "Utah State University Extension", "url": "https://extension.usu.edu/vegetableguide/tomato-pepper-eggplant/early-blight"}
-      ]
-    },
-    {
       "index": 1,
       "key": "healthy",
       "folder": "Healthy",
@@ -63,46 +28,22 @@
         "Stake or cage plants, space them for good air circulation, and remove lower leaves that touch the soil",
         "Rotate crops and include disease-resistant varieties"
       ],
-      "images": ["/samples/healthy-1.jpg", "/samples/healthy-2.jpg", "/samples/healthy-3.jpg"],
+      "images": [
+        "/samples/healthy-1.jpg",
+        "/samples/healthy-2.jpg",
+        "/samples/healthy-3.jpg"
+      ],
       "references": [
-        {"title": "Growing Tomatoes at Home", "publisher": "NC State Extension (N.C. Cooperative Extension)", "url": "https://extensiongardener.ces.ncsu.edu/2021/04/growing-tomatoes-at-home/"},
-        {"title": "Growing Tomatoes in the Home Garden", "publisher": "Iowa State University Extension and Outreach", "url": "https://yardandgarden.extension.iastate.edu/how-to/growing-tomatoes-home-garden"}
-      ]
-    },
-    {
-      "index": 2,
-      "key": "late_blight",
-      "folder": "Late_blight",
-      "name": "Late Blight",
-      "category": "Oomycete disease",
-      "is_healthy": false,
-      "cause": "Phytophthora infestans (an oomycete or 'water mould'; often grouped with fungi in extension guides)",
-      "summary": "Late blight is a destructive disease of tomato and potato that develops when humid conditions coincide with mild temperatures. Lesions expand rapidly, spores can be carried long distances, and outbreaks can cause field-wide losses.",
-      "symptoms": [
-        "Small water-soaked spots that rapidly enlarge into purple-brown, oily-looking blotches",
-        "Lesions start as greasy-grey blotches and eventually turn black",
-        "Greyish-white growth of the pathogen may appear on the lower leaf surface around lesions",
-        "Infection can spread to petioles and young stems",
-        "Infected fruit develops hard, brown, blotchy lesions that extend into the flesh"
-      ],
-      "visual_characteristics": [
-        "Large, irregular dark brown to black blotches rather than small round spots",
-        "Greasy or water-soaked appearance around lesion margins",
-        "Possible pale or whitish growth at lesion edges on the underside",
-        "Dead tissue that can cover much of the leaflet as infection advances"
-      ],
-      "management": [
-        "Grow resistant varieties where available and inspect transplants before planting",
-        "Remove and destroy infected plants promptly; do not leave cull piles or plant debris",
-        "Remove volunteer tomato and potato plants and nightshade weeds that can harbour the pathogen",
-        "Avoid overhead or sprinkler irrigation and excessive nitrogen",
-        "Rotate out of tomato and potato for two years",
-        "Protective fungicide programmes may be required when weather favours the disease; consult your local extension service (e.g., Krishi Vigyan Kendra) for recommendations"
-      ],
-      "images": ["/samples/late_blight-1.jpg", "/samples/late_blight-2.jpg", "/samples/late_blight-3.jpg"],
-      "references": [
-        {"title": "Late Blight - Tomato: Agriculture Pest Management Guidelines", "publisher": "University of California Statewide IPM Program (UC IPM)", "url": "https://ipm.ucanr.edu/agriculture/tomato/late-blight/"},
-        {"title": "Late Blight", "publisher": "Utah State University Extension (Plant Health / IPM)", "url": "https://extension.usu.edu/planthealth/ipm/notes_ag/veg-late-blight"}
+        {
+          "title": "Growing Tomatoes at Home",
+          "publisher": "NC State Extension (N.C. Cooperative Extension)",
+          "url": "https://extensiongardener.ces.ncsu.edu/2021/04/growing-tomatoes-at-home/"
+        },
+        {
+          "title": "Growing Tomatoes in the Home Garden",
+          "publisher": "Iowa State University Extension and Outreach",
+          "url": "https://yardandgarden.extension.iastate.edu/how-to/growing-tomatoes-home-garden"
+        }
       ]
     },
     {
@@ -134,11 +75,27 @@
         "Remove old plantings right after the final harvest",
         "Confirm the pest's identity with your local extension service (e.g., Krishi Vigyan Kendra) before treating, since other pests such as Tuta absoluta also mine tomato leaves"
       ],
-      "images": ["/samples/leaf_miner-1.jpg", "/samples/leaf_miner-2.jpg", "/samples/leaf_miner-3.jpg"],
+      "images": [
+        "/samples/leaf_miner-1.jpg",
+        "/samples/leaf_miner-2.jpg",
+        "/samples/leaf_miner-3.jpg"
+      ],
       "references": [
-        {"title": "Leafminers - Tomato: Agriculture Pest Management Guidelines", "publisher": "University of California Statewide IPM Program (UC IPM)", "url": "https://ipm.ucanr.edu/agriculture/tomato/leafminers/"},
-        {"title": "Vegetable Leafminers", "publisher": "University of California Statewide IPM Program (UC IPM)", "url": "https://ipm.ucanr.edu/home-and-landscape/vegetable-leafminers"},
-        {"title": "Tuta absoluta (Tomato Leafminer) - Fact Sheet", "publisher": "Canadian Food Inspection Agency", "url": "https://inspection.canada.ca/en/plant-health/invasive-species/insects/tomato-leafminer/fact-sheet"}
+        {
+          "title": "Leafminers - Tomato: Agriculture Pest Management Guidelines",
+          "publisher": "University of California Statewide IPM Program (UC IPM)",
+          "url": "https://ipm.ucanr.edu/agriculture/tomato/leafminers/"
+        },
+        {
+          "title": "Vegetable Leafminers",
+          "publisher": "University of California Statewide IPM Program (UC IPM)",
+          "url": "https://ipm.ucanr.edu/home-and-landscape/vegetable-leafminers"
+        },
+        {
+          "title": "Tuta absoluta (Tomato Leafminer) - Fact Sheet",
+          "publisher": "Canadian Food Inspection Agency",
+          "url": "https://inspection.canada.ca/en/plant-health/invasive-species/insects/tomato-leafminer/fact-sheet"
+        }
       ]
     },
     {
@@ -169,11 +126,27 @@
         "Where a deficiency is confirmed, apply a magnesium source (e.g., magnesium sulfate) as advised by your local extension service (e.g., Krishi Vigyan Kendra)",
         "Similar yellowing can have other causes, so confirm the diagnosis before treating"
       ],
-      "images": ["/samples/magnesium_deficiency-1.jpg", "/samples/magnesium_deficiency-2.jpg", "/samples/magnesium_deficiency-3.jpg"],
+      "images": [
+        "/samples/magnesium_deficiency-1.jpg",
+        "/samples/magnesium_deficiency-2.jpg",
+        "/samples/magnesium_deficiency-3.jpg"
+      ],
       "references": [
-        {"title": "Interveinal Chlorosis (Scouting Guides for Problems of Vegetables)", "publisher": "University of Kentucky, Martin-Gatton College of Agriculture, Food and Environment", "url": "https://veggiescout.mgcafe.uky.edu/interveinal-chlorosis"},
-        {"title": "Nutrient Disorders (Vegetable MD Online)", "publisher": "Cornell University (Cornell Vegetables)", "url": "https://www.vegetables.cornell.edu/?p=2568"},
-        {"title": "Nutritional Deficiencies in Vegetables (Bulletin 1569)", "publisher": "University of Georgia Cooperative Extension", "url": "https://fieldreport.caes.uga.edu/publications/B1569/"}
+        {
+          "title": "Interveinal Chlorosis (Scouting Guides for Problems of Vegetables)",
+          "publisher": "University of Kentucky, Martin-Gatton College of Agriculture, Food and Environment",
+          "url": "https://veggiescout.mgcafe.uky.edu/interveinal-chlorosis"
+        },
+        {
+          "title": "Nutrient Disorders (Vegetable MD Online)",
+          "publisher": "Cornell University (Cornell Vegetables)",
+          "url": "https://www.vegetables.cornell.edu/?p=2568"
+        },
+        {
+          "title": "Nutritional Deficiencies in Vegetables (Bulletin 1569)",
+          "publisher": "University of Georgia Cooperative Extension",
+          "url": "https://fieldreport.caes.uga.edu/publications/B1569/"
+        }
       ]
     },
     {
@@ -203,45 +176,27 @@
         "Quick corrective measures such as foliar nitrogen sprays exist; follow your local extension service (e.g., Krishi Vigyan Kendra) for products and rates",
         "Several disorders cause yellowing, so confirm the diagnosis before treating"
       ],
-      "images": ["/samples/nitrogen_deficiency-1.jpg", "/samples/nitrogen_deficiency-2.jpg", "/samples/nitrogen_deficiency-3.jpg"],
+      "images": [
+        "/samples/nitrogen_deficiency-1.jpg",
+        "/samples/nitrogen_deficiency-2.jpg",
+        "/samples/nitrogen_deficiency-3.jpg"
+      ],
       "references": [
-        {"title": "Nutritional Deficiencies in Vegetables (Bulletin 1569)", "publisher": "University of Georgia Cooperative Extension", "url": "https://fieldreport.caes.uga.edu/publications/B1569/"},
-        {"title": "Nutrient Disorders (Vegetable MD Online)", "publisher": "Cornell University (Cornell Vegetables)", "url": "https://www.vegetables.cornell.edu/?p=2568"},
-        {"title": "Deficiencies and Disorders - Tomato: Nitrogen", "publisher": "TNAU Agritech Portal, Tamil Nadu Agricultural University", "url": "https://agritech.tnau.ac.in/horticulture/plant_nutri/tomato_nitro.html"}
-      ]
-    },
-    {
-      "index": 6,
-      "key": "potassium_deficiency",
-      "folder": "Pottassium Deficiency",
-      "name": "Potassium Deficiency",
-      "category": "Nutrient deficiency",
-      "is_healthy": false,
-      "cause": "Insufficient potassium available to the plant",
-      "summary": "Potassium deficiency shows first on older, mature leaves as yellowing and browning (scorch) of the leaf margins that spreads inward. Low potassium is also linked to fruit ripening disorders such as yellow shoulder and blotchy ripening.",
-      "symptoms": [
-        "Brown, scorched outer margins on older, mature leaves",
-        "Yellow spots or chlorosis along leaf edges that spread and turn brown",
-        "Leaf tips and edges may scorch and curl",
-        "Slow, stunted growth with small leaves",
-        "Fruit may ripen unevenly (yellow shoulder, blotchy ripening)"
-      ],
-      "visual_characteristics": [
-        "Yellow to brown, dry-looking leaf margins (marginal scorch)",
-        "Discolouration progressing from the edge inward between the veins",
-        "Curled or crinkled leaf edges"
-      ],
-      "management": [
-        "Test soil before planting and supply potassium according to the soil test",
-        "Confirm a suspected deficiency with leaf tissue analysis where possible",
-        "Corrective foliar or soil potassium applications should follow your local extension service (e.g., Krishi Vigyan Kendra)",
-        "Keep nutrients balanced: very high potassium can reduce magnesium uptake",
-        "Other stresses can cause similar leaf-edge browning, so confirm the diagnosis before treating"
-      ],
-      "images": ["/samples/potassium_deficiency-1.jpg", "/samples/potassium_deficiency-2.jpg", "/samples/potassium_deficiency-3.jpg"],
-      "references": [
-        {"title": "Nutritional Deficiencies in Vegetables (Bulletin 1569)", "publisher": "University of Georgia Cooperative Extension", "url": "https://fieldreport.caes.uga.edu/publications/B1569/"},
-        {"title": "Deficiencies and Disorders - Tomato: Potassium", "publisher": "TNAU Agritech Portal, Tamil Nadu Agricultural University", "url": "https://agritech.tnau.ac.in/horticulture/plant_nutri/tomato_potassium.html"}
+        {
+          "title": "Nutritional Deficiencies in Vegetables (Bulletin 1569)",
+          "publisher": "University of Georgia Cooperative Extension",
+          "url": "https://fieldreport.caes.uga.edu/publications/B1569/"
+        },
+        {
+          "title": "Nutrient Disorders (Vegetable MD Online)",
+          "publisher": "Cornell University (Cornell Vegetables)",
+          "url": "https://www.vegetables.cornell.edu/?p=2568"
+        },
+        {
+          "title": "Deficiencies and Disorders - Tomato: Nitrogen",
+          "publisher": "TNAU Agritech Portal, Tamil Nadu Agricultural University",
+          "url": "https://agritech.tnau.ac.in/horticulture/plant_nutri/tomato_nitro.html"
+        }
       ]
     },
     {
@@ -274,10 +229,22 @@
         "Avoid planting near infected crops, and destroy old plants and volunteers after harvest",
         "Infected plants cannot be cured, so focus on prevention and seek thrips-management advice from your local extension service (e.g., Krishi Vigyan Kendra)"
       ],
-      "images": ["/samples/spotted_wilt_virus-1.jpg", "/samples/spotted_wilt_virus-2.jpg", "/samples/spotted_wilt_virus-3.jpg"],
+      "images": [
+        "/samples/spotted_wilt_virus-1.jpg",
+        "/samples/spotted_wilt_virus-2.jpg",
+        "/samples/spotted_wilt_virus-3.jpg"
+      ],
       "references": [
-        {"title": "Tomato Spotted Wilt - Tomato: Agriculture Pest Management Guidelines", "publisher": "University of California Statewide IPM Program (UC IPM)", "url": "https://ipm.ucanr.edu/agriculture/tomato/tomato-spotted-wilt/"},
-        {"title": "Current Status and Potential of RNA Interference for the Management of Tomato Spotted Wilt Virus and Thrips Vectors (Pathogens, 10(3), 320)", "publisher": "Nilon, A., Robinson, K., Pappu, H.R. & Mitter, N. (2021), MDPI", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8001667"}
+        {
+          "title": "Tomato Spotted Wilt - Tomato: Agriculture Pest Management Guidelines",
+          "publisher": "University of California Statewide IPM Program (UC IPM)",
+          "url": "https://ipm.ucanr.edu/agriculture/tomato/tomato-spotted-wilt/"
+        },
+        {
+          "title": "Current Status and Potential of RNA Interference for the Management of Tomato Spotted Wilt Virus and Thrips Vectors (Pathogens, 10(3), 320)",
+          "publisher": "Nilon, A., Robinson, K., Pappu, H.R. & Mitter, N. (2021), MDPI",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8001667"
+        }
       ]
     }
   ],

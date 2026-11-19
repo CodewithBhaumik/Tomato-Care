@@ -58,15 +58,20 @@ def refusal_reason(status: str, confidence: float, threshold: float, ood_ratio, 
                              f"(distance {ood_ratio:.2f}x the limit)."}
     else:
         reason = {"code": "low_confidence",
-                  "message": f"The model is only {confidence:.0%} sure; this mode answers at {threshold:.0%} or more."}
+                  "message": f"The model is only {confidence:.0%} sure; it answers at {threshold:.0%} or more."}
     hints = [issue["tip"] for issue in quality["issues"]]
     missing = [CLASSES[CLASS_KEYS.index(k)]["name"] for k in CLASS_KEYS if k not in class_keys]
     if missing:
-        hints.append(f"This mode does not cover {', '.join(missing[:-1])} or {missing[-1]}. If the leaf may have one "
-                     "of these, try the Full mode.")
+        hints.append(f"Tomato Care diagnoses {len(class_keys)} conditions; it does not cover {', '.join(missing[:-1])} or "
+                     f"{missing[-1]}. If the leaf may have one of these, ask an agronomist.")
     if not quality["issues"]:
         hints.append("Try another photo: one leaf filling the frame, on plain light paper, in daylight.")
     return {**reason, "hints": hints}
+
+
+def _feature_words(feature_set: str) -> str:
+    """'Color + Texture' -> 'colour + texture' (display wording of a classical model's feature set)."""
+    return feature_set.replace("Color", "colour").replace("Texture", "texture")
 
 
 def lowmem_enabled() -> bool:
@@ -336,21 +341,40 @@ class EnsemblePredictor(Predictor):
 
 
 class SklearnPredictor(Predictor):
-    score_type = "predict_proba"
-    calibration = None
+    """Classical model on handcrafted features. The served classical model (scripts/43) takes the full
+    HOG | colour | texture row and adds its validated calibration (temperature in the entry, vector scaling in
+    `adjust`) and an unusual-image gate (feature distance to its training photos in the colour + texture space)."""
 
     def __init__(self, entry: dict):
         super().__init__(entry)
         bundle = joblib.load(MODELS_DIR / entry["path"])
-        self.pipeline = bundle["pipeline"]
+        self.estimator = bundle["pipeline"]
         self.class_keys = list(bundle.get("class_keys") or CLASS_KEYS)
-        if "clf__n_jobs" in self.pipeline.get_params():
-            self.pipeline.set_params(clf__n_jobs=1)
+        self.full_row = bundle.get("input") == "hog|color|texture"
+        self.gate = bundle.get("gate")
+        self.temperature = float(entry.get("temperature") or 1.0)
+        if "clf__n_jobs" in self.estimator.get_params():
+            self.estimator.set_params(clf__n_jobs=1)
+        self.score_type = "calibrated_probability" if self.full_row else "predict_proba"
         self.input = f"256x256 RGB -> handcrafted features ({self.feature_set})"
+        self.runtime = "scikit-learn"
 
     def analyse(self, rgb: np.ndarray):
-        x = feature_vector(extract_features(rgb), self.feature_set)[None, :]
-        return self.pipeline.predict_proba(x)[0], None
+        feats = extract_features(rgb)
+        if not self.full_row:  # earlier classical models (benchmark only): raw probabilities, no gate
+            return self.estimator.predict_proba(feature_vector(feats, self.feature_set)[None, :])[0], None
+        row = np.concatenate([feats["hog"], feats["color"], feats["texture"]])[None, :]
+        logits = np.log(np.clip(self.estimator.predict_proba(row)[0], 1e-6, 1.0))
+        gate = self.gate
+        distance = getattr(gate["density"], gate["score"])(gate["scaler"].transform(row[:, gate["columns"]]))[0]
+        return self.calibrate(_softmax(logits, self.temperature)), float(distance / gate["threshold"])
+
+    @property
+    def calibration(self):
+        if not self.full_row:
+            return None
+        kind = "per-class vector scaling" if (self.adjust or {}).get("calibration") else "temperature scaling"
+        return {"method": kind, "temperature": self.temperature, "pipeline": self.pipeline}
 
 
 class ModelRegistry:
@@ -425,7 +449,7 @@ class ModelRegistry:
             else:
                 explanation = {"method": None, "overlay": None, "heatmap": None,
                                "note": "Grad-CAM needs a neural network; this classical model uses handcrafted "
-                                       "colour/HOG features."}
+                                       f"{_feature_words(predictor.feature_set)} features."}
         confidence = float(probs[top])
         threshold = self.threshold_for(predictor)
         unusual = ood_ratio is not None and ood_ratio > 1.0

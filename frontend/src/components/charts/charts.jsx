@@ -4,6 +4,7 @@ import {
   CartesianGrid,
   Cell,
   ComposedChart,
+  LabelList,
   Legend,
   Line,
   LineChart,
@@ -24,7 +25,7 @@ import { SERIES, tooltipStyle, useChartTheme } from "./theme.js";
 const axisProps = (t) => ({ stroke: t.axis, tick: { fill: t.axis, fontSize: 11 }, tickLine: false, axisLine: { stroke: t.grid } });
 const pctTick = (v) => `${Math.round(v * 100)}%`;
 
-/* Reliability diagram: accuracy vs confidence per bin, before and after temperature scaling. */
+/* Reliability diagram: accuracy vs confidence per bin, before and after calibration (temperature or vector scaling). */
 export function ReliabilityDiagram({ before, after, height = 260 }) {
   const t = useChartTheme();
   const bins = Array.from({ length: 10 }, (_, i) => {
@@ -43,8 +44,8 @@ export function ReliabilityDiagram({ before, after, height = 260 }) {
         <Tooltip {...tooltipStyle(t)} formatter={(v, n) => [v == null ? "—" : pct(v), n]} labelFormatter={(v) => `confidence ${pct(v - 0.05, 0)}–${pct(v + 0.05, 0)}`} />
         <Legend wrapperStyle={{ fontSize: 12, color: t.axis }} />
         <ReferenceLine segment={[{ x: 0, y: 0 }, { x: 1, y: 1 }]} stroke={t.axis} strokeDasharray="4 4" ifOverflow="extendDomain" />
-        {before && <Bar dataKey="before" name="before scaling" fill={t.warn} fillOpacity={0.35} barSize={14} />}
-        <Bar dataKey="after" name="after temperature scaling" fill={t.accent} barSize={14} radius={[3, 3, 0, 0]} />
+        {before && <Bar dataKey="before" name="before calibration" fill={t.warn} fillOpacity={0.35} barSize={14} />}
+        <Bar dataKey="after" name="after calibration" fill={t.accent} barSize={14} radius={[3, 3, 0, 0]} />
       </ComposedChart>
     </ResponsiveContainer>
   );

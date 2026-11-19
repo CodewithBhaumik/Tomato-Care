@@ -316,3 +316,18 @@ Full numbers, generated from the result files: `docs/FINAL_REPORT.md`.
   (data-limited).
 - **Gallery:** demo examples, i.e. the held-out photo per condition with the clearest result (disclosed on the page).
   They show no wrong answer in either mode; Early Blight in the full mode shows "not sure".
+
+## 10. Scope change: five conditions, two models (user request, 2026-11-19)
+
+- **Request:** keep only the five-condition model, remove the eight-condition model and the examples of the removed
+  conditions, add a five-condition model that uses classical ML only, and delete unnecessary code.
+- **Removed from the apps:**
+  - the Full · 8 conditions mode and its model (no longer served or downloaded);
+  - the gallery, library and Grad-CAM images of Early Blight, Late Blight and Potassium Deficiency;
+  - their disease-library entries.
+
+  The eight-condition results stay in `experiments/` and in §1–9 as the reason for the scope.
+- **Added:** the classical model (`scripts/43`, out-of-fold choice; `scripts/44`, test scored once). It uses the
+  network's rules (calibration, threshold, gate), so the comparison is fair.
+- **Result:** Gradient boosting on colour + texture features. Test accuracy 78.1% vs 90.9% for
+  the network; -12.8 accuracy points (95% CI -18.9 to -7.2), macro-F1 -0.204 (-0.318 to -0.095) (classical − deep learning).

@@ -5,13 +5,25 @@ import { InfoTip, Segmented } from "../ui/primitives.jsx";
 
 /**
  * Grad-CAM viewer. `input` is the 256x256 image the model actually received; `heatmap` is an RGBA PNG whose alpha
- * encodes the Grad-CAM strength, so it can be blended live with an opacity slider.
+ * encodes the Grad-CAM strength, so it can be blended live with an opacity slider. Without a heat map or overlay (the
+ * classical ML model has no network to explain) it shows the model input with the server's note instead.
  */
 export default function GradCamViewer({ input, heatmap, overlay, note, className = "" }) {
   const [mode, setMode] = useState("overlay");
   const [opacity, setOpacity] = useState(0.7);
-  if (!input && !overlay) return null;
   const canBlend = Boolean(input && heatmap);
+  if (!canBlend && !overlay) {
+    if (!input && !note) return null;
+    return (
+      <div className={className}>
+        <p className="mb-3 text-sm font-semibold text-ink">Grad-CAM</p>
+        <div className="flex items-start gap-3 rounded-xl bg-surface-2 p-3">
+          {input && <img src={input} alt="Model input after preprocessing" className="size-20 shrink-0 rounded-lg border border-line object-cover" />}
+          <p className="text-sm leading-relaxed text-muted">{note || "No heat map is available for this model."}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={className}>

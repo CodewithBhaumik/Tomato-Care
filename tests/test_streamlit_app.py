@@ -36,7 +36,7 @@ def _offline(monkeypatch):
     monkeypatch.setenv("TOMATO_DOWNLOAD_WEIGHTS", "0")
 
 
-@pytest.mark.parametrize("view, metric", [("home", "Focused · accuracy"), ("lab", "Served model · accuracy"),
+@pytest.mark.parametrize("view, metric", [("home", "Deep learning · accuracy"), ("lab", "Served model · accuracy"),
                                           ("library", None), ("method", "Non-leaf images flagged"),
                                           ("diagnose", None)])
 def test_page_renders_without_exception(view, metric):
@@ -50,7 +50,7 @@ def test_numbers_on_the_home_page_come_from_the_benchmark():
     platform = json.loads((ROOT / "experiments" / "platform.json").read_text(encoding="utf-8"))
     new5 = next(m for m in platform["models"] if m["key"] == platform["tasks"]["5class"]["default_model"])
     at = AppTest.from_function(_run_view, kwargs={"view": "home"}, default_timeout=120).run()
-    shown = next(m for m in at.metric if m.label == "Focused · accuracy").value
+    shown = next(m for m in at.metric if m.label == "Deep learning · accuracy").value
     assert shown == f"{100 * new5['test']['accuracy']:.1f}%"
 
 
@@ -73,14 +73,18 @@ def test_example_photo_is_diagnosed_end_to_end():
 
 
 @pytest.mark.skipif(not _weights_present(), reason="model weights not downloaded")
-def test_refusal_says_why_and_lists_candidates():
-    example = str(ROOT / "frontend" / "public" / "test-samples" / "potassium_deficiency.jpg")  # outside the focused 5
-    at = AppTest.from_function(_run_view, kwargs={"view": "diagnose", "example": example}, default_timeout=300)
+def test_refusal_says_why_and_lists_candidates(tmp_path):
+    import numpy as np
+    from PIL import Image
+
+    example = tmp_path / "noise.jpg"  # nothing like a leaf on paper: refused as an unusual image
+    Image.fromarray(np.random.default_rng(0).integers(0, 255, (400, 300, 3), dtype=np.uint8)).save(example)
+    at = AppTest.from_function(_run_view, kwargs={"view": "diagnose", "example": str(example)}, default_timeout=300)
     at.run()
     at.segmented_control(key="src_mode").set_value("Examples").run()
     assert not at.exception, at.exception[0].value if at.exception else ""
     why = [w.value for w in at.warning if "Why no diagnosis" in w.value]
-    assert why and "Most likely:" in why[0] and "Full mode" in why[0]
+    assert why and "Most likely:" in why[0] and "does not cover" in why[0]
 
 
 def test_cached_deployment_follows_file_updates(tmp_path, monkeypatch):

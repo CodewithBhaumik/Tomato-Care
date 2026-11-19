@@ -1,13 +1,60 @@
 import { useEffect, useMemo, useState } from "react";
-import { Activity, BarChart3, Grid3x3, LineChart as LineIcon, ScanEye, ShieldCheck, Target } from "lucide-react";
+import { Activity, BarChart3, Grid3x3, Layers3, LineChart as LineIcon, ScanEye, ShieldCheck, Target } from "lucide-react";
 import { ReliabilityDiagram, RiskCoverage, TrainingCurves } from "../components/charts/charts.jsx";
 import ConfusionMatrix from "../components/charts/ConfusionMatrix.jsx";
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
-import { Callout, Card, CardHeader, ErrorState, PageHeader, Segmented, Skeleton, Stat } from "../components/ui/primitives.jsx";
+import { Badge, Callout, Card, CardHeader, ErrorState, Meter, PageHeader, Segmented, Skeleton, Stat } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
-import { defaultModel, modelByKey, modelsFor, recipesFor, taskClasses, taskInfo } from "../lib/analytics.js";
+import { TASK, classicalModel, defaultModel, isClassicalModel, modelByKey, modelsFor, recipesFor, taskClasses, taskInfo } from "../lib/analytics.js";
 import { classMeta } from "../lib/classes.js";
 import { ci, cx, num, pct } from "../lib/format.js";
+
+/** "vector scaling", "temperature scaling, T = 1.20", … — temperature is shown only when it is the method used. */
+function calibrationHint(c) {
+  if (!c) return "probabilities from the classifier";
+  const t = c.temperature != null ? `T = ${num(c.temperature, 2)}` : null;
+  if (c.method) return c.method.startsWith("temperature") && t ? `${c.method}, ${t}` : c.method;
+  return t ? `temperature ${t}` : "probabilities from the classifier";
+}
+
+/** Readable name of a handcrafted feature (tomatoleaf.features naming: hue_3, lab_a_mean, lbp8r1_4, glcm_contrast_d2). */
+function describeFeature(name) {
+  let m = /^(hue|sat|val)_(\d+)$/.exec(name);
+  if (m) return { group: "Colour", text: `${{ hue: "Hue", sat: "Saturation", val: "Brightness" }[m[1]]} histogram · bin ${m[2]}` };
+  m = /^lab_([Lab])_(mean|std|skew)$/.exec(name);
+  if (m) return { group: "Colour", text: `L*a*b* ${m[1]}* · ${{ mean: "mean", std: "spread", skew: "skewness" }[m[2]]}` };
+  m = /^lbp(\d+)r(\d+)_(\d+)$/.exec(name);
+  if (m) return { group: "Texture", text: `LBP (${m[1]} points, radius ${m[2]}) · code ${m[3]}` };
+  m = /^glcm_([a-z]+)_d(\d+)$/.exec(name);
+  if (m) return { group: "Texture", text: `GLCM ${m[1]} · distance ${m[2]}` };
+  return { group: null, text: name };
+}
+
+function FeatureImportance({ items }) {
+  const top = items.slice(0, 15);
+  const max = Math.max(...top.map((f) => f.importance || 0), 1e-9);
+  return (
+    <ul className="space-y-2.5 p-5">
+      {top.map((f) => {
+        const d = describeFeature(f.feature);
+        return (
+          <li key={f.feature} className="flex items-center gap-3 text-xs">
+            <span className="w-40 shrink-0 truncate text-ink-2 sm:w-64" title={f.feature}>
+              {d.text}
+            </span>
+            {d.group && (
+              <Badge tone={d.group === "Colour" ? "sun" : "sky"} className="hidden sm:inline-flex">
+                {d.group}
+              </Badge>
+            )}
+            <Meter value={(f.importance || 0) / max} color="#d6760b" className="flex-1" label={`${d.text} importance`} />
+            <span className="w-12 text-right font-mono tabular text-ink-2">{pct(f.importance, 1)}</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 function PerClassTable({ model }) {
   return (
@@ -56,21 +103,29 @@ function PerClassTable({ model }) {
 export default function PerformancePage() {
   useDocumentTitle("Performance");
   const { analytics, analyticsLoading, analyticsError, reloadAnalytics } = useData();
-  const [task, setTask] = useState("5class");
+  const task = TASK;
   const [key, setKey] = useState(null);
 
   useEffect(() => {
     if (analytics) setKey(defaultModel(analytics, task)?.key || modelsFor(analytics, task)[0]?.key);
   }, [analytics, task]);
 
+  const info = taskInfo(analytics, task);
+  const def = defaultModel(analytics, task);
+  const cm = classicalModel(analytics, task);
+  const servedOptions = [def && { value: def.key, label: "Deep learning" }, cm && { value: cm.key, label: "Classical ML" }].filter(Boolean);
   const model = modelByKey(analytics, key);
+  const classical = isClassicalModel(model);
   const classes = taskClasses(analytics, task);
   const selective = analytics?.selective?.[task];
   const recipes = recipesFor(analytics, task);
+  // Training curves belong to networks; a classical model has none (it shows its feature importance instead).
   const curvesRecipe = useMemo(() => {
-    const keyRecipe = model?.recipe;
+    if (!model || classical) return null;
+    const keyRecipe = model.recipe;
     return recipes.find((r) => r.recipe === keyRecipe) || recipes.find((r) => r.curves?.length) || null;
-  }, [recipes, model]);
+  }, [recipes, model, classical]);
+  const importance = model?.feature_importance || (model && model.key === cm?.key ? analytics?.classical?.feature_importance : null);
   const lowSupport = model?.per_class?.filter((c) => c.support < 10) || [];
 
   if (analyticsError && !analytics) return <ErrorState title="Could not load results" error={analyticsError} onRetry={reloadAnalytics} />;
@@ -80,8 +135,8 @@ export default function PerformancePage() {
       <PageHeader
         eyebrow="Interactive results"
         title="Performance"
-        description="A deep dive into one model at a time: confusion matrix, per-class precision and recall, calibration of its confidence, the accuracy–coverage trade-off and how it trained."
-        actions={<Segmented options={[{ value: "5class", label: "5 classes" }, { value: "8class", label: "8 classes" }]} value={task} onChange={setTask} label="Task" />}
+        description="A deep dive into one model at a time: confusion matrix, per-class precision and recall, calibration of its confidence, the accuracy–coverage trade-off, and how it trained (networks) or which features it relies on (classical ML)."
+        actions={servedOptions.length > 1 && <Segmented options={servedOptions} value={key} onChange={setKey} label="Served model" />}
       />
       {analyticsLoading && !analytics && <Skeleton className="h-96 rounded-2xl" />}
       {analytics && (
@@ -98,7 +153,8 @@ export default function PerformancePage() {
             >
               {modelsFor(analytics, task).map((m) => (
                 <option key={m.key} value={m.key}>
-                  {m.name} {m.key === taskInfo(analytics, task)?.default_model ? "(default)" : ""} — {m.generation === "upgrade" ? "upgrade" : "original"}
+                  {m.name}
+                  {m.key === info?.default_model ? " (default)" : info?.served_models?.includes(m.key) ? " (served)" : ""} — {isClassicalModel(m) ? "classical ML" : "deep learning"} · {m.generation === "upgrade" ? "upgrade" : "original"}
                 </option>
               ))}
             </select>
@@ -109,7 +165,7 @@ export default function PerformancePage() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Stat icon={Target} label="Test accuracy" value={pct(model.test.accuracy)} hint={`95% CI ${ci(model.test.accuracy_ci)}`} />
                 <Stat icon={BarChart3} tone="violet" label="Macro-F1" value={pct(model.test.f1_macro)} hint={`95% CI ${ci(model.test.f1_macro_ci)}`} />
-                <Stat icon={Activity} tone="sky" label="Calibration error (ECE)" value={num(model.test.ece, 3)} hint={model.calibration ? `temperature T = ${num(model.calibration.temperature, 2)}` : "probabilities from the classifier"} />
+                <Stat icon={Activity} tone="sky" label="Calibration error (ECE)" value={num(model.test.ece, 3)} hint={calibrationHint(model.calibration)} />
                 <Stat
                   icon={ShieldCheck}
                   tone="sun"
@@ -156,7 +212,8 @@ export default function PerformancePage() {
                     )}
                     {model.calibration && (
                       <p className="mt-2 text-center text-xs text-muted">
-                        ECE {num(model.calibration.ece_before, 3)} before → {num(model.calibration.ece_after, 3)} after temperature scaling (fitted on {model.calibration.fitted_on || "held-out training data"}).
+                        ECE {model.calibration.ece_before != null && `${num(model.calibration.ece_before, 3)} before → `}
+                        {num(model.calibration.ece_after, 3)} after {model.calibration.method || "temperature scaling"} (fitted on {model.calibration.fitted_on || "held-out training data"}).
                       </p>
                     )}
                   </div>
@@ -172,11 +229,26 @@ export default function PerformancePage() {
                         </p>
                       </>
                     ) : (
-                      <p className="p-6 text-center text-sm text-muted">The risk–coverage curve is computed for the default model of each task.</p>
+                      <p className="p-6 text-center text-sm text-muted">
+                        The risk–coverage curve is computed for the default model only.
+                        {model.selective?.threshold != null &&
+                          ` This model's operating point: threshold ${pct(model.selective.threshold, 0)}, answers ${pct(model.selective.test?.coverage ?? model.selective.coverage, 0)} of the test photos with ${pct(model.selective.test?.accuracy_kept ?? model.selective.accuracy_kept)} accuracy.`}
+                      </p>
                     )}
                   </div>
                 </Card>
               </div>
+
+              {classical && importance?.length > 0 && (
+                <Card>
+                  <CardHeader
+                    icon={Layers3}
+                    title="What the classical model relies on"
+                    subtitle="Top handcrafted features by the classifier's built-in importance (share of the total). Colour: HSV histograms and L*a*b* statistics over leaf pixels; texture: LBP and GLCM."
+                  />
+                  <FeatureImportance items={importance} />
+                </Card>
+              )}
 
               {curvesRecipe?.curves?.length > 0 && (
                 <Card>

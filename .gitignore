@@ -83,3 +83,6 @@ experiments/results/final_benchmark_dryrun.json
 
 # Out-of-dataset evaluation photos (PlantVillage, Lorem Picsum): downloaded by scripts/37, not redistributed
 data/external_ood/
+
+# classical-model feature cache (scripts/43), rebuilt from the dataset
+data/features_classical.npz

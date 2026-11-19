@@ -4,6 +4,7 @@ import GradCamViewer from "../components/diagnose/GradCamViewer.jsx";
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
 import { Badge, ButtonLink, Callout, Card, CardHeader, EmptyState, PageHeader, Segmented, Skeleton } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
+import { TASK, modelByKey, taskClasses } from "../lib/analytics.js";
 import { classMeta } from "../lib/classes.js";
 import { cx, pct } from "../lib/format.js";
 
@@ -17,7 +18,20 @@ const STEPS = [
 export default function ExplainabilityPage() {
   useDocumentTitle("Explainability");
   const { analytics, analyticsLoading } = useData();
-  const gallery = analytics?.gradcam;
+  // Only the five diagnosed conditions and five-condition networks (an older results file may hold more).
+  const gallery = useMemo(() => {
+    const g = analytics?.gradcam;
+    if (!g) return g;
+    const keys = taskClasses(analytics, TASK);
+    const inTask = (key) => {
+      const m = modelByKey(analytics, key);
+      return !m || m.task === TASK;
+    };
+    const items = (g.items || [])
+      .filter((it) => !keys.length || keys.includes(it.true_key))
+      .map((it) => ({ ...it, overlays: (it.overlays || []).filter((o) => inTask(o.model)) }));
+    return { ...g, items };
+  }, [analytics]);
   const modelsInGallery = useMemo(() => {
     const seen = new Map();
     gallery?.items?.forEach((it) => it.overlays.forEach((o) => seen.set(o.model, o.model_name)));
@@ -41,7 +55,7 @@ export default function ExplainabilityPage() {
       <PageHeader
         eyebrow="Explainable AI"
         title="Explainability"
-        description="Grad-CAM shows which parts of the photo pushed the network towards its answer. It is a sanity check — does the model look at the leaf and its lesions, or at the paper and shadows? — not proof of why a leaf is diseased."
+        description="Grad-CAM shows which parts of the photo pushed the network towards its answer. It is a sanity check — does the model look at the leaf and its lesions, or at the paper and shadows? — not proof of why a leaf is diseased. It needs a neural network, so it is shown for the deep-learning model; the classical ML model has none."
         actions={<ButtonLink to="/diagnose" icon={ScanSearch}>Explain your own photo</ButtonLink>}
       />
 
@@ -59,7 +73,7 @@ export default function ExplainabilityPage() {
         <CardHeader
           icon={Eye}
           title="Held-out test photos"
-          subtitle={gallery ? `${gallery.items.length} photos, one per class, never used for training or model choice` : "Precomputed for the deployed models"}
+          subtitle={gallery ? `${gallery.items.length} photos, one per condition, never used for training or model choice` : "Precomputed for the deep-learning model"}
           action={modelsInGallery.length > 1 && <Segmented size="sm" options={modelsInGallery} value={model} onChange={setModel} label="Model" />}
         />
         {analyticsLoading && !analytics && <div className="p-5"><Skeleton className="h-80" /></div>}

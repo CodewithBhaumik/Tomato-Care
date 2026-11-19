@@ -4,17 +4,18 @@ Format after Mitchell et al., *Model Cards for Model Reporting* (2019). Numbers:
 
 ## Model details
 
-* **What**: image classifiers for single tomato leaves photographed on plain paper. Two served models, one per
-  mode, from the final round (`docs/FINAL_REPORT.md`, `scripts/36_final_pipeline.py`):
-  * **Focused** (`focused_5class`, default): Healthy, Leaf Miner, Magnesium Deficiency, Nitrogen Deficiency, Spotted
-    Wilt Virus. Class-weighted loss plus outlier exposure: trained to be unsure on Early Blight, Late Blight and
-    Potassium photos. Threshold 0.81.
-  * **Full** (`full_8class`): all eight conditions. Class-balanced sampling. Threshold 0.76.
-  * Both: per-class vector-scaling calibration and a per-condition "unusual image" limit, all fitted on cross-fitted
-    out-of-fold predictions; the answer is the most probable condition.
-* **Architecture**: 5-fold ensembles of ConvNeXt-Tiny (ImageNet-1k pretrained) fine-tuned at 256×256, one view per
-  network (members and thresholds: `experiments/deployment.json`). Probabilities are averaged over the 5 networks,
-  then calibrated.
+* **What**: image classifiers for single tomato leaves photographed on plain paper, five conditions (Healthy,
+  Leaf Miner, Magnesium Deficiency, Nitrogen Deficiency, Spotted Wilt Virus). Two served models, chosen with the same
+  rules (`docs/FINAL_REPORT.md`):
+  * **Deep learning** (`focused_5class`, default): 5-fold ensemble of ConvNeXt-Tiny (ImageNet-1k pretrained)
+    fine-tuned at 256×256, class-weighted loss plus outlier exposure (trained to be unsure on Early Blight, Late Blight
+    and Potassium photos). Probabilities averaged over the 5 networks, then calibrated. Threshold
+    0.81. `scripts/36_final_pipeline.py`.
+  * **Classical ML** (`classical_5class`): gradient boosting on colour + texture features (HSV histograms and L\*a\*b\* moments of the
+    leaf pixels, uniform LBP histograms and GLCM properties), class-balanced; no neural network. Threshold
+    0.84. `scripts/43_classical_model.py`.
+  * Both: calibration (temperature or per-class vector scaling) and a per-condition "unusual image" limit, all fitted
+    on cross-fitted out-of-fold predictions; the answer is the most probable condition.
 * **Outputs**: calibrated class probabilities; a decision — *Healthy*, *Diseased*, *Uncertain* (confidence below a
   threshold fitted on out-of-fold data) or *Unusual image* (feature-space distance to the training photos above a
   threshold fitted on out-of-fold data); Grad-CAM maps on request.
@@ -34,7 +35,7 @@ service (in India, a Krishi Vigyan Kendra).
 * Tomato-Village, Variant-a (Gehlot et al., 2023): 2,103 distinct photographs (4,525 files incl. the authors'
   augmented copies), one phone model (realme GT Master Edition), Jodhpur and Jaipur, Rajasthan.
 * Leakage-free split by leaf group: 1,813 train+validation photographs (5-fold cross-validation for model choice and
-  calibration) and 290 test photographs (265 in the focused scope), scored once.
+  calibration) and 290 test photographs (265 of the five conditions), scored once.
 * Severe imbalance: 1,024 Leaf Miner vs 9 Potassium photographs.
 
 ## Metrics
@@ -45,17 +46,13 @@ deployed threshold; flip rates under harmless image changes; out-of-distribution
 
 ## Quantitative results (test photos, scored once)
 
-| Model | Accuracy (95% CI) | Macro-F1 | ECE | Answers → accuracy | Previous version (v1) |
-|---|---:|---:|---:|---:|---|
-| Focused (`upgrade_5class`, 265 photos) | 92.1% (88.4–95.3) | 0.844 | 0.055 | 81% → 98.1% | 90.9%, F1 0.835, 85% → 96.0% |
-| Full (`upgrade_8class`, 290 photos) | 82.4% (77.7–87.0) | 0.559 | 0.076 | 88% → 87.4% | 84.8%, F1 0.586, 90% → 87.7% |
+| Model | Accuracy (95% CI) | Macro-F1 | ECE | Answers → accuracy | Unsupported photos refused |
+|---|---:|---:|---:|---:|---:|
+| Deep learning (`focused_5class`, 265 photos) | 90.9% (87.1%–94.5%) | 0.838 | 0.048 | 82% → 97.7% | 52% |
+| Classical ML (`classical_5class`, 265 photos) | 78.1% (72.1%–83.9%) | 0.634 | 0.074 | 59% → 91.7% | 28% |
 
-Paired bootstrap (v2 − v1): focused +1.1 accuracy points (95% CI −1.8 to +3.9), full −2.4 (−5.0 to 0.0) — neither
-difference is reliable on this test set. The full model was chosen by a rule fixed on out-of-fold data before the
-test set was scored; it is reported as chosen.
-Unusual-image check: 100% of held-out non-leaf probe images flagged; 7.9% (focused) and 4.8% (full) of normal test
-photos flagged; only 4% of photos of the three conditions outside the focused scope are flagged (20% receive no
-diagnosis once “Uncertain” is included).
+Paired bootstrap (classical − deep learning): -12.8 accuracy points (95% CI -18.9 to -7.2), macro-F1 -0.204 (-0.318 to -0.095).
+Genuine test photos flagged as unusual: 6.0% (deep learning), 4.5% (classical).
 
 ## Factors and known failure modes
 

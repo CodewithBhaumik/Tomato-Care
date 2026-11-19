@@ -154,7 +154,6 @@ export default function ResultPanel({ result }) {
         <Card>
           <div className="p-5">
             <GradCamViewer input={result.input_image} heatmap={result.explanation?.heatmap} overlay={result.explanation?.overlay} note={result.explanation?.note} />
-            {!result.explanation?.overlay && result.explanation?.note && <p className="text-sm text-muted">{result.explanation.note}</p>}
           </div>
         </Card>
       </div>

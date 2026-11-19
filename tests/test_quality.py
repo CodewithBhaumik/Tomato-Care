@@ -50,8 +50,8 @@ def test_refusal_reason():
     assert refusal_reason("Diseased", 0.95, 0.81, 0.5, ok, FIVE) is None
     low = refusal_reason("Uncertain", 0.42, 0.81, 0.5, ok, FIVE)
     assert low["code"] == "low_confidence" and "42%" in low["message"] and "81%" in low["message"]
-    assert any("Full mode" in h and "Early Blight" in h for h in low["hints"])  # unsupported conditions, from data
+    assert any("does not cover" in h and "Early Blight" in h for h in low["hints"])  # unsupported, from data
     full = refusal_reason("Unusual image", 0.6, 0.76, 1.4, ok, CLASS_KEYS)
-    assert full["code"] == "unusual_image" and not any("Full mode" in h for h in full["hints"])
+    assert full["code"] == "unusual_image" and not any("does not cover" in h for h in full["hints"])
     bad = {"ok": False, "issues": [{"code": "blurry", "tip": TIPS["blurry"]}]}
     assert TIPS["blurry"] in refusal_reason("Uncertain", 0.5, 0.81, 0.5, bad, CLASS_KEYS)["hints"]

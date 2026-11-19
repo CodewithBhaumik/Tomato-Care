@@ -232,6 +232,44 @@ Scripts: `21_train_cv.py` (arms), `36_final_pipeline.py` (selection, calibration
   - it shifts confidences by up to 2 points, so the validated thresholds would no longer hold exactly;
   - peak memory rose to about 2.2 GB, close to the Streamlit Cloud limit.
 
+## 6e. Five conditions, two models: deep learning and classical ML
+
+**Scope.** The app diagnoses the five conditions that the eight-condition study could recognise reliably. The
+eight-condition model (`full_8class`) is no longer served; its results stay in `experiments/` as the reason for the
+scope. Photos of Early Blight, Late Blight and Potassium Deficiency are used only to check refusals.
+
+**Classical model** (`scripts/43_classical_model.py`, rules in its docstring, fixed before training):
+- Features of the same 256×256 image the network sees (`tomatoleaf.features`):
+  - colour: HSV histograms and L\*a\*b\* moments over leaf pixels (73 values);
+  - texture: uniform LBP histograms at radius 1 and 2, and GLCM contrast, dissimilarity, homogeneity, energy and
+    correlation at distances 1, 2 and 4 over leaf pixels (43);
+  - HOG: 64 principal components, fitted inside each training fold.
+- Arms: four class-balanced classifiers (logistic regression, RBF SVM, random forest, histogram gradient boosting) on
+  three feature sets. Hyperparameters were tuned by nested grouped cross-validation inside the network's 5 folds.
+- Calibration, threshold and unusual-image gate follow the network's rules (§6c). The gate uses the distance to the
+  training photos in the standardised colour + texture space.
+
+Best arms (out-of-fold):
+
+| Arm | Macro-F1 | Accuracy |
+|---|---:|---:|
+| Gradient boosting · Color + Texture | 0.697 | 78.7% |
+| Gradient boosting · Color | 0.672 | 77.5% |
+| Random forest · Color + Texture | 0.671 | 76.8% |
+| Random forest · HOG + Color + Texture | 0.666 | 76.5% |
+
+Chosen: **Gradient boosting on colour + texture features** (highest out-of-fold macro-F1 (0.6969)). Texture features added about
+2.5 macro-F1 points over colour alone; HOG did not help.
+
+**Test, once:**
+
+| Model | Accuracy | Macro-F1 |
+|---|---:|---:|
+| Deep learning | 90.9% | 0.838 |
+| Classical ML | 78.1% | 0.634 |
+
+Paired difference (classical − deep learning): -12.8 accuracy points (95% CI -18.9 to -7.2), macro-F1 -0.204 (-0.318 to -0.095).
+
 ## 7. Final evaluation
 
 All models — classical ML, the original networks and the upgrade — are scored by the **same predictor code that the

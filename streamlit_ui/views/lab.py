@@ -6,14 +6,15 @@ import streamlit as st
 from .. import charts, core, theme
 
 
-def _verdict(comp: dict) -> str:
+def _verdict(comp: dict, first: str = "Version 2") -> str:
     lo, hi = comp["accuracy_ci"]
     if lo > 0:
-        return "Version 2 is more accurate, and the 95% interval excludes zero."
+        return f"{first} is more accurate, and the 95% interval excludes zero."
     if hi < 0:
-        return "Version 2 is less accurate, and the 95% interval excludes zero."
+        return f"{first} is less accurate, and the 95% interval excludes zero."
     word = "higher" if comp["accuracy_diff"] > 0 else "lower" if comp["accuracy_diff"] < 0 else "equal"
-    return (f"Version 2's accuracy is {word}, but the 95% interval includes zero: on 290 test photos the "
+    n = core.platform()["tasks"][core.TASK]["test_photos"]
+    return (f"{first}'s accuracy is {word}, but the 95% interval includes zero: on {n} test photos the "
             "difference is within noise.")
 
 
@@ -22,7 +23,7 @@ def _leaderboard(models: list[dict]):
     for m in sorted(models, key=lambda m: -m["test"]["f1_macro"]):
         t, s = m["test"], m["selective"]
         rows.append({
-            "Model": ("★ " if m["is_default"] else "") + m["name"], "Version": charts.generation(m),
+            "Model": ("★ " if m.get("deployed") else "") + m["name"], "Version": charts.generation(m),
             "Accuracy": t["accuracy"], "Accuracy 95% CI": f"{100 * t['accuracy_ci'][0]:.1f}–{100 * t['accuracy_ci'][1]:.1f}%",
             "Macro-F1": t["f1_macro"], "F1 95% CI": f"{t['f1_macro_ci'][0]:.3f}–{t['f1_macro_ci'][1]:.3f}",
             "ECE": t.get("ece"), "Answers": s.get("coverage"), "Accuracy when answering": s.get("accuracy_kept"),
@@ -42,15 +43,17 @@ def _leaderboard(models: list[dict]):
             format="%.3f", help="Macro-F1 on the data the model was chosen with: out-of-fold (v2) or the "
                                 "validation split (baseline). Not comparable with test scores."),
     })
-    st.caption("★ = deployed default. Confidence intervals: 2,000 bootstrap resamples of whole leaf groups.")
+    st.caption("★ = served by the app (deep learning and classical ML). Confidence intervals: 2,000 bootstrap "
+               "resamples of whole leaf groups.")
 
 
 def _per_class(models: list[dict], task: str):
     new, old = core.task_defaults(task)
     picks = [new, old]
-    best_classical = max((m for m in models if m["family"] == "Classical ML"), key=lambda m: m["test"]["f1_macro"], default=None)
-    if best_classical:
-        picks.append(best_classical)
+    ml = core.classical_result() or max((m for m in models if m["family"] == "Classical ML"),
+                                        key=lambda m: m["test"]["f1_macro"], default=None)
+    if ml:
+        picks.append(ml)
     label = {new["key"]: f"{new['name']} (v2)", old["key"]: f"{old['name']} (baseline)"}
     rows = [{"Condition": c["name"], "Model": label.get(m["key"], m["name"]), "F1": c["f1"], "Support": c["support"]}
             for m in picks for c in m["per_class"]]
@@ -60,8 +63,7 @@ def _per_class(models: list[dict], task: str):
                           for c, o in zip(new["per_class"], old["per_class"])])
     st.dataframe(table, hide_index=True, width="stretch",
                  column_config={k: st.column_config.NumberColumn(format="%.3f") for k in ("Precision", "Recall", "F1", "F1 (baseline)")})
-    st.caption("Classes with very few test photos (Potassium Deficiency: 2, Nitrogen Deficiency: 8) have very "
-               "uncertain per-class scores.")
+    st.caption("Conditions with few test photos (Nitrogen Deficiency: 8) have very uncertain per-class scores.")
 
 
 def _confusion(models: list[dict], task: str):
@@ -102,7 +104,7 @@ def _calibration(models: list[dict], task: str):
 
 
 def _bias(models: list[dict], task: str):
-    rows = [{"Model": ("★ " if m["is_default"] else "") + m["name"], "Accuracy": m["test"]["accuracy"],
+    rows = [{"Model": ("★ " if m.get("deployed") else "") + m["name"], "Accuracy": m["test"]["accuracy"],
              "Balanced accuracy": m["test"]["balanced_accuracy"], "Macro-F1": m["test"]["f1_macro"],
              "Per-class calibration error": m["test"]["classwise_ece"]}
             for m in models if m["test"].get("balanced_accuracy") is not None]
@@ -119,12 +121,10 @@ def _bias(models: list[dict], task: str):
                                     format="%.3f", help="How far each condition's average confidence is from its own "
                                                         "accuracy (lower = more even confidence)")})
     st.caption("Earlier balanced / calibrated variants (v2.1, no longer served): the same networks with per-class "
-               "calibration (and, for balanced, a class-prior correction on top of a class-weighted loss). The final "
-               "round replaced them with one validated pipeline per mode (tab Final pipeline). "
-               "Balanced and calibrated variants: the same networks with per-class calibration (and, for balanced, a "
-               "class-prior correction), fitted on out-of-fold data before the test photos were scored. A GAN was "
-               "not used to synthesise rare-class photos: with 9 Potassium and 45 Nitrogen photographs it would "
-               "copy them rather than add new information, and generated images would need their own validation.")
+               "calibration (and, for balanced, a class-prior correction on top of a class-weighted loss), fitted on "
+               "out-of-fold data. The final round replaced them with one validated pipeline per model (tab Final "
+               "pipeline). A GAN was not used to synthesise rare-condition photos: with 45 Nitrogen photographs it "
+               "would copy them rather than add information, and generated images would need their own validation.")
 
 
 STRESS_LABEL = {"blur_sigma2": "Blur (σ 2)", "blur_sigma4": "Strong blur (σ 4)", "dark_x0.35": "Very dark",
@@ -147,7 +147,7 @@ def _final_round(task: str):
              "Accuracy": a["oof"]["accuracy"], "NLL": a["oof"]["nll"], "ECE": a["oof"]["ece"],
              "Calibration": a["calibration"], "Threshold": a["threshold"], "Answered": a["coverage"],
              "Accuracy when answering": a["accuracy_kept"],
-             **({"Unsupported conditions refused": a["out_of_scope_refusal"]} if task == "5class" else {})}
+             "Unsupported conditions refused": a["out_of_scope_refusal"]}
             for a in fr["arms"]]
     st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
                  column_config={"Macro-F1": PCT, "Accuracy": PCT, "Answered": PCT, "Accuracy when answering": PCT,
@@ -159,12 +159,12 @@ def _final_round(task: str):
                f"distance, out-of-fold AUROC {fr['gate']['auroc_select']:.3f}.")
     if not fr.get("test"):
         return
-    st.markdown("**2 · Before vs after** — held-out test photos")
-    rows = [{"Model": ("★ " if r["final"] else "") + r["name"], "Accuracy": r["accuracy"], "Macro-F1": r["f1_macro"],
+    st.markdown("**2 · Served models and earlier versions** — held-out test photos")
+    rows = [{"Model": ("★ " if r["final"] or r.get("classical") else "") + r["name"], "Accuracy": r["accuracy"], "Macro-F1": r["f1_macro"],
              "Weighted F1": r["f1_weighted"], "ECE": r["ece"], "Brier": r["brier"], "Threshold": r["threshold"],
              "Answered": r["coverage"], "Accuracy when answering": r["accuracy_kept"],
-             **({"Unsupported: confident wrong answer": (r.get("out_of_scope") or {}).get("answered_wrong")}
-                if task == "5class" else {})} for r in fr["test"]]
+             "Unsupported: confident wrong answer": (r.get("out_of_scope") or {}).get("answered_wrong")}
+            for r in fr["test"]]
     st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
                  column_config={"Accuracy": PCT, "Macro-F1": PCT, "Weighted F1": PCT, "Answered": PCT,
                                 "Accuracy when answering": PCT, "Unsupported: confident wrong answer": PCT,
@@ -172,26 +172,32 @@ def _final_round(task: str):
                                 "Brier": st.column_config.NumberColumn(format="%.3f"),
                                 "Threshold": st.column_config.NumberColumn(format="%.2f")})
     final_key = next(r["key"] for r in fr["test"] if r["final"])
-    before_key = next(r["key"] for r in fr["test"] if not r["final"])
+    before_key = next(r["key"] for r in fr["test"] if not r["final"] and not r.get("classical"))
+    ml_key = next((r["key"] for r in fr["test"] if r.get("classical")), None)
+    s_ml = fr["stress"].get(ml_key) or {}
+    o_ml = fr["out_of_dataset"].get(ml_key) or {}
     a, b = st.columns(2, gap="large")
     with a:
         st.markdown("**3 · Stress tests** — test photos changed on purpose")
         s_f, s_b = fr["stress"][final_key], fr["stress"][before_key]
         rows = [{"Condition": STRESS_LABEL.get(n, n),
                  "Before: wrong answer": s_b[n].get("answered_wrong", s_b[n]["answered"]),
-                 "Final: right answer": s_f[n].get("answered_correct"),
-                 "Final: wrong answer": s_f[n].get("answered_wrong", s_f[n]["answered"]),
-                 "Final: refused": s_f[n]["refused"]} for n in s_f]
+                 "Deep learning: right answer": s_f[n].get("answered_correct"),
+                 "Deep learning: wrong answer": s_f[n].get("answered_wrong", s_f[n]["answered"]),
+                 "Deep learning: refused": s_f[n]["refused"],
+                 **({"Classical ML: wrong answer": s_ml[n].get("answered_wrong", s_ml[n]["answered"])}
+                    if n in s_ml else {})} for n in s_f]
         st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
                      column_config={k: PCT for k in rows[0] if k != "Condition"})
         st.caption("Mixed-condition collages have no single right answer: any answer counts as wrong.")
     with b:
         st.markdown("**4 · Out-of-dataset images** — share refused (higher is better)")
         o_f, o_b = fr["out_of_dataset"][final_key], fr["out_of_dataset"][before_key]
-        rows = [{"Images": OOD_LABEL[n], "Photos": o_f[n]["photos"], "Before": o_b[n]["refused"], "Final": o_f[n]["refused"]}
+        rows = [{"Images": OOD_LABEL[n], "Photos": o_f[n]["photos"], "Before": o_b[n]["refused"],
+                 "Deep learning": o_f[n]["refused"], **({"Classical ML": o_ml[n]["refused"]} if n in o_ml else {})}
                 for n in OOD_LABEL if n in o_f]
         st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
-                     column_config={"Before": PCT, "Final": PCT})
+                     column_config={"Before": PCT, "Deep learning": PCT, "Classical ML": PCT})
     if (core.platform().get("final_round") or {}).get("note"):
         st.caption(core.platform()["final_round"]["note"])
 
@@ -244,11 +250,10 @@ def _cross_validation(task: str):
 
 
 def render() -> None:
-    theme.section("Model lab", "Every model — classical machine learning, the original study's networks and the "
-                  "version-2 upgrade — scored by the same code on the same held-out test photos, once.",
+    theme.section("Model lab", "Every five-condition model — classical machine learning, the original study's "
+                  "networks and the version-2 upgrade — scored by the same code on the same held-out test photos, once.",
                   kicker="Evidence")
-    task = st.segmented_control("Task", ["5class", "8class"], format_func=lambda t: core.TASK_LABEL[t], default="5class",
-                                key="lab_task", required=True, label_visibility="collapsed")
+    task = core.TASK
     data = core.platform()
     models = [m for m in data["models"] if m["task"] == task]
     new, old = core.task_defaults(task)
@@ -259,14 +264,26 @@ def render() -> None:
               delta=f"{core.pts(new['test']['accuracy'] - old['test']['accuracy'])} vs baseline", border=True)
     c2.metric("Served model · macro-F1", f"{new['test']['f1_macro']:.3f}",
               delta=f"{new['test']['f1_macro'] - old['test']['f1_macro']:+.3f} vs baseline", border=True)
-    c3.metric("Baseline · accuracy", core.pct(old["test"]["accuracy"]), delta=old["name"].split(" (original")[0],
-              delta_color="off", border=True, help="The original study's model for this task (not served by the app).")
+    ml = core.classical_result()
+    if ml:
+        c3.metric("Classical ML · accuracy", core.pct(ml["test"]["accuracy"]),
+                  delta=f"{core.pts(ml['test']['accuracy'] - new['test']['accuracy'])} vs deep learning",
+                  border=True, help=f"{ml['name']}: handcrafted colour and texture features, no neural network.")
+    else:
+        c3.metric("Baseline · accuracy", core.pct(old["test"]["accuracy"]), delta=old["name"].split(" (original")[0],
+                  delta_color="off", border=True, help="The original study's model (not served by the app).")
     c4.metric("Test photos", f"{n}", delta="scored once", delta_color="off", border=True)
     if comp:
         st.info(f"**Paired comparison (served model − original study's model, bootstrap over leaf groups):** accuracy {core.pts(comp['accuracy_diff'])} "
                 f"[95% CI {core.pts(comp['accuracy_ci'][0])}, {core.pts(comp['accuracy_ci'][1])}], macro-F1 "
                 f"{comp['f1_diff']:+.3f} [{comp['f1_ci'][0]:+.3f}, {comp['f1_ci'][1]:+.3f}]. {_verdict(comp)}",
                 icon=":material/balance:")
+    mlc = next((c for c in data["comparisons"] if c.get("ml_vs_dl")), None)
+    if mlc:
+        st.info(f"**Classical ML − deep learning (same photos, bootstrap over leaf groups):** accuracy "
+                f"{core.pts(mlc['accuracy_diff'])} [95% CI {core.pts(mlc['accuracy_ci'][0])}, "
+                f"{core.pts(mlc['accuracy_ci'][1])}], macro-F1 {mlc['f1_diff']:+.3f} [{mlc['f1_ci'][0]:+.3f}, "
+                f"{mlc['f1_ci'][1]:+.3f}]. {_verdict(mlc, 'The classical model')}", icon=":material/compare_arrows:")
     tabs = st.tabs(["Leaderboard", "Final pipeline", "Per condition", "Confusion", "Calibration", "Robustness", "Speed",
                     "Cross-validation"])
     with tabs[1]:

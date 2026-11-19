@@ -24,7 +24,7 @@ an unusual-image check and Grad-CAM explanations, evaluated without data leakage
 ## Contents
 
 1. [What it does](#what-it-does)
-2. [Results: version 2 against version 1](#results-version-2-against-version-1)
+2. [Results](#results)
 3. [What changed in version 2](#what-changed-in-version-2)
 4. [Run it](#run-it) · [Deploy on Streamlit Community Cloud](#deploy-on-streamlit-community-cloud)
 5. [Tour](#tour)
@@ -36,9 +36,8 @@ an unusual-image check and Grad-CAM explanations, evaluated without data leakage
 
 ## What it does
 
-Photograph a single tomato leaf on plain paper. Tomato Care tells you whether it is healthy or which condition it
-shows — Early Blight, Late Blight, Leaf Miner, Magnesium / Nitrogen / Potassium Deficiency or Spotted Wilt Virus —
-and how sure it is:
+Photograph a single tomato leaf on plain paper. Tomato Care tells you whether it is healthy or which of four conditions
+it shows — Leaf Miner, Magnesium Deficiency, Nitrogen Deficiency or Spotted Wilt Virus — and how sure it is:
 
 | Answer | When |
 |---|---|
@@ -46,23 +45,26 @@ and how sure it is:
 | **Not sure** | confidence below the threshold — no diagnosis instead of a guess |
 | **Unusual image** | the photo looks unlike every training photo (not a leaf on paper, another crop, …) |
 
-Every answer comes with the probability of each condition, a Grad-CAM heat map of where the networks looked, the
-symptoms and management of the condition, and — on request — the answers of the other Tomato Care models on the
-same photo. The apps serve **one validated model per mode** (final round, `docs/FINAL_REPORT.md`):
+Every answer comes with the probability of each condition, photo-quality tips, a Grad-CAM heat map (deep-learning
+model), the symptoms and management of the condition, and — on request — the other model's answer on the same photo.
+Two models diagnose the same five conditions:
 
-* **Focused · 5 conditions** — 5 ConvNeXt-Tiny networks, class-weighted loss, trained to be unsure on the three
-  conditions it does not cover (outlier exposure). Threshold 0.81 (>= 90% accuracy on answered
-  photos, cross-validation). Test: accuracy 90.9%; it answers 82% of photos at
-  97.7% accuracy and gives no diagnosis to 52% of the Early Blight / Late Blight /
-  Potassium test photos (the rest get a wrong diagnosis — use the Full mode for those conditions).
-* **Full · 8 conditions** — 5 ConvNeXt-Tiny networks, class-balanced sampling, threshold 0.76. Test: accuracy
-  83.1%, answers 80% of photos at 92.2% accuracy. Early Blight and Potassium are still
-  rarely recognised (too few photos).
+* **Deep learning** (default) — 5 ConvNeXt-Tiny networks, class-weighted loss, trained to be unsure on the
+  dataset's other three conditions (outlier exposure). Threshold 0.81. Test: accuracy
+  90.9% (87.1%–94.5%), macro-F1 0.838; it answers 82% of photos, 97.7% of them correctly.
+* **Classical ML** — gradient boosting on handcrafted colour + texture features of the leaf (HSV histograms and L\*a\*b\* statistics,
+  LBP and GLCM texture), no neural network. Threshold 0.84. Test: accuracy
+  78.1% (72.1%–83.9%), macro-F1 0.634; it answers 59% of photos, 91.7% of them correctly.
 
-The example gallery shows demo examples: held-out test photos chosen for a clear result (disclosed on the page); the
-unbiased numbers above and in the Model lab are what to quote.
+Classical − deep learning on the same photos: -12.8 accuracy points (95% CI -18.9 to -7.2), macro-F1 -0.204 (-0.318 to -0.095). Both models were chosen on cross-validation data only, with the
+same rules (calibration, threshold, unusual-image check), and scored once on the same 265 held-out test
+photos ([docs/FINAL_REPORT.md](docs/FINAL_REPORT.md)). The example gallery shows demo examples: held-out test photos
+chosen for a clear result (disclosed on the page); the numbers above and in the Model lab are what to quote.
 
-Both were chosen on cross-validation data only; earlier models appear only in the evaluation.
+**Why five conditions.** The dataset has eight. In the earlier eight-condition study, Early Blight (62 photographs),
+Late Blight and Potassium Deficiency (9 photographs) were rarely recognised, so the app diagnoses the other five. Photos
+of those three conditions are only used to check that they are refused: the deep-learning model refuses
+52% of them, the classical model 28%.
 
 Two front ends share one prediction engine (`backend/services/predictor.py`):
 
@@ -71,60 +73,29 @@ Two front ends share one prediction engine (`backend/services/predictor.py`):
 * **React platform + REST API** (`frontend/`, `backend/`) — the full web platform (dashboard, diagnosis studio, model
   lab, performance, explainability, library, methodology, docs) served by FastAPI, as one Docker container.
 
-## Results: version 2 against version 1
+## Results
 
-All models were scored by the same code on the same **290 held-out test photos** (265 in the focused scope) —
+All models were scored by the same code on the same **265 held-out test photos** of the five conditions —
 **once**, after every model choice had been fixed on cross-validation data. 95% confidence intervals come from 2,000
-bootstrap resamples of whole leaf groups. Full tables: [docs/RESULTS.md](docs/RESULTS.md).
+bootstrap resamples of whole leaf groups. Full tables: [docs/FINAL_REPORT.md](docs/FINAL_REPORT.md) and
+[docs/RESULTS.md](docs/RESULTS.md).
 
-The table below is the v2.1 round (three variants, since replaced by the final round's one model per mode — see
-[docs/FINAL_REPORT.md](docs/FINAL_REPORT.md)). Those variants used the same fold networks, post-processed by rules
-fitted on out-of-fold data (per-class calibration; for *balanced*, also a class-prior correction). Balanced accuracy is the mean per-condition recall, so a rare
-condition counts as much as Leaf Miner. Per-class calibration error measures how far each condition's confidence
-is from its own accuracy (lower means more even confidence).
+| Model | Accuracy (95% CI) | Macro-F1 | Balanced acc. | ECE | Answers → correct | Unsupported photos refused |
+|---|---:|---:|---:|---:|---:|---:|
+| **Tomato Care · Deep learning (5 conditions)** | 90.9% (87.1%–94.5%) | 0.838 | 82.8% | 0.048 | 82% → 97.7% | 52% |
+| **Tomato Care · Classical ML (5 conditions)** | 78.1% (72.1%–83.9%) | 0.634 | 61.3% | 0.074 | 59% → 91.7% | 28% |
+| Tomato Care · Deep learning (5 conditions) (round 1) | 90.9% (87.1%–94.5%) | 0.838 | 82.8% | 0.048 | 46% → 99.2% | 100% |
+| Ensemble ConvNeXt-T + EfficientNet-B0 (original 5-class default) | 90.9% (87.3%–94.3%) | 0.835 | 85.6% | 0.039 | 85% → 96.0% | 12% |
 
-| Task | Model | Accuracy | Macro-F1 | Balanced acc. | Per-class calib. error | When it answers |
-|---|---|---:|---:|---:|---:|---:|
-| **Focused · 5 conditions** | **v2 balanced** (app default) | 90.6% (86.6–94.0) | 0.826 | **88.1%** | **0.038** | 78% → **98.6%** correct |
-| | v2 calibrated | **92.1%** (88.5–95.3) | 0.831 | 83.6% | 0.041 | 78% → **98.6%** correct |
-| | v2 networks, uncorrected | **92.1%** (88.4–95.3) | **0.844** | 86.3% | 0.045 | 81% → 98.1% correct |
-| | v1 — ConvNeXt-T + EfficientNet-B0 | 90.9% (87.3–94.3) | 0.835 | 85.6% | 0.043 | 85% → 96.0% correct |
-| **Full · 8 conditions** | **v2 balanced** (app model) | 82.8% (78.0–87.3) | 0.584 | 60.1% | **0.026** | 88% → **88.2%** correct |
-| | v2 networks, uncorrected | 82.4% (77.7–87.0) | 0.559 | 56.8% | 0.052 | 88% → 87.4% correct |
-| | v1 — ConvNeXt-T + TTA | **84.8%** (80.1–89.3) | **0.586** | **60.4%** | 0.045 | 90% → 87.7% correct |
-
-**Paired differences on the same photos:**
-
-* Focused balanced − v1: accuracy −0.4 pts (95% CI −3.5 to +2.7), macro-F1 −0.010 (−0.054 to +0.035).
-* Focused calibrated − v1: +1.1 pts (−1.9 to +4.1).
-* Full balanced − v1: −2.1 pts (−4.9 to +0.7), macro-F1 −0.002 (−0.048 to +0.045).
-* Full balanced − uncorrected v2: macro-F1 +0.025 (−0.008 to +0.064).
-
-Every interval includes zero: on 290 photos none of these accuracy differences is statistically reliable.
-
-What this means, without spin:
-
-* **Bias and uneven confidence, the problems version 2 set out to fix, are clearly better.** The balanced focused model
-  recognises the conditions more evenly than v1: balanced accuracy 88.1% vs 85.6%. Each condition's confidence is
-  closer to its accuracy (0.038 vs 0.043; full model 0.026 vs 0.045). When it answers it is right 98.6% of the time
-  vs 96.0%, and it abstains more often on conditions it was never trained on (16% vs 12%).
-* **Overall accuracy is on par with v1, not higher.** Removing the majority-class bias costs a little accuracy on the
-  frequent classes. The uncorrected v2 networks score 92.1% (v1 90.9%), and the calibrated model offers that
-  accuracy in the app.
-* **Chosen honestly.** The variants and the rule for the prior correction were fixed on out-of-fold data before the
-  test set was scored. The focused default was switched from *calibrated* to *balanced* after the test scores, to
-  follow the request to remove bias; both are reported in full. The 8-class networks were chosen by a rule fixed in
-  advance (out-of-fold macro-F1 0.634 vs 0.620 for the original recipe); on the test photos the order of these
-  close recipes did not hold, and every result is published.
-* **Why no GAN.** With 9 Potassium and 45 Nitrogen photographs, a generative model would copy these few leaves rather
-  than add new information, and synthetic photos would need their own validation. Instead the bias is handled by
-  class-weighted training plus the prior correction above.
-* **New in v2:** uploads are converted like the training photos (prediction changes on simulated phone photos fall
-  from 2.1–3.5% to 0.0–1.4%, validation), an **unusual-image check** (100% of held-out non-leaf probe images flagged;
-  7.9% of normal test photos flagged as the price), and calibrated confidence with an abstention threshold chosen on
-  out-of-fold data.
-* **95% accuracy on unseen leaves is not reached** for the full task; the leaky official split gives 97.6% for the
-  same networks, which measures memorisation of augmented copies (see [Methodology §2](docs/METHODOLOGY.md#2-a-leakage-free-split)).
+* **Deep learning vs classical ML.** -12.8 accuracy points (95% CI -18.9 to -7.2), macro-F1 -0.204 (-0.318 to -0.095). The network is clearly better; the classical model is the honest
+  baseline: what colour and texture statistics alone can do with the same data and the same rules.
+* **Both say “not sure”.** Each model answers only above its own threshold, chosen on out-of-fold data for at least
+  90% accuracy on answered photos, counting answered photos of the three unsupported conditions as errors. The
+  classical model cannot reach 90% while answering half of the photos, so it uses the most accurate threshold that
+  still answers half (the fallback written into the rule before training).
+* **Earlier versions** (last two rows) are the deep model before the final round and the original study's model.
+* **95% accuracy on unseen leaves is not reached**; the leaky official split gives higher numbers that measure
+  memorisation of augmented copies (see [Methodology §2](docs/METHODOLOGY.md#2-a-leakage-free-split)).
 
 ## What changed in version 2
 
@@ -269,15 +240,15 @@ docs/                  methodology, results, model card, API, screenshots
 
 * One phone model, two districts of Rajasthan, single leaves on paper: accuracy on field photos, other cameras or
   regions is unknown.
-* Potassium Deficiency has 9 photographs in total (2 in the test set) and Nitrogen Deficiency 45: their per-class
-  scores are very uncertain; neither default full-task model (v1 or v2) recognises a single Early Blight or
-  Potassium Deficiency test photo.
-* The test set is small (290 photos): differences of a few points are within noise — read the intervals.
+* Five conditions only: Early Blight, Late Blight and Potassium Deficiency are not diagnosed (too few photographs to
+  learn them reliably). Nitrogen Deficiency has 45 photographs (8 in the test set): its per-class scores are very
+  uncertain.
+* The test set is small (265 photos): differences of a few points are within noise — read the intervals.
 * The same test photos were used to report the original study, so they are not perfectly fresh; no upgrade decision
   used them.
-* The unusual-image check catches non-leaf images but few unknown leaf conditions (4% of out-of-scope leaves flagged;
-  20% receive no diagnosis once “not sure” is included).
-* Grad-CAM shows where a network looked, not why a leaf is diseased.
+* Unknown leaf conditions are hard to refuse: the deep model learned to refuse the dataset's other three conditions;
+  diseases it has never seen may still get a diagnosis. The classical model had no such training.
+* Grad-CAM shows where a network looked, not why a leaf is diseased; the classical model has no Grad-CAM.
 
 ## Dataset, citation and licence
 

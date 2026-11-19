@@ -14,8 +14,9 @@ was fixed on out-of-fold data by scripts/36.
 4. CPU latency (same machine, same conditions) for the served models.
 
 Writes experiments/results/final_round.json, the final rows / comparisons in final_benchmark.json, the two final
-entries (with test metrics) in benchmark_models.json and deployment.json (which then serves ONLY the two final
-pipelines), and figures in reports/figures/final/.
+entries (with test metrics) in benchmark_models.json and deployment.json (which then serves the final focused pipeline;
+scripts/44 adds the classical model; the eight-condition model is evaluated here for the record but not served), and
+figures in reports/figures/final/.
 """
 import argparse
 import csv
@@ -471,9 +472,10 @@ def main():
                 m["latency_ms"] = lat[m["key"]]["median_ms"]
     save_json(bench_models, EXPERIMENTS_DIR / "benchmark_models.json")
     deployment = load_json(EXPERIMENTS_DIR / "deployment.json")
-    deployment.update({"version": 3, "default_model": FINAL["5class"], "defaults_by_task": dict(FINAL),
-                       "previous_defaults": dict(SERVED_BEFORE),
-                       "models": [m for m in bench_models["models"] if m["key"] in FINAL.values()]})
+    # the apps diagnose five conditions: the deep model here, the classical model added by scripts/44
+    deployment.update({"version": 3, "default_model": FINAL["5class"], "defaults_by_task": {"5class": FINAL["5class"]},
+                       "previous_defaults": {"5class": SERVED_BEFORE["5class"]},
+                       "models": [m for m in bench_models["models"] if m["key"] == FINAL["5class"]]})
     save_json(deployment, EXPERIMENTS_DIR / "deployment.json")
     print("deployment.json now serves:", [m["key"] for m in deployment["models"]])
     figures(rows, oof, stress, ood)

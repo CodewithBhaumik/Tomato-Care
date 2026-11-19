@@ -17,14 +17,17 @@ import {
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
 import { ButtonLink, Card } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
-import { defaultModel, modelsFor } from "../lib/analytics.js";
+import { TASK, classicalModel, defaultModel, modelsFor, taskClasses } from "../lib/analytics.js";
 import { CLASSES } from "../lib/classes.js";
 import { pct } from "../lib/format.js";
+
+// The five conditions the apps diagnose (until the results file has loaded; afterwards tasks["5class"].classes is used).
+const DIAGNOSED = ["healthy", "leaf_miner", "magnesium_deficiency", "nitrogen_deficiency", "spotted_wilt_virus"];
 
 const FEATURES = [
   { icon: ScanSearch, title: "Instant diagnosis", text: "Upload or snap a leaf photo; get the condition, a calibrated confidence and the full probability distribution in about a second on a CPU." },
   { icon: ShieldQuestion, title: "Knows when it doesn't know", text: "Below a validated confidence threshold it answers “Uncertain”; photos unlike the training data are flagged as “Unusual” instead of guessed." },
-  { icon: BrainCircuit, title: "Explainable", text: "Grad-CAM heat maps show where the network looked, blended live over exactly the image the model received." },
+  { icon: BrainCircuit, title: "Explainable", text: "Grad-CAM heat maps show where the deep-learning network looked, blended live over exactly the image the model received." },
   { icon: FlaskConical, title: "Model laboratory", text: "Classical ML, the original networks and the upgraded ones on identical test photos — leaderboards, confusion matrices, significance tests." },
   { icon: Split, title: "Leakage-free by design", text: "Near-duplicate shots are grouped so no leaf appears in both training and test; models are chosen by cross-validation and the test set is scored once." },
   { icon: Microscope, title: "Dataset-faithful preprocessing", text: "Uploads are resized, colour-converted and compressed exactly like the dataset photos, removing a hidden source of inconsistent predictions." },
@@ -33,7 +36,7 @@ const FEATURES = [
 const STEPS = [
   { icon: Upload, title: "Photograph", text: "One detached leaf on plain paper." },
   { icon: Layers3, title: "Normalise", text: "Whole frame → 256×256, Display P3, JPEG q90 — like the training photos." },
-  { icon: Gauge, title: "Predict", text: "Ensemble of fine-tuned networks with test-time augmentation and temperature scaling." },
+  { icon: Gauge, title: "Predict", text: "Fine-tuned networks with test-time augmentation — or classical ML on colour, texture and shape features — then calibration." },
   { icon: ScanEye, title: "Check & explain", text: "Confidence threshold, similarity to training photos, Grad-CAM." },
 ];
 
@@ -93,14 +96,16 @@ function HeroVisual({ hero }) {
 export default function LandingPage() {
   useDocumentTitle(null);
   const { analytics } = useData();
-  const d5 = defaultModel(analytics, "5class");
-  const d8 = defaultModel(analytics, "8class");
-  const nModels = modelsFor(analytics).length;
+  const d5 = defaultModel(analytics, TASK);
+  const cm = classicalModel(analytics, TASK);
+  const nModels = modelsFor(analytics, TASK).length;
+  const keys = taskClasses(analytics, TASK);
+  const diagnosed = CLASSES.filter((c) => (keys.length ? keys : DIAGNOSED).includes(c.key));
 
   const stats = [
-    { label: "Test accuracy · focused model", value: pct(d5?.test?.accuracy), hint: `${analytics?.tasks?.["5class"]?.test_photos ?? "—"} unseen photos` },
+    { label: "Test accuracy · deep learning", value: pct(d5?.test?.accuracy), hint: `${analytics?.tasks?.[TASK]?.test_photos ?? "—"} unseen photos` },
     { label: "Accuracy when it answers", value: pct(d5?.selective?.test?.accuracy_kept ?? d5?.selective?.accuracy_kept), hint: "selective prediction" },
-    { label: "Macro-F1 · all 8 classes", value: pct(d8?.test?.f1_macro), hint: "every class weighted equally" },
+    { label: "Test accuracy · classical ML", value: pct(cm?.test?.accuracy), hint: "no neural network, same test photos" },
     { label: "Models benchmarked", value: nModels || "—", hint: "on identical test photos" },
   ];
 
@@ -118,7 +123,7 @@ export default function LandingPage() {
               <span className="block bg-gradient-to-r from-leaf-600 via-leaf-500 to-sun-500 bg-clip-text text-transparent">before it spreads.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
-              Tomato Care diagnoses eight leaf conditions from a single photo — with calibrated confidence, an honest “I'm not sure”, out-of-distribution warnings and visual explanations.
+              Tomato Care diagnoses five tomato leaf conditions from a single photo — with a deep-learning or a classical machine-learning model, calibrated confidence, an honest “I'm not sure”, out-of-distribution warnings and visual explanations.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink to="/diagnose" size="lg" iconRight={ArrowRight}>
@@ -196,17 +201,17 @@ export default function LandingPage() {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-leaf-600 dark:text-leaf-400">Eight conditions</p>
-            <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink">Fungal, viral, pest and nutrient problems — and healthy leaves</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-leaf-600 dark:text-leaf-400">Five conditions</p>
+            <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink">Viral, pest and nutrient problems — and healthy leaves</h2>
             <p className="mt-4 text-[15px] leading-relaxed text-muted">
-              Trained on 2,103 photographs of tomato leaves from Rajasthan, India (Tomato-Village dataset). The focused model covers the five classes with enough photos to be recognised reliably; the full model covers all eight, with honest per-class reliability.
+              Built on {analytics?.dataset?.photos ? analytics.dataset.photos.toLocaleString() : "2,103"} photographs of tomato leaves from Rajasthan, India (Tomato-Village dataset). Tomato Care diagnoses the five conditions with enough photos to be recognised reliably, with two models for the same five: a deep-learning network (the default) and a classical machine-learning model that uses no neural network.
             </p>
             <ButtonLink to="/library" variant="secondary" className="mt-6" iconRight={ArrowRight}>
               Open the disease library
             </ButtonLink>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {CLASSES.map(({ key, name, color, icon: Icon }) => (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {diagnosed.map(({ key, name, color, icon: Icon }) => (
               <a key={key} href={`/library/${key}`} className="group overflow-hidden rounded-2xl border border-line bg-surface transition hover:-translate-y-0.5 hover:shadow-pop">
                 <div className="aspect-square overflow-hidden">
                   <img src={`/samples/${key}-2.jpg`} alt={name} className="size-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />

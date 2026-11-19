@@ -1,13 +1,17 @@
-"""Exports one held-out TEST photograph per class for the web apps' example gallery (default rule: demo).
+"""Exports one held-out TEST photograph per diagnosed condition (the served models' classes) for the web apps'
+example gallery.
 
-Rules (both deterministic and NOT based on any model's answer):
-  --rule typical (default since 2026-11-19): the most typical test photo of each class — the medoid of the class's
-      test photos in a GENERIC image-feature space (ConvNeXt-Tiny with ImageNet weights only, never trained on this
-      dataset): the photo with the highest mean cosine similarity to the other test photos of its class. The rule was
-      fixed before the final models were scored; it uses images and labels only, no prediction.
-  --rule first: the first test photo of each class in splits.csv order (the gallery up to v2.1).
+Rules (deterministic):
+  --rule demo (default): the test photo on which the served models give the clearest correct result (see
+      demo_scores), ties -> the most typical one. Disclosed on the page: it shows how the app works, not how often
+      it is right.
+  --rule typical: the most typical test photo of each condition — the medoid of its test photos in a GENERIC
+      image-feature space (ConvNeXt-Tiny with ImageNet weights only, never trained on this dataset). Images and labels
+      only, no prediction.
+  --rule first: the first test photo of each condition in splits.csv order (the gallery up to v2.1).
 Files are byte-identical copies of the dataset photos (re-encoding could change pixels and flip borderline answers).
-Output: frontend/public/test-samples/<key>.jpg and manifest.json (with the true label and the rule).
+Output: frontend/public/test-samples/<key>.jpg and manifest.json (with the true label and the rule); photos of
+conditions the app no longer diagnoses are removed.
 """
 import argparse
 import shutil
@@ -21,9 +25,9 @@ from tomatoleaf.utils import save_json
 
 NOTES = {
     "demo": ("Demo examples: for each condition, the held-out test photo (never used for training or model selection) "
-             "on which the served models give the clearest correct result — a confident correct diagnosis, or for a "
-             "condition outside the focused model's five, a refusal; ties go to the most typical photo. They show how "
-             "the app works, NOT how often it is right: the unbiased test results are in the Model lab."),
+             "on which the served models give the clearest correct result — a confident correct diagnosis; ties go to "
+             "the most typical photo. They show how the app works, NOT how often it is right: the unbiased test "
+             "results are in the Model lab."),
     "typical": ("One held-out test photograph per class (never used for training or model selection): the most typical "
                 "test photo of each class, i.e. the medoid in a generic ImageNet feature space (ConvNeXt-Tiny, not trained "
                 "on this dataset). Chosen from images and labels only, without looking at any model's answer."),
@@ -48,15 +52,18 @@ def generic_features(images: np.ndarray) -> np.ndarray:
     return np.stack(feats)
 
 
-def demo_scores(test, images) -> np.ndarray:
-    """Per test photo: how clearly the SERVED models handle it (higher = clearer). Each mode adds 2 for a confident
-    correct answer (or, for a condition outside that model's classes, any refusal), 1 for 'not sure' with the right
-    best guess, 0 for a wrong answer."""
+def served_registry():
     from backend.services.predictor import ModelRegistry
     from tomatoleaf.config import EXPERIMENTS_DIR
 
-    reg = ModelRegistry(EXPERIMENTS_DIR / "deployment.json", device="cuda" if torch.cuda.is_available() else "cpu")
-    keys = list(reg.meta["defaults_by_task"].values())
+    return ModelRegistry(EXPERIMENTS_DIR / "deployment.json", device="cuda" if torch.cuda.is_available() else "cpu")
+
+
+def demo_scores(reg, test, images) -> np.ndarray:
+    """Per test photo: how clearly the SERVED models handle it (higher = clearer). Each model adds 2 for a confident
+    correct answer (or, for a condition outside that model's classes, any refusal), 1 for 'not sure' with the right
+    best guess, 0 for a wrong answer."""
+    keys = [e["key"] for e in reg.entries]
     score = np.zeros(len(test))
     for i, (rgb, true) in enumerate(zip(images, test.class_key)):
         for key in keys:
@@ -76,15 +83,18 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--rule", choices=list(NOTES), default="demo")
     args = parser.parse_args()
+    reg = served_registry()
+    scope = set(reg.entry(reg.default_key)["class_keys"])
     splits = load_splits()
+    splits = splits[splits.class_key.isin(scope)]
     test = splits[splits.split == "test"].sort_values("photo_id").reset_index(drop=True)
     out = ROOT / "frontend" / "public" / "test-samples"
     out.mkdir(parents=True, exist_ok=True)
     images = load_images(test.path) if args.rule != "first" else None
     feats = generic_features(images) if images is not None else None
-    demo = demo_scores(test, images) if args.rule == "demo" else None
+    demo = demo_scores(reg, test, images) if args.rule == "demo" else None
     manifest = []
-    for c in CLASSES:
+    for c in (c for c in CLASSES if c["key"] in scope):
         rows = test[test.label == c["index"]]
         if args.rule in ("typical", "demo"):
             idx = rows.index.to_numpy()
@@ -103,6 +113,9 @@ def main():
         shutil.copyfile(DATASET_DIR / row.path, out / f"{c['key']}.jpg")
         manifest.append({"key": c["key"], "name": c["name"], "file": f"/test-samples/{c['key']}.jpg",
                          "photo_id": row.photo_id, **extra})
+    for stale in out.glob("*.jpg"):  # conditions the app no longer diagnoses
+        if stale.stem not in scope:
+            stale.unlink()
     save_json({"note": NOTES[args.rule], "rule": args.rule, "samples": manifest}, out / "manifest.json")
     print(f"Exported {len(manifest)} test samples ({args.rule}) to {out}: "
           + ", ".join(f"{m['key']}={m['photo_id']}" for m in manifest))

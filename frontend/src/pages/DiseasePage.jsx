@@ -4,7 +4,7 @@ import { ArrowLeft, ExternalLink, Eye, GitCompareArrows, ListChecks, ScanSearch,
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
 import { Badge, ButtonLink, Callout, Card, CardHeader, EmptyState, Meter, Skeleton } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
-import { defaultModel, taskClasses } from "../lib/analytics.js";
+import { TASK, classicalModel, defaultModel, taskClasses } from "../lib/analytics.js";
 import { classMeta } from "../lib/classes.js";
 import { cx, pct } from "../lib/format.js";
 
@@ -42,12 +42,12 @@ export default function DiseasePage() {
   useDocumentTitle(item?.name || "Disease");
   const [img, setImg] = useState(0);
 
-  const d8 = defaultModel(analytics, "8class");
-  const d5 = defaultModel(analytics, "5class");
-  const c8 = taskClasses(analytics, "8class");
-  const alikes = useMemo(() => lookAlikes(d8, c8, key), [d8, c8, key]);
-  const perf8 = d8?.per_class?.find((p) => p.key === key);
-  const perf5 = d5?.per_class?.find((p) => p.key === key);
+  const dl = defaultModel(analytics, TASK);
+  const ml = classicalModel(analytics, TASK);
+  const classes = taskClasses(analytics, TASK);
+  const alikes = useMemo(() => lookAlikes(dl, classes, key), [dl, classes, key]);
+  const perfDl = dl?.per_class?.find((p) => p.key === key);
+  const perfMl = ml?.per_class?.find((p) => p.key === key);
 
   if (libraryLoading && !library) return <Skeleton className="h-[520px] rounded-2xl" />;
   if (!item)
@@ -135,8 +135,8 @@ export default function DiseasePage() {
             <CardHeader icon={ScanSearch} title="How well the models recognise it" subtitle="Held-out test photos" />
             <div className="space-y-5 p-5">
               {[
-                ["Full 8-class model", d8, perf8],
-                ["Focused 5-class model", d5, perf5],
+                ["Deep learning", dl, perfDl],
+                ["Classical ML", ml, perfMl],
               ].map(([label, m, p]) =>
                 p ? (
                   <div key={label}>
@@ -164,7 +164,7 @@ export default function DiseasePage() {
 
           {alikes.length > 0 && (
             <Card>
-              <CardHeader icon={GitCompareArrows} title="Most often confused with" subtitle="From the 8-class model's test confusion matrix" />
+              <CardHeader icon={GitCompareArrows} title="Most often confused with" subtitle="From the deep-learning model's test confusion matrix" />
               <ul className="divide-y divide-line">
                 {alikes.map((a) => (
                   <li key={a.key} className="flex items-center justify-between gap-3 px-5 py-3 text-sm">

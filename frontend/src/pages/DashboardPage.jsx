@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Activity, ArrowRight, Cpu, Database, FlaskConical, Gauge, History, ScanSearch, ShieldCheck, Sparkles, Target, Trash2, TrendingUp } from "lucide-react";
+import { Activity, ArrowRight, Cpu, Database, FlaskConical, Gauge, History, Layers3, ScanSearch, ShieldCheck, Sparkles, Target, Trash2 } from "lucide-react";
 import { ClassDistribution } from "../components/charts/charts.jsx";
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
 import { Badge, Button, ButtonLink, Card, CardHeader, EmptyState, ErrorState, PageHeader, Skeleton, Stat } from "../components/ui/primitives.jsx";
 import { useData } from "../context/DataContext.jsx";
-import { comparisonsFor, defaultModel, previousDefault, ranked, taskInfo } from "../lib/analytics.js";
+import { TASK, classicalModel, comparisonsFor, defaultModel, isClassicalModel, previousDefault, ranked, taskClasses, taskInfo } from "../lib/analytics.js";
 import { STATUS_STYLE, classMeta } from "../lib/classes.js";
 import { ci, ms, pct, signedPct, timeAgo } from "../lib/format.js";
 import { clearHistory, loadHistory } from "../lib/history.js";
@@ -66,8 +66,10 @@ function RecentDiagnoses() {
   );
 }
 
-function Leaderboard({ analytics, task }) {
-  const rows = ranked(analytics, task).slice(0, 5);
+function Leaderboard({ analytics, family }) {
+  const rows = ranked(analytics, TASK)
+    .filter((m) => family === "all" || (family === "ml" ? isClassicalModel(m) : !isClassicalModel(m)))
+    .slice(0, 5);
   return (
     <ul className="divide-y divide-line">
       {rows.map((m, i) => (
@@ -93,13 +95,14 @@ function Leaderboard({ analytics, task }) {
 export default function DashboardPage() {
   useDocumentTitle("Dashboard");
   const { analytics, analyticsError, analyticsLoading, reloadAnalytics, health, analyticsSource } = useData();
-  const [task, setTask] = useState("5class");
+  const [family, setFamily] = useState("all");
 
-  const d5 = defaultModel(analytics, "5class");
-  const d8 = defaultModel(analytics, "8class");
-  const p5 = previousDefault(analytics, "5class");
-  const gain = useMemo(() => comparisonsFor(analytics, "5class").find((c) => c.a === d5?.key && c.b === p5?.key), [analytics, d5, p5]);
+  const d5 = defaultModel(analytics, TASK);
+  const cm = classicalModel(analytics, TASK);
+  const p5 = previousDefault(analytics, TASK);
+  const gain = useMemo(() => comparisonsFor(analytics, TASK).find((c) => c.a === d5?.key && c.b === p5?.key), [analytics, d5, p5]);
   const classes = analytics?.dataset?.classes || [];
+  const diagnosed = taskClasses(analytics, TASK);
 
   return (
     <div>
@@ -128,9 +131,9 @@ export default function DashboardPage() {
           <>
             <Stat
               icon={Target}
-              label="Default model · test accuracy"
+              label="Deep learning (default) · test accuracy"
               value={pct(d5?.test?.accuracy)}
-              hint={`${taskInfo(analytics, "5class")?.label || "5 classes"} · 95% CI ${ci(d5?.test?.accuracy_ci)}`}
+              hint={`5 conditions · 95% CI ${ci(d5?.test?.accuracy_ci)}`}
             />
             <Stat
               icon={ShieldCheck}
@@ -139,8 +142,20 @@ export default function DashboardPage() {
               value={pct(d5?.selective?.test?.accuracy_kept ?? d5?.selective?.accuracy_kept)}
               hint={d5?.selective ? `Answers ${pct(d5.selective.test?.coverage ?? d5.selective.coverage, 0)} of test photos; says “Uncertain” for the rest` : "Selective prediction not configured"}
             />
-            <Stat icon={TrendingUp} tone="violet" label="8-class model · macro-F1" value={pct(d8?.test?.f1_macro)} hint={`accuracy ${pct(d8?.test?.accuracy)} · CI ${ci(d8?.test?.f1_macro_ci)}`} />
-            <Stat icon={Cpu} tone="sun" label="Default model · CPU time" value={ms(d5?.latency_ms)} hint="Median per photo, including test-time augmentation" />
+            <Stat
+              icon={Layers3}
+              tone="violet"
+              label="Classical ML · test accuracy"
+              value={pct(cm?.test?.accuracy)}
+              hint={cm ? `No neural network · macro-F1 ${pct(cm.test?.f1_macro)} · 95% CI ${ci(cm.test?.accuracy_ci)}` : "Not in this results file"}
+            />
+            <Stat
+              icon={Cpu}
+              tone="sun"
+              label="Deep learning · CPU time"
+              value={ms(d5?.latency_ms)}
+              hint={`Median per photo, including test-time augmentation${cm?.latency_ms != null ? ` · classical ML ${ms(cm.latency_ms)}` : ""}`}
+            />
           </>
         )}
       </div>
@@ -151,7 +166,7 @@ export default function DashboardPage() {
             <Sparkles className="size-5" aria-hidden />
           </span>
           <div className="flex-1 text-sm leading-relaxed text-ink-2">
-            <strong className="text-ink">Upgrade vs original default (same {analytics.tasks["5class"].test_photos} test photos):</strong> accuracy {signedPct(gain.accuracy_diff)}, macro-F1 {signedPct(gain.f1_diff)} (95% CI {signedPct(gain.f1_ci[0])} to {signedPct(gain.f1_ci[1])}).{" "}
+            <strong className="text-ink">Upgrade vs original default (same {taskInfo(analytics, TASK)?.test_photos ?? "—"} test photos):</strong> accuracy {signedPct(gain.accuracy_diff)}, macro-F1 {signedPct(gain.f1_diff)} (95% CI {signedPct(gain.f1_ci[0])} to {signedPct(gain.f1_ci[1])}).{" "}
             {gain.f1_ci[0] > 0 ? "The improvement is statistically reliable." : "The confidence interval includes zero, so this difference is not statistically reliable."}
           </div>
           <ButtonLink to="/lab" variant="ghost" size="sm" iconRight={ArrowRight}>
@@ -168,15 +183,19 @@ export default function DashboardPage() {
             subtitle="Ranked by macro-F1, which weighs every class equally"
             action={
               <div className="inline-flex rounded-lg border border-line bg-surface-2 p-0.5 text-xs">
-                {["5class", "8class"].map((t) => (
-                  <button key={t} onClick={() => setTask(t)} className={`rounded-md px-2.5 py-1 font-medium ${task === t ? "bg-surface text-ink shadow-sm" : "text-muted"}`}>
-                    {t === "5class" ? "5 classes" : "8 classes"}
+                {[
+                  ["all", "All"],
+                  ["dl", "Deep learning"],
+                  ["ml", "Classical ML"],
+                ].map(([f, label]) => (
+                  <button key={f} onClick={() => setFamily(f)} className={`rounded-md px-2.5 py-1 font-medium ${family === f ? "bg-surface text-ink shadow-sm" : "text-muted"}`}>
+                    {label}
                   </button>
                 ))}
               </div>
             }
           />
-          {analytics ? <Leaderboard analytics={analytics} task={task} /> : <div className="p-5"><Skeleton className="h-48" /></div>}
+          {analytics ? <Leaderboard analytics={analytics} family={family} /> : <div className="p-5"><Skeleton className="h-48" /></div>}
           <div className="border-t border-line px-5 py-3 text-right">
             <Link to="/lab" className="inline-flex items-center gap-1 text-sm font-medium text-leaf-700 hover:underline dark:text-leaf-300">
               Open the model lab <ArrowRight className="size-4" aria-hidden />
@@ -208,7 +227,15 @@ export default function DashboardPage() {
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className="xl:col-span-2">
-          <CardHeader icon={Database} title="Dataset" subtitle={analytics ? `${analytics.dataset.photos.toLocaleString()} unique photos · ${analytics.dataset.files.toLocaleString()} files · leakage-free split by leaf group` : ""} />
+          <CardHeader
+            icon={Database}
+            title="Dataset"
+            subtitle={
+              analytics
+                ? `${analytics.dataset.photos.toLocaleString()} unique photos · ${analytics.dataset.files.toLocaleString()} files · leakage-free split by leaf group${diagnosed.length && classes.length ? ` · the app diagnoses ${diagnosed.length} of the ${classes.length} classes` : ""}`
+                : ""
+            }
+          />
           <div className="p-4">{classes.length ? <ClassDistribution classes={classes} /> : <Skeleton className="h-64" />}</div>
         </Card>
         <Card>

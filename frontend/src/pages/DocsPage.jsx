@@ -29,16 +29,16 @@ function Code({ children, lang = "bash" }) {
 
 const ENDPOINTS = [
   { method: "GET", path: "/api/health", desc: "Server status, loaded models, device, load errors." },
-  { method: "GET", path: "/api/models", desc: "Deployed models with task, classes, thresholds, operating point and test metrics; default per task." },
-  { method: "POST", path: "/api/predict?model=&explain=", desc: "Multipart `file`. Calibrated probabilities, status (Healthy / Diseased / Uncertain / Unusual image), OOD ratio, preprocessing details; with explain=true also Grad-CAM (overlay + RGBA heat map) and the 256×256 model input." },
-  { method: "POST", path: "/api/compare?task=|models=", desc: "Runs several models on the same photo (all by default, one task, or a comma-separated list)." },
+  { method: "GET", path: "/api/models", desc: "The two served models — deep learning (default) and classical ML, both for the same five conditions — with kind, classes, thresholds, operating point and test metrics." },
+  { method: "POST", path: "/api/predict?model=&explain=", desc: "Multipart `file`. Calibrated probabilities, status (Healthy / Diseased / Uncertain / Unusual image), OOD ratio, preprocessing details; with explain=true also the 256×256 model input and, for the deep-learning model, Grad-CAM (overlay + RGBA heat map)." },
+  { method: "POST", path: "/api/compare?models=", desc: "Runs several models on the same photo: both served models by default, or a comma-separated list of model keys." },
   { method: "GET", path: "/api/classes", desc: "Disease library: symptoms, visual signs, management, references." },
   { method: "GET", path: "/api/analytics", desc: "All results shown on this site (experiments/platform.json)." },
 ];
 
 const TREE = `tomato-leaf-ai/
 ├── src/tomatoleaf/        shared library: preprocessing, models, training, evaluation, OOD, Grad-CAM
-├── scripts/               numbered pipeline (01–18 original study, 19–27 upgrade)
+├── scripts/               numbered pipeline (01–18 original study, 19–42 upgrade, 43–44 classical ML model)
 ├── backend/               FastAPI app (api/, services/, data/, tests/)
 ├── frontend/              React + Vite + Tailwind platform (this site)
 ├── tests/                 unit tests for the shared library
@@ -68,8 +68,8 @@ export default function DocsPage() {
           <div className="grid grid-cols-1 gap-4 p-5 md:grid-cols-3">
             {[
               { icon: Boxes, title: "Frontend", text: "React 19 + Vite + Tailwind 4 + Recharts. Reads results from /api/analytics (falls back to a bundled snapshot when the API is offline)." },
-              { icon: Server, title: "API", text: "FastAPI. Validates uploads by content, applies the dataset-faithful preprocessing, runs PyTorch models on CPU, returns calibrated, explained predictions." },
-              { icon: Settings2, title: "Models", text: "Checkpoints listed in experiments/deployment.json with their temperature, thresholds and OOD statistics; weights come from a GitHub release (SHA-256 verified)." },
+              { icon: Server, title: "API", text: "FastAPI. Validates uploads by content, applies the dataset-faithful preprocessing, runs the deep-learning network (PyTorch / ONNX Runtime) or the scikit-learn classical model on CPU, returns calibrated, explained predictions." },
+              { icon: Settings2, title: "Models", text: "Two served models for the same five conditions, listed in experiments/deployment.json with their calibration, thresholds and OOD statistics; weights come from a GitHub release (SHA-256 verified)." },
             ].map(({ icon: Icon, title, text }) => (
               <div key={title} className="rounded-xl bg-surface-2 p-4">
                 <Icon className="size-5 text-leaf-600" aria-hidden />
@@ -81,7 +81,8 @@ export default function DocsPage() {
           <div className="px-5 pb-5">
             <Code lang="text">{`photo ─▶ validate (type, size, decode) ─▶ EXIF orientation ─▶ colour → Display P3
       ─▶ aspect clamp 3:4..4:3 ─▶ resize whole frame to 256×256 ─▶ JPEG q90
-      ─▶ model (8-view TTA) ─▶ temperature scaling ─▶ thresholds (Uncertain / Unusual) ─▶ Grad-CAM`}</Code>
+      ─▶ deep learning: network (8-view TTA) ─▶ calibration ─▶ thresholds (Uncertain / Unusual) ─▶ Grad-CAM
+      ─▶ classical ML: colour + texture + HOG features ─▶ classifier ─▶ calibration ─▶ thresholds (Uncertain / Unusual)`}</Code>
           </div>
         </Card>
 

@@ -2,7 +2,7 @@
 
 Every page at desktop and phone width in the light and the dark theme: no Python exception on the page, no
 horizontal scrolling, no browser console errors. On Diagnose: an example photo, a full-size phone-style JPEG upload,
-an invalid file, the 8-class model and the all-model comparison. Screenshots go to docs/screenshots/.
+an invalid file, the classical ML model and the two-model comparison. Screenshots go to docs/screenshots/.
 
     streamlit run streamlit_app.py --server.port 8510      # in another terminal
     python scripts/30_streamlit_check.py --url http://localhost:8510
@@ -125,24 +125,26 @@ def main():
         page.wait_for_timeout(800)
         if page.locator('[data-testid="stImage"]').count() < 2:
             failures.append("Grad-CAM images missing")
-        # all-model comparison (5-class)
-        page.get_by_text("Ask the other models too").click()
+        # two-model comparison
+        page.get_by_text("Ask the other model too").click()
         settle(page)
         page.wait_for_selector('[data-testid="stDataFrame"]', timeout=180000)
         report["diagnose"]["compare"] = "shown"
-        # 8-class model
-        focused = page.locator(".tc-status").first.inner_text()
-        segment(page, "Full · 8 conditions").click()
+        # classical ML model
+        deep = page.locator(".tc-status").first.inner_text()
+        segment(page, "Classical ML").click()
         dep = json.loads((ROOT / "experiments" / "deployment.json").read_text(encoding="utf-8"))
-        full = next(e for e in dep["models"] if e["key"] == dep["defaults_by_task"]["8class"])
-        page.wait_for_selector(f"text=Full · {len(full['members'])} ConvNeXt-T networks", timeout=300000)
+        ml = next(e for e in dep["models"] if e.get("type") == "sklearn")
+        page.wait_for_selector(f"text=Classical ML · {ml['pipeline']['classifier']}", timeout=300000)
         for _ in range(60):  # a slow server may still show the previous answer for a moment
             text = page.locator(".tc-status").first.inner_text() if page.locator(".tc-status").count() else ""
-            if text and text != focused:
+            if text and text != deep:
                 break
             page.wait_for_timeout(2000)
-        report["diagnose"]["example_8class"] = text
-        print("8-class ->", report["diagnose"]["example_8class"].replace("\n", " | "))
+        report["diagnose"]["example_classical"] = text
+        print("classical ->", report["diagnose"]["example_classical"].replace("\n", " | "))
+        segment(page, "Deep learning").click()
+        settle(page)
         # upload a phone-size photo
         segment(page, "Upload").click()
         settle(page)

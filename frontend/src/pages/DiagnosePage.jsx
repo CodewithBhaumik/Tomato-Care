@@ -27,7 +27,7 @@ function Scanning() {
         </div>
         <div className="flex-1 space-y-3">
           <p className="font-display font-semibold text-ink">Analysing the leaf…</p>
-          <p className="text-sm text-muted">Preprocessing like the dataset, running the network with test-time augmentation, calibrating confidence and computing Grad-CAM.</p>
+          <p className="text-sm text-muted">Preprocessing like the dataset, running the model, calibrating its confidence and checking the photo.</p>
           <div className="h-1.5 overflow-hidden rounded-full bg-surface-3">
             <div className="skeleton h-full w-full" />
           </div>
@@ -41,18 +41,16 @@ export default function DiagnosePage() {
   useDocumentTitle("Diagnose");
   const { online, models, health } = useData();
   const { file, choose, result, status, error, run, comparison, compareStatus, compareError, runCompare } = usePrediction();
-  const [task, setTask] = useState("5class");
   const [model, setModel] = useState(null);
   const [sample, setSample] = useState(null);
 
-  const defaults = models?.defaults_by_task;
   useEffect(() => {
-    const list = (models?.models || []).filter((m) => m.task === task);
+    const list = models?.models || [];
     if (!list.length) return;
-    if (!list.some((m) => m.key === model)) setModel(defaults?.[task] || list[0].key);
-  }, [models, task, model, defaults]);
+    if (!list.some((m) => m.key === model)) setModel(models.default_model || list[0].key);
+  }, [models, model]);
 
-  // A result belongs to the model that produced it. Switching scope (focused <-> full) must not leave the other
+  // A result belongs to the model that produced it. Switching model (deep learning <-> classical ML) must not leave the other
   // model's answer on screen: clear it (same photo kept) so the next "Diagnose" shows this model's own answer.
   useEffect(() => {
     if (result?.model?.key && model && result.model.key !== model) choose(file);
@@ -94,7 +92,7 @@ export default function DiagnosePage() {
             </div>
           </Card>
           <Card className="p-5">
-            <ModelPicker task={task} onTask={setTask} model={model} onModel={setModel} disabled={running} />
+            <ModelPicker model={model} onModel={setModel} disabled={running} />
             <Button className="mt-5 w-full" size="lg" icon={Wand2} onClick={diagnose} disabled={!file || !online || !model} loading={running}>
               {running ? "Diagnosing…" : "Diagnose"}
             </Button>
@@ -132,18 +130,18 @@ export default function DiagnosePage() {
                 <CardHeader
                   icon={FlaskConical}
                   title="Second opinion"
-                  subtitle="Run both Tomato Care models — focused (5 conditions) and full (8 conditions) — on this photo"
+                  subtitle="Run both Tomato Care models — deep learning and classical ML — on this photo"
                   action={
                     <Button variant="secondary" size="sm" onClick={() => runCompare()} loading={compareStatus === "running"} disabled={!online}>
-                      {comparison ? "Run again" : "Ask all models"}
+                      {comparison ? "Run again" : "Ask both models"}
                     </Button>
                   }
                 />
                 <div className="p-5">
                   {compareStatus === "error" && <ErrorState error={compareError} onRetry={() => runCompare()} />}
-                  {compareStatus === "running" && <p className="text-sm text-muted">Running all models on the same photo…</p>}
+                  {compareStatus === "running" && <p className="text-sm text-muted">Running both models on the same photo…</p>}
                   {comparison && compareStatus === "done" && <CompareTable results={comparison.results} trueKey={result.trueKey} models={models} />}
-                  {compareStatus === "idle" && !comparison && <p className="text-sm text-muted">See whether the other Tomato Care models agree on exactly this photo.</p>}
+                  {compareStatus === "idle" && !comparison && <p className="text-sm text-muted">See whether the other Tomato Care model agrees on exactly this photo.</p>}
                 </div>
               </Card>
             </motion.div>
