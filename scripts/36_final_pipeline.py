@@ -6,14 +6,15 @@ before training:
 
 P1  Arms: A class-weighted loss, B class-balanced sampling (one compensation mechanism each). The focused model uses
     arm A with outlier exposure; the other planned arms (C: plain + post-hoc logit adjustment, and B/C with outlier
-    exposure) were dropped for time before any of their results existed. Selection: highest OOF macro-F1 (argmax of the final calibrated probabilities); within 0.01 -> lower OOF
-    NLL. Focused only: eligible if the operating threshold refuses >= 80% of the OOF out-of-scope photos (else: the
-    arm with the highest refusal rate).
+    exposure) were dropped for time before any of their results existed. Last round adds leaf-crop arms (D focused,
+    E full). Selection: highest OOF macro-F1 (argmax of the final calibrated probabilities); within 0.01 -> lower OOF
+    NLL.
 P2  Calibration: temperature scaling vs per-class vector scaling, both cross-fitted; lower OOF NLL wins, within 0.005
     -> temperature scaling. The answer is the argmax of the final calibrated probabilities (= the tallest bar).
 P3  One threshold: the lowest calibrated confidence whose OOF accuracy on answered photos is >= 90% (the user's target,
-    both models) with >= 50% of in-scope photos answered. Focused: an answered out-of-scope photo counts as an error, and
-    >= 80% of out-of-scope photos must be refused; among such arms the one answering the most photos is chosen.
+    both models) with >= 50% of in-scope photos answered. Focused: an answered out-of-scope photo counts as an error.
+    (An extra ">= 80% of out-of-scope photos refused" constraint forced 0.95 and left the focused model answering
+    almost only Leaf Miner; it was dropped at the user's request to lower the threshold. Refusal is still reported.)
 P4  Unusual-image gate of the selected networks: kNN vs Mahalanobis feature distance (each fold network's own
     training photos), chosen by OOF AUROC against synthetic non-leaf probes (half A), leaf-free paper made from
     held-out photos and, for the focused model, OOF out-of-scope photos. Limits: 95% of OOF genuine photos pass, per
@@ -72,7 +73,7 @@ ARM_LABEL = {"A": "class-weighted loss", "B": "class-balanced sampling",
              "D": "leaf crop + class-weighted loss (outlier exposure 1.0)", "E": "leaf crop + class-balanced sampling"}
 REFERENCE = {"5class": "convnext_t_in1k_robust"}  # the v2 focused networks (no outlier exposure), for comparison only
 TARGET = {"5class": 0.90, "8class": 0.90}
-MIN_REFUSAL, F1_TIE, NLL_TIE = 0.80, 0.01, 0.005
+F1_TIE, NLL_TIE = 0.01, 0.005
 GRID = np.round(np.arange(0.30, 0.991, 0.01), 2)
 OOD_KEEP, SHRINK_N, CLAMP = 0.95, 30, (0.5, 2.0)
 PAPER_PER_FOLD = 30
@@ -140,16 +141,11 @@ def operating_point(p, y, po, target):
         curve.append({"threshold": float(t), "coverage": float(keep.mean()),
                       "accuracy_kept": float((pred[keep] == y[keep]).sum() / answered) if answered else None,
                       "out_of_scope_answered": float(okeep.mean()) if len(oconf) else None})
-
-    def refused_ok(r):
-        return r["out_of_scope_answered"] is None or r["out_of_scope_answered"] <= 1 - MIN_REFUSAL
-
-    ok = [r for r in curve if r["accuracy_kept"] is not None and r["accuracy_kept"] >= target and r["coverage"] >= 0.5
-          and refused_ok(r)]
+    ok = [r for r in curve if r["accuracy_kept"] is not None and r["accuracy_kept"] >= target and r["coverage"] >= 0.5]
     if ok:
         return ok[0], (f"lowest calibrated confidence with out-of-fold accuracy on answered photos >= {target:.0%} "
-                       f"(coverage of in-scope photos >= 50%)"
-                       + (f" and >= {MIN_REFUSAL:.0%} of out-of-scope photos refused" if po is not None else "")), curve
+                       f"(coverage of in-scope photos >= 50%"
+                       + ("; answered out-of-scope photos count as errors" if po is not None else "") + ")"), curve
     row = max((r for r in curve if r["coverage"] >= 0.5), key=lambda r: r["accuracy_kept"])
     return row, f"target {target:.0%} not reachable at >= 50% coverage: best accuracy at >= 50% coverage", curve
 
@@ -193,17 +189,6 @@ def evaluate_arm(task, arm, recipe, prior):
 
 def select(task, arms):
     pool = list(arms.values())
-    if task == "5class":
-        eligible = [a for a in pool if a["out_of_scope_refusal"] is not None and a["out_of_scope_refusal"] >= MIN_REFUSAL]
-        if not eligible:
-            best = max(pool, key=lambda a: a["out_of_scope_refusal"] or 0)
-            return best, "no arm refused >= 80% of out-of-fold out-of-scope photos: the highest refusal rate wins"
-        # focused: the most photos answered under the same reliability constraints; within 0.01 -> higher macro-F1
-        top = max(a["operating_point"]["coverage"] for a in eligible)
-        tied = [a for a in eligible if a["operating_point"]["coverage"] >= top - F1_TIE]
-        chosen = max(tied, key=lambda a: a["oof"]["f1_macro"])
-        return chosen, (f"most in-scope photos answered at >= {TARGET[task]:.0%} accuracy with >= {MIN_REFUSAL:.0%} of "
-                        f"out-of-scope photos refused (coverage {chosen['operating_point']['coverage']:.3f})")
     top = max(a["oof"]["f1_macro"] for a in pool)
     tied = [a for a in pool if a["oof"]["f1_macro"] >= top - F1_TIE]
     chosen = min(tied, key=lambda a: a["oof"]["nll"])
