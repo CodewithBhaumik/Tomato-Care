@@ -2,7 +2,7 @@
 # streamlit_app.py). CPU-only PyTorch: the default PyPI build would also pull ~2 GB of CUDA libraries.
 # Other environments: requirements-serve.txt (REST API / Docker), requirements-train.txt (full pipeline),
 # requirements-dev.txt (tests and tooling).
-# Community Cloud reinstalls and restarts the app whenever this file changes (models v2.1: balanced/calibrated).
+# Community Cloud reinstalls and restarts the app whenever this file changes (2026-11-19: one model per mode, data-keyed caches).
 torch @ https://download.pytorch.org/whl/cpu/torch-2.7.0%2Bcpu-cp310-cp310-manylinux_2_28_x86_64.whl ; python_version == "3.10" and sys_platform == "linux" and platform_machine == "x86_64"
 torch @ https://download.pytorch.org/whl/cpu/torch-2.7.0%2Bcpu-cp311-cp311-manylinux_2_28_x86_64.whl ; python_version == "3.11" and sys_platform == "linux" and platform_machine == "x86_64"
 torch @ https://download.pytorch.org/whl/cpu/torch-2.7.0%2Bcpu-cp312-cp312-manylinux_2_28_x86_64.whl ; python_version == "3.12" and sys_platform == "linux" and platform_machine == "x86_64"
