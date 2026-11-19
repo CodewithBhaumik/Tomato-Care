@@ -49,7 +49,6 @@ backgroundColor = "#0b120e"
 
 [server]
 maxUploadSize = 10          # MB, same limit as the REST API
-fileWatcherType = "none"
 
 [browser]
 gatherUsageStats = false

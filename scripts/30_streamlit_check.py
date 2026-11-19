@@ -84,6 +84,7 @@ def main():
             for vp_name, vp in VIEWPORTS.items():
                 ctx = browser.new_context(viewport=vp, color_scheme=scheme, device_scale_factor=1)
                 page = ctx.new_page()
+                page.set_default_navigation_timeout(120000)  # a cold Community Cloud app can be slow
                 errors = []
                 # Streamlit probes <page>/_stcore/... on deep links before falling back to the root: harmless 404s
                 page.on("console", lambda m, errors=errors: errors.append(m.text) if m.type == "error"
@@ -107,6 +108,7 @@ def main():
         # ---- diagnose flows (desktop, light)
         ctx = browser.new_context(viewport=VIEWPORTS["desktop"], color_scheme="light")
         page = ctx.new_page()
+        page.set_default_navigation_timeout(120000)
         page.goto(f"{base}/diagnose", wait_until="domcontentloaded")
         settle(page)
         segment(page, "Examples").click()
@@ -129,9 +131,15 @@ def main():
         page.wait_for_selector('[data-testid="stDataFrame"]', timeout=180000)
         report["diagnose"]["compare"] = "shown"
         # 8-class model
+        focused = page.locator(".tc-status").first.inner_text()
         segment(page, "Full · 8 conditions").click()
-        settle(page)
-        report["diagnose"]["example_8class"] = page.locator(".tc-status").first.inner_text()
+        page.wait_for_selector("text=10 ConvNeXt-T networks", timeout=120000)
+        for _ in range(60):  # a slow server may still show the previous answer for a moment
+            text = page.locator(".tc-status").first.inner_text() if page.locator(".tc-status").count() else ""
+            if text and text != focused:
+                break
+            page.wait_for_timeout(2000)
+        report["diagnose"]["example_8class"] = text
         print("8-class ->", report["diagnose"]["example_8class"].replace("\n", " | "))
         # upload a phone-size photo
         segment(page, "Upload").click()
@@ -145,7 +153,10 @@ def main():
         # invalid file
         page.locator('input[type="file"]').set_input_files(
             {"name": "not-a-photo.jpg", "mimeType": "image/jpeg", "buffer": b"this is not an image"})
-        settle(page)
+        try:
+            page.wait_for_selector("text=could not be read as an image", timeout=120000)
+        except Exception:
+            pass
         err = page.locator('[data-testid="stAlertContentError"], [data-testid="stAlert"]').first
         report["diagnose"]["invalid"] = err.inner_text() if err.count() else None
         print("invalid ->", report["diagnose"]["invalid"])

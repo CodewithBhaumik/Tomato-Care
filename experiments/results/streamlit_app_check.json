@@ -1,5 +1,5 @@
 {
-  "url": "http://localhost:8510",
+  "url": "https://tomato-care.streamlit.app/~/+",
   "pages": [
     {
       "page": "home",
