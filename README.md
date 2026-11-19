@@ -49,10 +49,10 @@ Every answer comes with the probability of each condition, photo-quality tips, a
 model), the symptoms and management of the condition, and — on request — the other model's answer on the same photo.
 Two models diagnose the same five conditions:
 
-* **Deep learning** (default) — 5 ConvNeXt-Tiny networks, class-weighted loss, trained to be unsure on the
+* **ConvNeXt-Tiny ensemble** (deep learning, default) — 5 ConvNeXt-Tiny networks, class-weighted loss, trained to be unsure on the
   dataset's other three conditions (outlier exposure). Threshold 0.81. Test: accuracy
   90.9% (87.1%–94.5%), macro-F1 0.838; it answers 82% of photos, 97.7% of them correctly.
-* **Classical ML** — gradient boosting on handcrafted colour + texture features of the leaf (HSV histograms and L\*a\*b\* statistics,
+* **Gradient Boosting** (classical ML) — gradient boosting on handcrafted colour + texture features of the leaf (HSV histograms and L\*a\*b\* statistics,
   LBP and GLCM texture), no neural network. Threshold 0.84. Test: accuracy
   78.1% (72.1%–83.9%), macro-F1 0.634; it answers 59% of photos, 91.7% of them correctly.
 

@@ -7,11 +7,11 @@ Format after Mitchell et al., *Model Cards for Model Reporting* (2019). Numbers:
 * **What**: image classifiers for single tomato leaves photographed on plain paper, five conditions (Healthy,
   Leaf Miner, Magnesium Deficiency, Nitrogen Deficiency, Spotted Wilt Virus). Two served models, chosen with the same
   rules (`docs/FINAL_REPORT.md`):
-  * **Deep learning** (`focused_5class`, default): 5-fold ensemble of ConvNeXt-Tiny (ImageNet-1k pretrained)
+  * **ConvNeXt-Tiny ensemble** (`focused_5class`, deep learning, default): 5-fold ensemble of ConvNeXt-Tiny (ImageNet-1k pretrained)
     fine-tuned at 256×256, class-weighted loss plus outlier exposure (trained to be unsure on Early Blight, Late Blight
     and Potassium photos). Probabilities averaged over the 5 networks, then calibrated. Threshold
     0.81. `scripts/36_final_pipeline.py`.
-  * **Classical ML** (`classical_5class`): gradient boosting on colour + texture features (HSV histograms and L\*a\*b\* moments of the
+  * **Gradient Boosting** (`classical_5class`, classical ML): gradient boosting on colour + texture features (HSV histograms and L\*a\*b\* moments of the
     leaf pixels, uniform LBP histograms and GLCM properties), class-balanced; no neural network. Threshold
     0.84. `scripts/43_classical_model.py`.
   * Both: calibration (temperature or per-class vector scaling) and a per-condition "unusual image" limit, all fitted
@@ -48,8 +48,8 @@ deployed threshold; flip rates under harmless image changes; out-of-distribution
 
 | Model | Accuracy (95% CI) | Macro-F1 | ECE | Answers → accuracy | Unsupported photos refused |
 |---|---:|---:|---:|---:|---:|
-| Deep learning (`focused_5class`, 265 photos) | 90.9% (87.1%–94.5%) | 0.838 | 0.048 | 82% → 97.7% | 52% |
-| Classical ML (`classical_5class`, 265 photos) | 78.1% (72.1%–83.9%) | 0.634 | 0.074 | 59% → 91.7% | 28% |
+| ConvNeXt-Tiny ensemble (`focused_5class`, 265 photos) | 90.9% (87.1%–94.5%) | 0.838 | 0.048 | 82% → 97.7% | 52% |
+| Gradient Boosting (`classical_5class`, 265 photos) | 78.1% (72.1%–83.9%) | 0.634 | 0.074 | 59% → 91.7% | 28% |
 
 Paired bootstrap (classical − deep learning): -12.8 accuracy points (95% CI -18.9 to -7.2), macro-F1 -0.204 (-0.318 to -0.095).
 Genuine test photos flagged as unusual: 6.0% (deep learning), 4.5% (classical).
