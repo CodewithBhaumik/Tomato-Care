@@ -247,3 +247,50 @@ Selection:
 - **Test-set reuse.** The 290 test photos were already scored for v1, v2 and v2.1, though never used for a choice.
   Every decision in this round follows the rules above, written down before training. The final test score is
   reported as a repeated look, not a first one.
+
+## 8. Targeted repair (2026-11-19) — what was fixed, what was not
+
+Instruction: repair, do not rebuild, do not retrain without approval. A retraining round started earlier was
+stopped after 2 of 25 folds; that work is kept, unserved, on the local branch `final-round-wip`.
+
+**Reproduction:** every example image was run three ways, and the results agree.
+
+- Direct inference uses the training code (`tomatoleaf.training.infer` on each fold checkpoint, temperature, mean,
+  per-class calibration and decision rule read from `deployment.json`).
+- The HTTP API gives identical decisions in 96 of 96 cases; the largest probability difference is 8.3e-7.
+- The React UI in a real browser matches the API in 16 of 16 cases (both modes × 8 gallery photos).
+- The Streamlit page matches the API in 64 of 64 cases (both modes × 32 examples).
+
+**Software bugs found and fixed**
+
+1. **Example images had lost their colour profile (RC5).** The 24 images in `frontend/public/samples` are the
+   disease-library pictures and Streamlit's "More examples". They had been re-encoded without their Display P3 tag,
+   so the upload path converted their colours. Results differed from the real photos: confidence by up to 30 points,
+   and two outcomes flipped. They are now lossless copies of the dataset files (`strip_jpeg_metadata`,
+   `scripts/40_library_images.py`). Re-audit (`audit_examples_after_fix.json`): their results are now identical to
+   the dataset files'.
+2. **Stale result after switching mode (React).** Switching Focused ↔ Full kept the previous model's answer on screen
+   until Diagnose was clicked again. Example: the Late Blight photo kept showing the focused model's "Spotted Wilt
+   93.4%", while the full model answers "Late Blight 84.6%". The result is now cleared when the model changes
+   (`DiagnosePage.jsx`), and this was verified in the browser.
+3. **Balanced/Calibrated choice.** Each mode now serves one model, the validated default: `balanced_5class` and
+   `balanced_8class`. `calibrated_5class` stays in the benchmark. Balancing and calibration are unchanged inside the
+   models.
+
+**Checked and correct** (§3, plus): calibration is applied exactly once and in the fitted order (per-network
+temperature → mean → per-class vector scaling; the prior correction only picks the answer); softmax and probability
+handling were checked against the independent direct path; no stale weights or responses besides bug 2.
+
+**Not fixed — model behaviour (needs approval to change):**
+
+- **Focused model, unsupported conditions.** It answers out-of-scope photos confidently. Out-of-fold, 78% of Early
+  Blight / Late Blight / Potassium photos pass the 0.89 threshold, so accuracy on answered photos is 87.7% instead
+  of the 95% target. No existing checkpoint does better (53–73% answered).
+  - Raising the threshold alone would answer only about half of the supported photos and still leak.
+  - Outlier-exposure fine-tuning (2 completed folds): confident answers on unsupported photos drop 0.73 → 0.28, at a
+    cost of in-scope macro-F1 0.884 → 0.836 on the same folds.
+- **Full model, Early Blight / Potassium.** Out-of-fold recall is 0.19 and 0.00. The best existing alternative
+  (DINOv2-S) reaches 0.28 and 0.14 at the same macro-F1. Both conditions are limited by the data (62 and 9
+  photographs).
+- **Rare in-scope conditions flagged "unusual".** On the focused model's test photos this happens to Healthy 22%,
+  Magnesium 21% and Nitrogen 14% of the time, including the gallery's Nitrogen photo.

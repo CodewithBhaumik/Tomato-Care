@@ -76,7 +76,7 @@ def test_models_have_one_default_per_task(client):
     by_key = {m["key"]: m for m in body["models"]}
     assert by_key[defaults["5class"]]["classes"] == FIVE and by_key[defaults["8class"]]["classes"] == CLASS_KEYS
     assert all(m["loaded"] for m in body["models"]), [m["key"] for m in body["models"] if not m["loaded"]]
-    assert set(defaults.values()) <= set(by_key) and len(by_key) == 3  # 2 focused + 1 full, all version 2
+    assert set(by_key) == set(defaults.values())  # one served model per mode (no balanced/calibrated choice)
     assert {m["generation"] for m in body["models"]} == {"upgrade"}
     for key in defaults.values():
         m = by_key[key]

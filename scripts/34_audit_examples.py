@@ -12,7 +12,7 @@ Example sets:
   their colour profile; shown in the disease library and on the landing page);
 - library_original: the dataset file each library image was made from (same photo, original bytes).
 
-Writes experiments/results/audit_examples.json. Run again after any model change.
+Writes experiments/results/audit_examples.json (or --out NAME). Run again after any model change.
 """
 import csv
 import hashlib
@@ -37,6 +37,7 @@ PUBLIC = ROOT / "frontend" / "public"
 
 
 def main():
+    out_name = sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else "audit_examples.json"
     index = list(csv.DictReader(open(DATA_DIR / "splits.csv", encoding="utf-8")))
     folds = {r["photo_id"]: r["fold"] for r in csv.DictReader(open(DATA_DIR / "cv_folds.csv", encoding="utf-8"))}
     by_md5 = {r["md5"]: r for r in index}
@@ -99,7 +100,7 @@ def main():
                                  ("correct", "WRONG", "uncertain", "unusual image")}
         summary[f"{s} | {m}"]["wrong_out_of_scope"] = sum(r["outcome"] == "WRONG" and not r["in_scope"] for r in sub)
     save_json({"created": time.strftime("%Y-%m-%d %H:%M"), "served_models": served, "summary": summary, "rows": rows},
-              RESULTS_DIR / "audit_examples.json")
+              RESULTS_DIR / out_name)
     for k, v in summary.items():
         print(f"{k:45s} {v}")
 

@@ -4,12 +4,13 @@ Format after Mitchell et al., *Model Cards for Model Reporting* (2019). Numbers:
 
 ## Model details
 
-* **What**: image classifiers for single tomato leaves photographed on plain paper. Three served models, all version 2:
-  * **Focused · balanced** (`balanced_5class`, default) and **Focused · calibrated** (`calibrated_5class`): Healthy,
+* **What**: image classifiers for single tomato leaves photographed on plain paper. Two served models (one per mode),
+  both version 2; the calibrated focused variant (`calibrated_5class`) is evaluated but not served:
+  * **Focused · balanced** (`balanced_5class`, default): Healthy,
     Leaf Miner, Magnesium Deficiency, Nitrogen Deficiency, Spotted Wilt Virus — the classes with enough photographs
     to be recognised reliably.
   * **Full · balanced** (`balanced_8class`): the five above plus Early Blight, Late Blight and Potassium Deficiency.
-  * All three post-process the fold networks `upgrade_5class` / `upgrade_8class` with per-class calibration, and the
+  * Both post-process the fold networks `upgrade_5class` / `upgrade_8class` with per-class calibration, and the
     balanced ones also with a class-prior correction (`scripts/31_balance_models.py`, fitted on out-of-fold data).
 * **Architecture**: fold ensembles of ConvNeXt-Tiny (ImageNet-1k pretrained) fine-tuned at 256×256, one view per
   network — the focused model is the 5 cross-validation networks of the robust recipe; the full model the 5 of the

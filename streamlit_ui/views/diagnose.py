@@ -236,7 +236,7 @@ def _result(data: bytes, label: str, task: str, key: str, explain: bool):
     _history_add(r, label)
     st.space("small")
     if st.toggle("Ask the other models too", key="compare_on",
-                 help="Runs every Tomato Care model — focused balanced, focused calibrated and full — on this photo."):
+                 help="Runs both Tomato Care models — focused (5 conditions) and full (8 conditions) — on this photo."):
         _compare(data)
 
 

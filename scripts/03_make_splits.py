@@ -14,7 +14,7 @@ from PIL import Image
 from tomatoleaf.config import CLASSES, DATA_DIR, DATASET_DIR, FIGURES_DIR, RESULTS_DIR, ROOT, SEED
 from tomatoleaf.data import assert_no_group_leakage, assign_leaf_groups, load_index, make_group_split
 from tomatoleaf.plotting import SHORT_NAMES, SPLIT_COLORS, apply_style, plt, save
-from tomatoleaf.preprocessing import load_canonical_array
+from tomatoleaf.preprocessing import load_canonical_array, strip_jpeg_metadata
 from tomatoleaf.utils import save_json
 
 
@@ -75,7 +75,9 @@ def main():
     for c in CLASSES:
         pool = originals[(originals.split == "train") & (originals.label == c["index"])].path.to_numpy()
         for n, rel in enumerate(rng.choice(pool, size=3, replace=False), start=1):
-            Image.fromarray(load_canonical_array(DATASET_DIR / rel)).save(samples_dir / f"{c['key']}-{n}.jpg", quality=92)
+            # lossless copy (metadata removed, Display P3 profile kept): a re-encode without the profile made the
+            # upload path convert the colours (docs/AUDIT.md, RC5)
+            (samples_dir / f"{c['key']}-{n}.jpg").write_bytes(strip_jpeg_metadata((DATASET_DIR / rel).read_bytes()))
     print("Exported web samples to", samples_dir)
 
 

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generated_at": "2026-11-19T11:37:02",
+  "generated_at": "2026-11-19T13:35:34",
   "project": {
     "name": "Tomato Care"
   },
@@ -171,8 +171,7 @@
       "network_model": "upgrade_5class",
       "previous_default": "ensemble_5class",
       "served_models": [
-        "balanced_5class",
-        "calibrated_5class"
+        "balanced_5class"
       ]
     },
     "8class": {
@@ -5794,7 +5793,7 @@
       "recipes": [
         "convnext_t_in1k_robust"
       ],
-      "deployed": true,
+      "deployed": false,
       "is_default": false,
       "description": "Same networks; per-class calibration so every condition's confidence matches its own accuracy.",
       "variant": "calibrated",

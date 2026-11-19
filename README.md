@@ -48,9 +48,8 @@ and how sure it is:
 
 Every answer comes with the probability of each condition, a Grad-CAM heat map of where the networks looked, the
 symptoms and management of the condition, and — on request — the answers of the other Tomato Care models on the
-same photo. The apps serve three version-2 models — **focused · balanced** (default), **focused · calibrated** and
-**full · balanced** — and the original study's models appear only as
-the baseline in the evaluation.
+same photo. The apps serve one version-2 model per mode — **focused · balanced** (default) and **full · balanced**;
+the focused · calibrated variant and the original study's models appear only in the evaluation.
 
 Two front ends share one prediction engine (`backend/services/predictor.py`):
 

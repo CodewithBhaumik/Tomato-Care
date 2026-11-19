@@ -15,6 +15,7 @@ from tomatoleaf.preprocessing import (
     load_canonical_array,
     open_image,
     prepare_upload,
+    strip_jpeg_metadata,
     to_dataset_colour,
 )
 
@@ -136,3 +137,23 @@ def test_sixteen_bit_png_is_supported():
     Image.fromarray(arr).save(buf, format="PNG")
     rgb, _ = prepare_upload(buf.getvalue())
     assert rgb.shape == (256, 256, 3) and rgb.max() > 200
+
+
+def test_strip_jpeg_metadata_is_lossless_and_keeps_the_colour_profile():
+    """Library images are dataset files minus metadata: same decoded pixels, Display P3 profile kept."""
+    from PIL import ImageCms
+
+    p3 = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()  # any valid ICC payload
+    rng = np.random.default_rng(0)
+    img = Image.fromarray(rng.integers(0, 255, (64, 64, 3), dtype=np.uint8))
+    raw = jpeg(img, icc_profile=p3)
+    app4 = bytes([0xFF, 0xE4])
+    junk = app4 + (2 + 1000).to_bytes(2, "big") + bytes(1000)  # an APP4 debug segment, like the phone's
+    raw = raw[:2] + junk + raw[2:]
+    out = strip_jpeg_metadata(raw)
+    assert len(out) < len(raw) - 1000
+    assert app4 not in out[:200]
+    assert np.array_equal(np.asarray(Image.open(BytesIO(out))), np.asarray(Image.open(BytesIO(raw))))
+    assert Image.open(BytesIO(out)).info.get("icc_profile") == p3
+    with pytest.raises(ValueError):
+        strip_jpeg_metadata(b"not a jpeg")

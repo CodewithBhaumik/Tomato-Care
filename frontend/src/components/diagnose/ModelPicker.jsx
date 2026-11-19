@@ -30,21 +30,28 @@ export default function ModelPicker({ task, onTask, model, onModel, disabled }) 
         <label htmlFor="model-select" className="mb-2 block text-sm font-medium text-ink">
           Model
         </label>
-        <select
-          id="model-select"
-          value={model || ""}
-          onChange={(e) => onModel(e.target.value)}
-          disabled={disabled || !list.length}
-          className="h-10 w-full rounded-xl border border-line-strong bg-surface px-3 text-sm text-ink shadow-sm outline-none focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/20"
-        >
-          {!list.length && <option value="">Models load when the server is online</option>}
-          {list.map((m) => (
-            <option key={m.key} value={m.key}>
-              {m.name}
-              {models?.defaults_by_task?.[task] === m.key ? " — recommended" : ""}
-            </option>
-          ))}
-        </select>
+        {list.length === 1 ? (
+          // one served model per scope: shown, not chosen
+          <div id="model-select" className="flex h-10 w-full items-center rounded-xl border border-line-strong bg-surface px-3 text-sm text-ink shadow-sm">
+            {list[0].name}
+          </div>
+        ) : (
+          <select
+            id="model-select"
+            value={model || ""}
+            onChange={(e) => onModel(e.target.value)}
+            disabled={disabled || !list.length}
+            className="h-10 w-full rounded-xl border border-line-strong bg-surface px-3 text-sm text-ink shadow-sm outline-none focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/20"
+          >
+            {!list.length && <option value="">Models load when the server is online</option>}
+            {list.map((m) => (
+              <option key={m.key} value={m.key}>
+                {m.name}
+                {models?.defaults_by_task?.[task] === m.key ? " — recommended" : ""}
+              </option>
+            ))}
+          </select>
+        )}
         {selected && (
           <div className="mt-2.5 flex flex-wrap gap-1.5">
             {selected.generation === "upgrade" ? <Badge tone="leaf" icon={Sparkles}>Upgraded model</Badge> : <Badge tone="slate">Original study</Badge>}
