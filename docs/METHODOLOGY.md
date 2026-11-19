@@ -163,7 +163,8 @@ this round; every choice uses cross-fitted out-of-fold (OOF) predictions of the 
    A class-weighted cross-entropy (inverse frequency); B class-balanced sampling with plain cross-entropy; C plain
    cross-entropy plus a post-hoc logit adjustment (τ · log prior subtracted from the logits; τ chosen on 4 folds by
    macro-F1 and applied to the 5th). No arm combines a training-time and a post-hoc correction.
-2. **Focused model: outlier exposure** (Hendrycks et al., ICLR 2019). In every focused arm, the training folds'
+2. **Focused model: outlier exposure** (Hendrycks et al., ICLR 2019) on arm A (arms B/C were dropped for time
+   before any result was seen; the weighting-vs-sampling comparison is made on the full model). The training folds'
    Early Blight, Late Blight and Potassium photos are trained towards a uniform output over the five classes (weight
    0.5, 8 outlier photos per step, fixed in advance). The model keeps exactly five outputs; it learns to be unsure on
    look-alike conditions it does not cover. The held-out folds' photos of these conditions measure refusal OOF.

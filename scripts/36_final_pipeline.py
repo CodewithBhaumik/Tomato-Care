@@ -61,7 +61,9 @@ DEPLOY_DIR = MODELS_DIR / "deploy"
 FIVE = ["healthy", "leaf_miner", "magnesium_deficiency", "nitrogen_deficiency", "spotted_wilt_virus"]
 KEYS = {"5class": FIVE, "8class": list(CLASS_KEYS)}
 ARMS = {
-    "5class": {"A": "convnext_t_in1k_robust_oe", "B": "convnext_t_in1k_sampler_oe", "C": "convnext_t_in1k_plain_oe"},
+    # focused: arms B/C (balanced sampling / logit adjustment with outlier exposure) were dropped for time before any
+    # result was seen; the weighting-vs-sampling comparison is made on the full model
+    "5class": {"A": "convnext_t_in1k_robust_oe"},
     "8class": {"A": "convnext_t_in1k_robust", "B": "convnext_t_in1k_sampler", "C": "convnext_t_in1k_plain"},
 }
 ARM_LABEL = {"A": "class-weighted loss", "B": "class-balanced sampling",

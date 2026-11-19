@@ -41,8 +41,8 @@ def test_uniform_target_loss_is_minimal_for_an_unsure_model():
 
 
 def test_outlier_recipes_need_outlier_photos():
-    recipe = RECIPES["convnext_t_in1k_plain_oe"]
-    assert recipe.outlier_weight > 0 and recipe.class_weighting == "none" and recipe.sampling == "uniform"
+    recipe = RECIPES["convnext_t_in1k_robust_oe"]
+    assert recipe.outlier_weight > 0 and recipe.class_weighting == "balanced" and recipe.sampling == "uniform"
     assert RECIPES["convnext_t_in1k_sampler"].sampling == "class_balanced"
     assert RECIPES["convnext_t_in1k_sampler"].class_weighting == "none"  # one compensation mechanism per arm
     tiny = dataclasses.replace(recipe, epochs=0, head_epochs=0)
