@@ -4,9 +4,9 @@ For each task (focused 5-class, full 8-class), every imbalance arm trained by sc
 pipeline on its cross-fitted out-of-fold (OOF) predictions, and one pipeline is selected. The rules were written down
 before training:
 
-P1  Arms: A class-weighted loss, B class-balanced sampling, C no compensation in training + a post-hoc logit
-    adjustment (tau, cross-fitted: chosen on 4 folds by macro-F1, applied to the 5th). Focused arms all use outlier
-    exposure. Selection: highest OOF macro-F1 (argmax of the final calibrated probabilities); within 0.01 -> lower OOF
+P1  Arms: A class-weighted loss, B class-balanced sampling (one compensation mechanism each). The focused model uses
+    arm A with outlier exposure; the other planned arms (C: plain + post-hoc logit adjustment, and B/C with outlier
+    exposure) were dropped for time before any of their results existed. Selection: highest OOF macro-F1 (argmax of the final calibrated probabilities); within 0.01 -> lower OOF
     NLL. Focused only: eligible if the operating threshold refuses >= 80% of the OOF out-of-scope photos (else: the
     arm with the highest refusal rate).
 P2  Calibration: temperature scaling vs per-class vector scaling, both cross-fitted; lower OOF NLL wins, within 0.005
@@ -64,14 +64,12 @@ ARMS = {
     # focused: arms B/C (balanced sampling / logit adjustment with outlier exposure) were dropped for time before any
     # result was seen; the weighting-vs-sampling comparison is made on the full model
     "5class": {"A": "convnext_t_in1k_robust_oe"},
-    "8class": {"A": "convnext_t_in1k_robust", "B": "convnext_t_in1k_sampler", "C": "convnext_t_in1k_plain"},
+    "8class": {"A": "convnext_t_in1k_robust", "B": "convnext_t_in1k_sampler"},
 }
-ARM_LABEL = {"A": "class-weighted loss", "B": "class-balanced sampling",
-             "C": "no correction in training + post-hoc logit adjustment"}
+ARM_LABEL = {"A": "class-weighted loss", "B": "class-balanced sampling"}
 REFERENCE = {"5class": "convnext_t_in1k_robust"}  # the v2 focused networks (no outlier exposure), for comparison only
 TARGET = {"5class": 0.95, "8class": 0.90}
 MIN_REFUSAL, F1_TIE, NLL_TIE = 0.80, 0.01, 0.005
-TAUS = np.round(np.arange(0.0, 1.51, 0.05), 2)
 GRID = np.round(np.arange(0.30, 0.991, 0.01), 2)
 OOD_KEEP, SHRINK_N, CLAMP = 0.95, 30, (0.5, 2.0)
 PAPER_PER_FOLD = 30
@@ -99,15 +97,6 @@ def load_arm(task: str, recipe: str) -> dict:
 def macro_f1(y, pred, k):
     return f1_score(y, pred, labels=list(range(k)), average="macro", zero_division=0)
 
-
-def cross_fit_tau(z, y, folds, prior, k):
-    """Arm C: tau maximising macro-F1 on the other 4 folds, applied to each fold; plus the tau fitted on all folds."""
-    def best_tau(zz, yy):
-        scores = [macro_f1(yy, (zz - t * np.log(prior)).argmax(1), k) for t in TAUS]
-        return float(TAUS[int(np.argmax(scores))])  # first maximum = smallest tau among ties
-
-    per_fold = {f: best_tau(z[folds != f], y[folds != f]) for f in range(5)}
-    return per_fold, best_tau(z, y)
 
 
 def fit_cal(kind, z, y):
@@ -171,14 +160,6 @@ def evaluate_arm(task, arm, recipe, prior):
     d = load_arm(task, recipe)
     z, y, folds = d["z"].astype(np.float64), d["y"], d["fold"]
     oz, ofold = (d["oz"].astype(np.float64), d["ofold"]) if "oz" in d else (None, None)
-    tau_info = None
-    if arm == "C":  # the arm's only compensation: post-hoc logit adjustment, cross-fitted
-        per_fold, tau_all = cross_fit_tau(z, y, folds, prior, k)
-        offs = np.array([per_fold[f] for f in folds])[:, None] * np.log(prior)[None]
-        z = z - offs
-        if oz is not None:
-            oz = oz - np.array([per_fold[f] for f in ofold])[:, None] * np.log(prior)[None]
-        tau_info = {"per_fold": per_fold, "deployed": tau_all}
     raw_f1 = macro_f1(y, z.argmax(1), k)
     cals = calibrate(z, y, folds, oz, ofold)
     nll_t, nll_v = cals["temperature"]["nll"], cals["vector"]["nll"]
@@ -189,7 +170,7 @@ def evaluate_arm(task, arm, recipe, prior):
     met = full_metrics(c["p"], y, k)
     p_raw = softmax(z)
     return {"arm": arm, "recipe": recipe, "label": ARM_LABEL.get(arm, arm), "photos": int(len(y)),
-            "macro_f1_before_calibration": raw_f1, "tau": tau_info,
+            "macro_f1_before_calibration": raw_f1,
             "uncalibrated": {"ece": expected_calibration_error(p_raw, y),
                              "nll": float(-np.log(np.clip(p_raw[np.arange(len(y)), y], 1e-12, 1)).mean()),
                              "brier": brier_score(p_raw, y), "classwise_ece": balance.classwise_ece(p_raw, y)},
@@ -305,16 +286,12 @@ def registry_entry(task, chosen, method, gate):
     kind = chosen["calibration"]["chosen"]
     cal = chosen["calibration"]["fitted_on_all_folds"]
     ev = gate[method]
-    tau = (chosen["tau"] or {}).get("deployed", 0.0)
-    prior = chosen["_prior"]
     members = []
     for k in range(5):
         spec = {"key": f"{recipe}_fold{k}", "name": f"{RECIPES[recipe].label} · fold {k}",
                 "path": f"deploy/{task}/{recipe}/fold{k}.pt",
                 "temperature": cal["T"] if kind == "temperature" else 1.0, "tta_views": 1,
                 "ood_method": method, "ood_threshold": ev["member_thresholds"][k] * ev["scale"]}
-        if tau:
-            spec["logit_offset"] = (tau * np.log(prior)).tolist()
         members.append(spec)
     adjust = {"ood_class_scale": ev["class_scales"],
               "fitted_on": "out-of-fold predictions of the train+val photos (cross-fitted)"}
@@ -334,7 +311,7 @@ def registry_entry(task, chosen, method, gate):
         "ood": {"method": f"{method} feature distance (fold models' own training photos)", "keep": OOD_KEEP,
                 "per_condition": True},
         "adjust": adjust,
-        "pipeline": {"imbalance": chosen["label"], "arm": chosen["arm"], "logit_adjustment_tau": tau,
+        "pipeline": {"imbalance": chosen["label"], "arm": chosen["arm"],
                      "calibration": kind, "threshold": op["threshold"], "unusual_gate": method,
                      "outlier_exposure": RECIPES[recipe].outlier_weight > 0},
     }

@@ -17,8 +17,6 @@ estimate: no epoch is chosen by looking at the held-out fold.
 Final round (docs/AUDIT.md §6, rules fixed before training): ONE imbalance mechanism per arm, same backbone and
 augmentation as `convnext_t_in1k_robust` (which is arm A, class-weighted loss):
 - `convnext_t_in1k_sampler` (arm B): plain cross-entropy, class-balanced sampling (every class drawn equally often);
-- `convnext_t_in1k_plain` (arm C): plain cross-entropy, ordinary sampling; its only compensation is a post-hoc logit
-  adjustment chosen out-of-fold (scripts/36);
 - `convnext_t_in1k_robust_oe` (focused task only): arm A plus outlier exposure (Hendrycks et al., ICLR 2019). The
   training folds' photos of the three unsupported conditions are pushed towards a uniform output over the five classes
   (weight 0.5, 8 outlier photos per step, both fixed in advance), so the model learns to be unsure on them while
@@ -78,8 +76,6 @@ RECIPES = {r.name: r for r in [
     # ---- final round: imbalance arms (B, C) and outlier exposure (focused task) ----
     Recipe("convnext_t_in1k_sampler", "convnext_tiny", "ConvNeXt-Tiny, robust recipe, class-balanced sampling",
            class_weighting="none", sampling="class_balanced", ema_decay=0.998),
-    Recipe("convnext_t_in1k_plain", "convnext_tiny", "ConvNeXt-Tiny, robust recipe, no imbalance correction in training",
-           class_weighting="none", ema_decay=0.998),
     Recipe("convnext_t_in1k_robust_oe", "convnext_tiny",
            "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure", outlier_weight=0.5, ema_decay=0.998),
 ]}
