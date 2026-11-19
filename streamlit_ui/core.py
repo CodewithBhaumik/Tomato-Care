@@ -64,15 +64,35 @@ def cpu_threads() -> int:
     return max(1, min(n, 8))
 
 
-@st.cache_data(show_spinner=False)
+DEPLOYMENT_FILE = EXPERIMENTS / "deployment.json"
+PLATFORM_FILE = EXPERIMENTS / "platform.json"
+
+
+def data_stamp(path: Path | None = None) -> tuple:
+    """(modification time, size) of a data file. Cached values are keyed on it, so they are rebuilt when a git push
+    updates the file: the running app reloads changed code, but st.cache_* entries keyed only on their arguments
+    would otherwise keep serving the old model list, results and models until a full restart."""
+    s = (path or DEPLOYMENT_FILE).stat()
+    return s.st_mtime_ns, s.st_size
+
+
+@st.cache_data(show_spinner=False, max_entries=2)
+def _deployment(stamp: tuple) -> dict:
+    return json.loads(DEPLOYMENT_FILE.read_text(encoding="utf-8"))
+
+
 def deployment() -> dict:
-    return json.loads((EXPERIMENTS / "deployment.json").read_text(encoding="utf-8"))
+    return _deployment(data_stamp(DEPLOYMENT_FILE))
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, max_entries=2)
+def _platform(stamp: tuple) -> dict:
+    return json.loads(PLATFORM_FILE.read_text(encoding="utf-8"))
+
+
 def platform() -> dict:
     """Every published result (written by scripts/27_export_platform_data.py from the final benchmark)."""
-    return json.loads((EXPERIMENTS / "platform.json").read_text(encoding="utf-8"))
+    return _platform(data_stamp(PLATFORM_FILE))
 
 
 @st.cache_data(show_spinner=False)
@@ -90,6 +110,7 @@ def missing_weights(keys=None) -> list[dict]:
 
 _DOWNLOAD_LOCK = threading.Lock()  # one download at a time per server process, whatever the number of visitors
 _READY = threading.Event()
+_READY_FOR: dict = {"stamp": None}  # the deployment.json the "ready" flag was set for
 
 
 def ensure_weights(keys=None) -> None:
@@ -98,8 +119,11 @@ def ensure_weights(keys=None) -> None:
     with SHA-256 and kept on disk for the life of the server."""
     if os.getenv("TOMATO_DOWNLOAD_WEIGHTS", "1") == "0":  # tests / offline use: never touch the network
         return
+    if _READY.is_set() and _READY_FOR["stamp"] != data_stamp():  # deployment changed since: check the files again
+        _READY.clear()
     if _READY.is_set() or not missing_weights(keys):
         if keys is None:
+            _READY_FOR["stamp"] = data_stamp()
             _READY.set()
         return
     with st.spinner("Preparing the models (first start only)…"), _DOWNLOAD_LOCK:
@@ -120,18 +144,24 @@ def ensure_weights(keys=None) -> None:
         if bar is not None:
             bar.empty()
     if keys is None:
+        _READY_FOR["stamp"] = data_stamp()
         _READY.set()
 
 
-@st.cache_resource(show_spinner=False)
-def registry():
-    """The model registry, shared by every visitor. Only the default model loads now; others on first use."""
+@st.cache_resource(show_spinner=False, max_entries=1)
+def _registry(stamp: tuple):
     import torch
 
     from backend.services.predictor import ModelRegistry
 
     torch.set_num_threads(cpu_threads())
-    return ModelRegistry(EXPERIMENTS / "deployment.json", device="cpu", lazy=True)
+    return ModelRegistry(DEPLOYMENT_FILE, device="cpu", lazy=True)
+
+
+def registry():
+    """The model registry, shared by every visitor. Only the default model loads now; others on first use.
+    Rebuilt when deployment.json changes (max_entries=1 drops the old models)."""
+    return _registry(data_stamp())
 
 
 def model_entry(key: str) -> dict:
@@ -179,9 +209,13 @@ def data_url_to_rgba(url: str | None) -> np.ndarray | None:
     return np.asarray(Image.open(io.BytesIO(base64.b64decode(url.split(",", 1)[1]))).convert("RGBA"))
 
 
-@st.cache_data(max_entries=64, show_spinner=False)
 def predict(image_bytes: bytes, model_key: str, explain: bool = True) -> dict:
     """One diagnosis (the API's /api/predict response) plus the canonical input and the Grad-CAM heat map."""
+    return _predict(image_bytes, model_key, explain, data_stamp())
+
+
+@st.cache_data(max_entries=64, show_spinner=False)
+def _predict(image_bytes: bytes, model_key: str, explain: bool, stamp: tuple) -> dict:
     rgb, info = canonical(image_bytes)
     t0 = time.perf_counter()
     try:
@@ -200,8 +234,12 @@ def predict(image_bytes: bytes, model_key: str, explain: bool = True) -> dict:
     return out
 
 
-@st.cache_data(max_entries=16, show_spinner=False)
 def compare(image_bytes: bytes, keys: tuple) -> list[dict]:
+    return _compare(image_bytes, keys, data_stamp())
+
+
+@st.cache_data(max_entries=16, show_spinner=False)
+def _compare(image_bytes: bytes, keys: tuple, stamp: tuple) -> list[dict]:
     rgb, _ = canonical(image_bytes)
     reg = registry()
     rows = []

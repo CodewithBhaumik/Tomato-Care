@@ -70,3 +70,20 @@ def test_example_photo_is_diagnosed_end_to_end():
     labels = {m.label: m.value for m in at.metric}
     assert labels["Confidence"].endswith("%") and 0 < float(labels["Confidence"][:-1]) <= 100
     assert labels["Threshold"].endswith("%")
+
+
+def test_cached_deployment_follows_file_updates(tmp_path, monkeypatch):
+    """A git push updates deployment.json under a running app: the cached model list must follow it (the live app
+    kept offering a removed model until a full restart)."""
+    import os
+
+    from streamlit_ui import core
+
+    dep = tmp_path / "deployment.json"
+    dep.write_text(json.dumps({"models": [{"key": "a"}, {"key": "b"}]}), encoding="utf-8")
+    monkeypatch.setattr(core, "DEPLOYMENT_FILE", dep)
+    assert [m["key"] for m in core.deployment()["models"]] == ["a", "b"]
+    dep.write_text(json.dumps({"models": [{"key": "a"}]}), encoding="utf-8")
+    st_ = dep.stat()
+    os.utime(dep, ns=(st_.st_atime_ns, st_.st_mtime_ns + 1_000_000_000))  # a later modification time, as after a pull
+    assert [m["key"] for m in core.deployment()["models"]] == ["a"]
