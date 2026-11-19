@@ -192,6 +192,46 @@ this round; every choice uses cross-fitted out-of-fold (OOF) predictions of the 
 Scripts: `21_train_cv.py` (arms), `36_final_pipeline.py` (selection, calibration, threshold, gate),
 `37_fetch_external_ood.py`, `38_final_test.py`; audits `34_audit_examples.py`, `35_audit_behaviour.py`.
 
+## 6d. After the diagnosis: photo quality, reasons, candidates (no change to the models' answers)
+
+- **Photo quality check** (`tomatoleaf.quality`). The quality check runs on the 256×256 image the model sees. It
+  measures:
+  - sharpness (variance of the Laplacian);
+  - brightness and highlights (99th-percentile grey level);
+  - the leaf, found as the region far from the paper colour in CIELAB. The paper colour is the median colour of the
+    image border, so paper of any colour works. From this it measures the contrast between leaf and paper, the leaf's
+    share of the frame, a second large region (several leaves) and the texture of the paper.
+
+  Each limit is the 0.5th or 99.5th percentile of the measure on the train + validation photos (`scripts/41`).
+  Evaluation, nothing fitted:
+  - **Genuine photos:** 2% of the held-out test photos are flagged.
+  - **Deliberately damaged test photos:** blur, darkening, over-exposure, other backgrounds and four leaves in one
+    frame are flagged in 100%–100% of cases. Heavy JPEG
+    compression is flagged in only 3% of cases.
+  - **Photos from outside the dataset** are flagged in 99%–100% of cases.
+
+  A failed check becomes a specific tip, and it never changes the diagnosis.
+- **Why no diagnosis.** Each refusal states its cause:
+  - low confidence, against the mode's threshold;
+  - or an unusual image, against the feature-distance limit.
+
+  The quality tips follow. In Focused mode, a pointer to Full mode lists the conditions the mode does not cover; the
+  list is read from the model's class list.
+- **Top-3 candidates.** "Not sure" results show the three most probable conditions.
+- **Several photos of one leaf** were evaluated and not shipped (`scripts/42`, out-of-fold). The test used the dataset's
+  leaves photographed 2–5 times, averaging their calibrated probabilities at the same threshold:
+
+  | Mode | Answered | Correct when answered |
+  |---|---|---|
+  | Focused | 88% → 84% | 96.9% → 97.8% |
+  | Full | 84% → 80% | 93.3% → 94.1% |
+
+  These photos were taken seconds apart and add little new information.
+- **int8 quantisation** was measured and not shipped:
+  - it is about 1.5× faster on 2 CPU threads (0.28 s vs 0.43 s per photo);
+  - it shifts confidences by up to 2 points, so the validated thresholds would no longer hold exactly;
+  - peak memory rose to about 2.2 GB, close to the Streamlit Cloud limit.
+
 ## 7. Final evaluation
 
 All models — classical ML, the original networks and the upgrade — are scored by the **same predictor code that the

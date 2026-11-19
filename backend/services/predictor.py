@@ -33,6 +33,7 @@ from tomatoleaf.gradcam import GradCAM, heatmap_png, overlay
 from tomatoleaf.models import FeatureTap, build_model, gradcam_layer, gradcam_reshape, load_checkpoint
 from tomatoleaf.ood import FeatureDensity
 from tomatoleaf.preprocessing import dihedral_views, preprocess_for_cnn
+from tomatoleaf.quality import assess as assess_quality
 from tomatoleaf.utils import load_json
 
 from . import onnx_runtime
@@ -44,6 +45,28 @@ def png_data_url(arr: np.ndarray) -> str:
     buf = BytesIO()
     Image.fromarray(arr).save(buf, format="PNG", optimize=True)
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
+
+
+def refusal_reason(status: str, confidence: float, threshold: float, ood_ratio, quality: dict,
+                   class_keys: list) -> dict | None:
+    """Why no diagnosis was given, and what the user can do (None when the model answered)."""
+    if status not in ("Unusual image", "Uncertain"):
+        return None
+    if status == "Unusual image":
+        reason = {"code": "unusual_image",
+                  "message": "The photo does not look like the leaf photos the model was trained on "
+                             f"(distance {ood_ratio:.2f}x the limit)."}
+    else:
+        reason = {"code": "low_confidence",
+                  "message": f"The model is only {confidence:.0%} sure; this mode answers at {threshold:.0%} or more."}
+    hints = [issue["tip"] for issue in quality["issues"]]
+    missing = [CLASSES[CLASS_KEYS.index(k)]["name"] for k in CLASS_KEYS if k not in class_keys]
+    if missing:
+        hints.append(f"This mode does not cover {', '.join(missing[:-1])} or {missing[-1]}. If the leaf may have one "
+                     "of these, try the Full mode.")
+    if not quality["issues"]:
+        hints.append("Try another photo: one leaf filling the frame, on plain light paper, in daylight.")
+    return {**reason, "hints": hints}
 
 
 def lowmem_enabled() -> bool:
@@ -409,6 +432,8 @@ class ModelRegistry:
         uncertain = confidence < threshold  # below the threshold the app gives no diagnosis ("Uncertain")
         is_healthy = top_cls["key"] == "healthy"
         status = "Unusual image" if unusual else "Uncertain" if uncertain else ("Healthy" if is_healthy else "Diseased")
+        quality = assess_quality(rgb)
+        order = np.argsort(probs)[::-1][:3]
         return {
             "model": predictor.info,
             "prediction": {"index": top_cls["index"], "key": top_cls["key"], "name": top_cls["name"],
@@ -428,6 +453,10 @@ class ModelRegistry:
             "calibration": predictor.calibration,
             "inference_ms": elapsed,
             "explanation": explanation,
+            "quality": {"ok": quality["ok"], "issues": quality["issues"]},
+            "candidates": [{"key": predictor.class_keys[i], "name": CLASSES[CLASS_KEYS.index(predictor.class_keys[i])]["name"],
+                            "probability": float(probs[i])} for i in order],
+            "refusal": refusal_reason(status, confidence, threshold, ood_ratio, quality, predictor.class_keys),
         }
 
     def compare(self, rgb: np.ndarray, keys=None) -> list:

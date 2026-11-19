@@ -1,8 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, ClipboardPaste, ImagePlus, RefreshCw, UploadCloud, X } from "lucide-react";
+import { Camera, ClipboardPaste, Focus, ImagePlus, Leaf, Maximize2, RefreshCw, StickyNote, Sun, UploadCloud, X } from "lucide-react";
 import { bytes, cx } from "../../lib/format.js";
 import { Button } from "../ui/primitives.jsx";
 
+// How the training photos were taken; photos taken this way get the most reliable results.
+const PHOTO_TIPS = [
+  { icon: Leaf, text: "One leaf only" },
+  { icon: StickyNote, text: "Plain, light paper" },
+  { icon: Sun, text: "Daylight, no glare" },
+  { icon: Maximize2, text: "Leaf fills the frame" },
+  { icon: Focus, text: "Sharp, in focus" },
+];
 const MAX_BYTES = 10 * 1024 * 1024;
 const TYPES = ["image/jpeg", "image/png", "image/webp", "image/bmp"];
 
@@ -120,6 +128,14 @@ export default function UploadPanel({ file, onFile, disabled = false }) {
                 Take photo
               </Button>
             </div>
+            <ul className="mt-5 grid w-full max-w-md grid-cols-2 gap-2 text-left text-xs text-ink-2">
+              {PHOTO_TIPS.map(({ icon: TipIcon, text }) => (
+                <li key={text} className="flex items-center gap-2 rounded-lg bg-surface px-2.5 py-2 ring-1 ring-line">
+                  <TipIcon className="size-4 shrink-0 text-leaf-600 dark:text-leaf-400" aria-hidden />
+                  {text}
+                </li>
+              ))}
+            </ul>
             <p className="mt-4 hidden items-center gap-1.5 text-xs text-muted sm:flex">
               <ClipboardPaste className="size-3.5" aria-hidden /> You can also paste an image (Ctrl/⌘ + V)
             </p>

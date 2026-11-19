@@ -38,6 +38,24 @@ def _examples():
     return None, None
 
 
+# How the training photos were taken; photos taken this way get the most reliable results.
+PHOTO_TIPS = ("Photo tips: one leaf only · plain, light paper · daylight, no glare · leaf fills the frame · "
+              "sharp, in focus.")
+
+
+def _guidance(r: dict) -> None:
+    """Why no diagnosis was given (with the top candidates), or photo-quality warnings on an answered photo."""
+    refusal, quality = r.get("refusal"), r.get("quality") or {}
+    if refusal:
+        likely = " · ".join(f"{c['name']} {core.pct(c['probability'], 0)}" for c in r.get("candidates", []))
+        hints = "\n".join(f"- {h}" for h in refusal.get("hints", []))
+        st.warning(f"**Why no diagnosis.** {refusal['message']}\n\nMost likely: {likely}\n\n{hints}",
+                   icon=":material/lightbulb:")
+    elif not quality.get("ok", True):
+        tips = "\n".join(f"- {i['tip']}" for i in quality["issues"])
+        st.warning(f"**Photo quality: the result may be less reliable.**\n\n{tips}", icon=":material/photo_camera:")
+
+
 def _input_panel():
     with st.container(border=True):
         st.markdown("**1 · Photo**")
@@ -47,9 +65,10 @@ def _input_panel():
             f = st.file_uploader("Leaf photo", type=core.UPLOAD_TYPES, key="upload", label_visibility="collapsed",
                                  help="JPEG, PNG, WebP, BMP or TIFF up to 10 MB. iPhone HEIC photos: share or export "
                                       "them as JPEG first.")
-            st.caption("One tomato leaf on plain paper, in daylight, filling most of the frame.")
+            st.caption(PHOTO_TIPS)
             return (f.getvalue(), f.name) if f else (None, None)
         if mode == "Camera":
+            st.caption(PHOTO_TIPS)
             shot = st.camera_input("Take a photo", key="camera", label_visibility="collapsed")
             return (shot.getvalue(), "Camera photo") if shot else (None, None)
         return _examples()
@@ -205,12 +224,13 @@ def _result(data: bytes, label: str, key: str, explain: bool):
         st.error(f"The diagnosis failed on the server ({type(exc).__name__}: {exc}). Please try again in a moment.")
         return
     theme.status_card(r)
+    _guidance(r)
     p = r["prediction"]
     c1, c2, c3 = st.columns(3)
     c1.metric("Confidence", core.pct(p["confidence"]), border=True,
               help="Calibrated: among photos given this confidence, about this share were right (out-of-fold data).")
     c2.metric("Threshold", core.pct(r["confidence_threshold"], 0), border=True,
-              help="Chosen on out-of-fold data so that answered photos reach the target accuracy (95% focused, 90% full).")
+              help="Chosen on out-of-fold data: " + (r.get("operating_point") or {}).get("rule", "see the Model lab") + ".")
     c3.metric("Time", f"{r['total_ms'] / 1000:.1f} s", border=True, help="Including Grad-CAM, on this server's CPU.")
     tabs = st.tabs(["Probabilities", "Where it looked", "The condition", "Details"])
     with tabs[0]:

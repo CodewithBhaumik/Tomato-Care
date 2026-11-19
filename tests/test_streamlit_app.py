@@ -72,6 +72,17 @@ def test_example_photo_is_diagnosed_end_to_end():
     assert labels["Threshold"].endswith("%")
 
 
+@pytest.mark.skipif(not _weights_present(), reason="model weights not downloaded")
+def test_refusal_says_why_and_lists_candidates():
+    example = str(ROOT / "frontend" / "public" / "test-samples" / "potassium_deficiency.jpg")  # outside the focused 5
+    at = AppTest.from_function(_run_view, kwargs={"view": "diagnose", "example": example}, default_timeout=300)
+    at.run()
+    at.segmented_control(key="src_mode").set_value("Examples").run()
+    assert not at.exception, at.exception[0].value if at.exception else ""
+    why = [w.value for w in at.warning if "Why no diagnosis" in w.value]
+    assert why and "Most likely:" in why[0] and "Full mode" in why[0]
+
+
 def test_cached_deployment_follows_file_updates(tmp_path, monkeypatch):
     """A git push updates deployment.json under a running app: the cached model list must follow it (the live app
     kept offering a removed model until a full restart)."""

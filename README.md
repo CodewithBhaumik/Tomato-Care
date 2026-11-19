@@ -212,7 +212,12 @@ photo ─▶ validate (type, size, decodes) ─▶ EXIF orientation ─▶ colou
       ─▶ aspect ratio clamped to 3:4…4:3 ─▶ whole frame resized to 256×256 ─▶ JPEG q90      (= how the dataset was made)
       ─▶ fold ensemble of fine-tuned ConvNeXt-Tiny networks
       ─▶ temperature scaling ─▶ "not sure" threshold ─▶ "unusual image" check (feature-space distance) ─▶ Grad-CAM
+      ─▶ photo-quality check (blur, light, leaf size, several leaves, background) ─▶ reason + tips when no diagnosis
 ```
+
+* **Photo-quality tips** (`tomatoleaf.quality`): limits come from the training photos. They flag 2% of genuine test
+  photos and almost all damaged or outside-dataset photos. Every refusal says why ("only 42% sure", "unlike the
+  training photos") and lists the top-3 candidates. The tips never change the diagnosis.
 
 * **One predictor for everything**: the Streamlit app, the REST API and the offline benchmark call the same
   `ModelRegistry`, so the published numbers are the numbers the apps produce (CPU/GPU, ONNX/PyTorch and low-memory

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { AlertTriangle, ArrowRight, CheckCircle2, CircleHelp, Download, Info, ScanEye, ShieldAlert, XCircle } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle2, CircleHelp, Download, Info, Lightbulb, ScanEye, ShieldAlert, XCircle } from "lucide-react";
 import { STATUS_STYLE, classMeta } from "../../lib/classes.js";
 import { ms, pct } from "../../lib/format.js";
 import ConfidenceRing from "../charts/ConfidenceRing.jsx";
@@ -57,7 +57,7 @@ export default function ResultPanel({ result }) {
                   {style.label}
                 </Badge>
                 {verdict && (
-                  <Badge tone={VERDICT[verdict].tone} icon={VERDICT[verdict].icon}>
+                  <Badge tone={VERDICT[verdict].tone} icon={VERDICT[verdict].icon} className="whitespace-normal! rounded-2xl! py-1!">
                     {VERDICT[verdict].text}
                   </Badge>
                 )}
@@ -65,9 +65,9 @@ export default function ResultPanel({ result }) {
               <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-ink sm:text-[28px]">
                 {answered ? meta.name : status === "Uncertain" ? "Not sure" : "No diagnosis"}
               </h2>
-              {status === "Uncertain" && (
+              {!answered && result.candidates?.length > 0 && (
                 <p className="mt-0.5 text-sm text-ink-2">
-                  Best guess {meta.name} · {pct(prediction.confidence, 1)} (threshold {pct(thr, 0)})
+                  Most likely: {result.candidates.map((c) => `${c.name} ${pct(c.probability, 0)}`).join(" · ")}
                 </p>
               )}
               <p className="mt-1.5 text-sm leading-relaxed text-muted">{style.description}</p>
@@ -85,6 +85,33 @@ export default function ResultPanel({ result }) {
             </div>
           </div>
 
+          {result.refusal && (
+            <div className="mt-5 rounded-xl border border-sun-500/30 bg-sun-500/5 px-3.5 py-3 text-sm">
+              <p className="flex items-center gap-2 font-semibold text-ink">
+                <Lightbulb className="size-4 shrink-0 text-sun-600" aria-hidden /> Why no diagnosis
+              </p>
+              <p className="mt-1 text-ink-2">{result.refusal.message}</p>
+              {result.refusal.hints?.length > 0 && (
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-ink-2">
+                  {result.refusal.hints.map((h) => (
+                    <li key={h}>{h}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+          {answered && result.quality && !result.quality.ok && (
+            <div className="mt-5 rounded-xl border border-sun-500/30 bg-sun-500/5 px-3.5 py-3 text-sm">
+              <p className="flex items-center gap-2 font-semibold text-ink">
+                <AlertTriangle className="size-4 shrink-0 text-sun-600" aria-hidden /> Photo quality: the result may be less reliable
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-ink-2">
+                {result.quality.issues.map((i) => (
+                  <li key={i.code}>{i.tip}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           {op?.test && (
             <p className="mt-5 rounded-xl bg-surface-2 px-3.5 py-2.5 text-xs leading-relaxed text-ink-2">
               <strong className="font-semibold">Operating point:</strong> on the held-out test photos this model answered {pct(op.test.coverage, 0)} of photos and was right on {pct(op.test.accuracy_kept, 1)} of those (threshold chosen on {op.chosen_on || "validation data"}).

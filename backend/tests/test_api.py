@@ -192,6 +192,21 @@ def test_noise_image_looks_more_unusual_than_a_leaf(client, test_photo):
     assert other["ood"]["ratio"] > leaf
 
 
+def test_response_explains_refusals_and_lists_top_candidates(client, test_photo):
+    _, data = test_photo
+    noise = Image.fromarray(np.random.default_rng(0).integers(0, 255, (400, 300, 3), dtype=np.uint8))
+    for body in (post(client, data).json(), post(client, image_bytes(noise)).json()):
+        answered = body["prediction"]["status"] in ("Healthy", "Diseased")
+        probs = sorted((p["probability"] for p in body["probabilities"]), reverse=True)
+        assert [c["probability"] for c in body["candidates"]] == pytest.approx(probs[:3])
+        assert body["candidates"][0]["key"] == body["prediction"]["key"]
+        assert (body["refusal"] is None) == answered
+        assert set(body["quality"]) == {"ok", "issues"}
+        if body["refusal"]:
+            assert body["refusal"]["code"] in ("unusual_image", "low_confidence") and body["refusal"]["hints"]
+    assert not body["quality"]["ok"]  # random noise fails the photo-quality checks
+
+
 def test_explain_returns_heatmap_overlay_and_model_input(client, test_photo):
     _, data = test_photo
     body = post(client, data, "?explain=true").json()
