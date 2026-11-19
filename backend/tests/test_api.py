@@ -175,19 +175,6 @@ def test_api_matches_offline_pipeline(client, test_photo):
     np.testing.assert_allclose([p["probability"] for p in api["probabilities"]], expected, atol=1e-5)
 
 
-def test_balanced_model_answers_with_prior_correction_and_calibrated_confidence(client, test_photo):
-    from tomatoleaf import balance
-
-    _, data = test_photo
-    for model in client.get("/api/models").json()["models"]:
-        body = post(client, data, f"?model={model['key']}").json()
-        probs = np.array([p["probability"] for p in body["probabilities"]])
-        adjust = client.app.state.registry.entry(model["key"])["adjust"]
-        decision = int(balance.decide(probs, adjust["prior"], adjust["tau"]))
-        assert body["probabilities"][decision]["key"] == body["prediction"]["key"]
-        assert abs(body["prediction"]["confidence"] - probs[decision]) < 1e-12
-
-
 def test_threshold_decides_uncertain(client, test_photo):
     _, data = test_photo
     body = post(client, data).json()

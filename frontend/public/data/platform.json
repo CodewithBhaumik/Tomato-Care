@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generated_at": "2026-11-19T13:35:34",
+  "generated_at": "2026-11-19T16:12:57",
   "project": {
     "name": "Tomato Care"
   },
@@ -167,11 +167,11 @@
         "spotted_wilt_virus"
       ],
       "test_photos": 265,
-      "default_model": "balanced_5class",
+      "default_model": "focused_5class",
       "network_model": "upgrade_5class",
       "previous_default": "ensemble_5class",
       "served_models": [
-        "balanced_5class"
+        "focused_5class"
       ]
     },
     "8class": {
@@ -187,11 +187,11 @@
         "spotted_wilt_virus"
       ],
       "test_photos": 290,
-      "default_model": "balanced_8class",
+      "default_model": "full_8class",
       "network_model": "upgrade_8class",
       "previous_default": "convnext_tiny_v2_tta",
       "served_models": [
-        "balanced_8class"
+        "full_8class"
       ]
     }
   },
@@ -213,6 +213,7 @@
       "description": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 original recipe (8-view TTA)",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": {
         "f1_macro": 0.8695661003863531,
         "accuracy": 0.9105199516324063
@@ -406,6 +407,7 @@
       "description": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust (8-view TTA)",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": {
         "f1_macro": 0.8861925102847751,
         "accuracy": 0.9171704957678356
@@ -592,6 +594,7 @@
       "description": "Chosen by cross-validation: Highest pooled out-of-fold macro-F1 among candidates (single recipes with/without 8-view TTA, and probability ensembles of 2-3 recipes) whose estimated CPU time for the whole fold ensemble is <= 1000 ms per photo; ties within 0.001 go to higher out-of-fold accuracy, then lower latency. Decided on out-of-fold data only; the test set is scored once afterwards.",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": {
         "f1_macro": 0.8851326519286067,
         "accuracy": 0.9141475211608222
@@ -839,6 +842,7 @@
       "description": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 original recipe",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": {
         "f1_macro": 0.6200728945928876,
         "accuracy": 0.8477661334804192
@@ -1096,6 +1100,7 @@
       "description": "5-fold ensemble of ConvNeXt-T IN-1k \u00b7 robust",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": {
         "f1_macro": 0.6157312519263284,
         "accuracy": 0.8532818532818532
@@ -1360,6 +1365,7 @@
       "description": "5-fold ensemble of ViT-S/14 DINOv2 \u00b7 robust (8-view TTA)",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": {
         "f1_macro": 0.6311192546803929,
         "accuracy": 0.8389409817981247
@@ -1625,6 +1631,7 @@
       "description": "Chosen by cross-validation: Highest pooled out-of-fold macro-F1 among candidates (single recipes with/without 8-view TTA, and probability ensembles of 2-3 recipes) whose estimated CPU time for the whole fold ensemble is <= 1000 ms per photo; ties within 0.001 go to higher out-of-fold accuracy, then lower latency. Decided on out-of-fold data only; the test set is scored once afterwards.",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": {
         "f1_macro": 0.6341314386966606,
         "accuracy": 0.8599007170435742
@@ -1948,6 +1955,7 @@
       "description": "Color",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.35515539894935,
@@ -2203,6 +2211,7 @@
       "description": "Color",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.36119110068039373,
@@ -2458,6 +2467,7 @@
       "description": "Color",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.3681398411484268,
@@ -2713,6 +2723,7 @@
       "description": "Learned features (end-to-end CNN)",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.4177641610200834,
@@ -2968,6 +2979,7 @@
       "description": "Learned features (ImageNet-pretrained MobileNetV2, 224px)",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.5251407136514452,
@@ -3230,6 +3242,7 @@
       "description": "Learned features (ImageNet-pretrained MobileNetV2, 224px)",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.6201998587386075,
@@ -3492,6 +3505,7 @@
       "description": "Learned features (ImageNet-pretrained EfficientNet-B0, 256px)",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.599819602649198,
@@ -3754,6 +3768,7 @@
       "description": "Learned features (ImageNet-pretrained ConvNeXt-Tiny, 256px)",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.718488191823432,
@@ -4016,6 +4031,7 @@
       "description": "Learned features; averaged over 8 test-time views",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.7219887554793216,
@@ -4280,6 +4296,7 @@
       "description": "Color",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.5936622762471482,
@@ -4471,6 +4488,7 @@
       "description": "Color",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.5481787836821393,
@@ -4662,6 +4680,7 @@
       "description": "Color",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.5954418933166294,
@@ -4853,6 +4872,7 @@
       "description": "Learned features (ImageNet-pretrained ConvNeXt-Tiny, 256px)",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.901279213636092,
@@ -5044,6 +5064,7 @@
       "description": "Learned features (ImageNet-pretrained ConvNeXt-Tiny, 256px); averaged over 8 test-time views",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.8923293126475501,
@@ -5228,6 +5249,7 @@
       "description": "Learned features (ImageNet-pretrained EfficientNet-B0, 256px)",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.8499969063379315,
@@ -5419,6 +5441,7 @@
       "description": "Learned features (ImageNet-pretrained EfficientNet-B0, 256px); averaged over 8 test-time views",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.8559377454130077,
@@ -5603,6 +5626,7 @@
       "description": "Average of calibrated probabilities: ConvNeXt-Tiny (single view) + EfficientNet-B0 (8-view TTA)",
       "variant": null,
       "base_model": null,
+      "pipeline": null,
       "cv": null,
       "val": {
         "f1_macro": 0.9118918918918919,
@@ -5798,6 +5822,7 @@
       "description": "Same networks; per-class calibration so every condition's confidence matches its own accuracy.",
       "variant": "calibrated",
       "base_model": "upgrade_5class",
+      "pipeline": null,
       "cv": {
         "f1_macro": 0.8856083257705578,
         "accuracy": 0.9141475211608222
@@ -5981,11 +6006,12 @@
       "recipes": [
         "convnext_t_in1k_robust"
       ],
-      "deployed": true,
-      "is_default": true,
+      "deployed": false,
+      "is_default": false,
       "description": "Same networks; per-class calibration, and a class-prior correction so rare conditions are not out-voted by frequent ones (confidence stays calibrated).",
       "variant": "balanced",
       "base_model": "upgrade_5class",
+      "pipeline": null,
       "cv": {
         "f1_macro": 0.8703348869500858,
         "accuracy": 0.907496977025393
@@ -6176,7 +6202,7 @@
         ],
         "fitted_on": "out-of-fold predictions"
       },
-      "latency_ms": 209.71599999757018,
+      "latency_ms": 155.97490000072867,
       "flagged_unusual": 0.07924528301886792,
       "out_of_scope": {
         "photos": 25,
@@ -6198,11 +6224,12 @@
         "convnext_t_in1k_base",
         "convnext_t_in1k_robust"
       ],
-      "deployed": true,
-      "is_default": true,
+      "deployed": false,
+      "is_default": false,
       "description": "Same networks; per-class calibration, and a class-prior correction so rare conditions are not out-voted by frequent ones (confidence stays calibrated).",
       "variant": "balanced",
       "base_model": "upgrade_8class",
+      "pipeline": null,
       "cv": {
         "f1_macro": 0.633293821521628,
         "accuracy": 0.8483177054605626
@@ -6455,8 +6482,618 @@
         ],
         "fitted_on": "out-of-fold predictions"
       },
-      "latency_ms": 385.0234999990789,
+      "latency_ms": 298.1576500023948,
       "flagged_unusual": 0.06206896551724138,
+      "out_of_scope": null
+    },
+    {
+      "key": "focused_5class",
+      "name": "Tomato Care \u00b7 Focused (5 conditions)",
+      "task": "5class",
+      "family": "Deep learning",
+      "generation": "upgrade",
+      "params": null,
+      "tta_views": 1,
+      "recipe": "convnext_t_in1k_robust_oe",
+      "recipes": [
+        "convnext_t_in1k_robust_oe"
+      ],
+      "deployed": true,
+      "is_default": true,
+      "description": "Imbalance: class-weighted loss. Calibration: vector scaling. One threshold (0.95) and a per-condition unusual-image gate, all fixed on out-of-fold data.",
+      "variant": null,
+      "base_model": null,
+      "pipeline": {
+        "imbalance": "class-weighted loss",
+        "arm": "A",
+        "calibration": "vector",
+        "threshold": 0.95,
+        "unusual_gate": "knn",
+        "outlier_exposure": true
+      },
+      "cv": {
+        "f1_macro": 0.852721358714635,
+        "accuracy": 0.9014510278113664
+      },
+      "val": null,
+      "test": {
+        "accuracy": 0.909433962264151,
+        "precision_macro": 0.850651741875146,
+        "recall_macro": 0.8275062001680707,
+        "f1_macro": 0.8382705543539497,
+        "f1_weighted": 0.908324299918731,
+        "accuracy_ci": [
+          0.8708367500341669,
+          0.9450560224089636
+        ],
+        "f1_macro_ci": [
+          0.7323237525865885,
+          0.9095848862078081
+        ],
+        "balanced_accuracy": 0.8275062001680707,
+        "ece": 0.048483359879887784,
+        "classwise_ece": 0.028523472059638382,
+        "nll": 0.26267162591099574,
+        "brier": 0.132245625829812
+      },
+      "per_class": [
+        {
+          "key": "healthy",
+          "name": "Healthy",
+          "precision": 0.8333333333333334,
+          "recall": 0.7407407407407407,
+          "f1": 0.7843137254901961,
+          "support": 27
+        },
+        {
+          "key": "leaf_miner",
+          "name": "Leaf Miner",
+          "precision": 0.9219858156028369,
+          "recall": 0.935251798561151,
+          "f1": 0.9285714285714286,
+          "support": 139
+        },
+        {
+          "key": "magnesium_deficiency",
+          "name": "Magnesium Deficiency",
+          "precision": 0.8461538461538461,
+          "recall": 0.7857142857142857,
+          "f1": 0.8148148148148148,
+          "support": 14
+        },
+        {
+          "key": "nitrogen_deficiency",
+          "name": "Nitrogen Deficiency",
+          "precision": 0.7142857142857143,
+          "recall": 0.7142857142857143,
+          "f1": 0.7142857142857143,
+          "support": 7
+        },
+        {
+          "key": "spotted_wilt_virus",
+          "name": "Spotted Wilt Virus",
+          "precision": 0.9375,
+          "recall": 0.9615384615384616,
+          "f1": 0.9493670886075949,
+          "support": 78
+        }
+      ],
+      "confusion": [
+        [
+          20,
+          7,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          130,
+          1,
+          1,
+          4
+        ],
+        [
+          0,
+          1,
+          11,
+          1,
+          1
+        ],
+        [
+          0,
+          1,
+          1,
+          5,
+          0
+        ],
+        [
+          1,
+          2,
+          0,
+          0,
+          75
+        ]
+      ],
+      "selective": {
+        "threshold": 0.95,
+        "coverage": 0.4641509433962264,
+        "accuracy_kept": 0.991869918699187,
+        "test": {
+          "coverage": 0.4641509433962264,
+          "accuracy_kept": 0.991869918699187
+        }
+      },
+      "calibration": {
+        "temperature": 1.0,
+        "ece_after": 0.02129105194308159,
+        "reliability_after": [
+          {
+            "lo": 0.2,
+            "hi": 0.30000000000000004,
+            "count": 5,
+            "confidence": 0.28945016308795823,
+            "accuracy": 0.0
+          },
+          {
+            "lo": 0.30000000000000004,
+            "hi": 0.4,
+            "count": 30,
+            "confidence": 0.34609198213132103,
+            "accuracy": 0.3333333333333333
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 20,
+            "confidence": 0.4582404390302915,
+            "accuracy": 0.6
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6000000000000001,
+            "count": 35,
+            "confidence": 0.5476474528011556,
+            "accuracy": 0.6571428571428571
+          },
+          {
+            "lo": 0.6000000000000001,
+            "hi": 0.7000000000000001,
+            "count": 33,
+            "confidence": 0.6554920832384205,
+            "accuracy": 0.5757575757575758
+          },
+          {
+            "lo": 0.7000000000000001,
+            "hi": 0.8,
+            "count": 52,
+            "confidence": 0.7478732805809329,
+            "accuracy": 0.6538461538461539
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 172,
+            "confidence": 0.8606674373210035,
+            "accuracy": 0.813953488372093
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 1307,
+            "confidence": 0.9557246007962727,
+            "accuracy": 0.9586840091813313
+          }
+        ],
+        "fitted_on": "out-of-fold predictions, cross-fitted (diagram: out-of-fold, before vs after)",
+        "reliability_before": [
+          {
+            "lo": 0.2,
+            "hi": 0.30000000000000004,
+            "count": 28,
+            "confidence": 0.24002255918308713,
+            "accuracy": 0.4642857142857143
+          },
+          {
+            "lo": 0.30000000000000004,
+            "hi": 0.4,
+            "count": 13,
+            "confidence": 0.35049471943159055,
+            "accuracy": 0.6923076923076923
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 24,
+            "confidence": 0.44866791342882967,
+            "accuracy": 0.6666666666666666
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6000000000000001,
+            "count": 35,
+            "confidence": 0.5542099428154158,
+            "accuracy": 0.7428571428571429
+          },
+          {
+            "lo": 0.6000000000000001,
+            "hi": 0.7000000000000001,
+            "count": 48,
+            "confidence": 0.6600499388377018,
+            "accuracy": 0.625
+          },
+          {
+            "lo": 0.7000000000000001,
+            "hi": 0.8,
+            "count": 61,
+            "confidence": 0.7599245564640111,
+            "accuracy": 0.6557377049180327
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 244,
+            "confidence": 0.8693813075911538,
+            "accuracy": 0.8319672131147541
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 1201,
+            "confidence": 0.9224007007688307,
+            "accuracy": 0.9700249791840133
+          }
+        ],
+        "ece_before": 0.06086690102806772,
+        "method": "vector scaling"
+      },
+      "latency_ms": 143.45940000202972,
+      "flagged_unusual": 0.06037735849056604,
+      "out_of_scope": {
+        "photos": 25,
+        "answered": 0.0,
+        "uncertain": 0.52,
+        "unusual": 0.48,
+        "refused": 1.0,
+        "answered_correct": 0.0,
+        "answered_wrong": 0.0,
+        "accuracy_all": 0.0,
+        "accuracy_answered": null,
+        "confidence_mean": 0.7001710846412582
+      }
+    },
+    {
+      "key": "full_8class",
+      "name": "Tomato Care \u00b7 Full (8 conditions)",
+      "task": "8class",
+      "family": "Deep learning",
+      "generation": "upgrade",
+      "params": null,
+      "tta_views": 1,
+      "recipe": "convnext_t_in1k_sampler",
+      "recipes": [
+        "convnext_t_in1k_sampler"
+      ],
+      "deployed": true,
+      "is_default": true,
+      "description": "Imbalance: class-balanced sampling. Calibration: vector scaling. One threshold (0.76) and a per-condition unusual-image gate, all fixed on out-of-fold data.",
+      "variant": null,
+      "base_model": null,
+      "pipeline": {
+        "imbalance": "class-balanced sampling",
+        "arm": "B",
+        "calibration": "vector",
+        "threshold": 0.76,
+        "unusual_gate": "maha",
+        "outlier_exposure": false
+      },
+      "cv": {
+        "f1_macro": 0.6289568585799462,
+        "accuracy": 0.8494208494208494
+      },
+      "val": null,
+      "test": {
+        "accuracy": 0.8310344827586207,
+        "precision_macro": 0.5631857439395063,
+        "recall_macro": 0.5682711340085441,
+        "f1_macro": 0.5655326354679803,
+        "f1_weighted": 0.8218583319177849,
+        "accuracy_ci": [
+          0.7839674168942462,
+          0.8767605633802817
+        ],
+        "f1_macro_ci": [
+          0.490589693760829,
+          0.620349651461235
+        ],
+        "balanced_accuracy": 0.5682711340085441,
+        "ece": 0.09012705121814667,
+        "classwise_ece": 0.035381574352485255,
+        "nll": 0.5020260506744852,
+        "brier": 0.2381221347588386
+      },
+      "per_class": [
+        {
+          "key": "early_blight",
+          "name": "Early Blight",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 8
+        },
+        {
+          "key": "healthy",
+          "name": "Healthy",
+          "precision": 0.7857142857142857,
+          "recall": 0.8148148148148148,
+          "f1": 0.8,
+          "support": 27
+        },
+        {
+          "key": "late_blight",
+          "name": "Late Blight",
+          "precision": 0.6428571428571429,
+          "recall": 0.6,
+          "f1": 0.6206896551724138,
+          "support": 15
+        },
+        {
+          "key": "leaf_miner",
+          "name": "Leaf Miner",
+          "precision": 0.9148936170212766,
+          "recall": 0.9280575539568345,
+          "f1": 0.9214285714285714,
+          "support": 139
+        },
+        {
+          "key": "magnesium_deficiency",
+          "name": "Magnesium Deficiency",
+          "precision": 0.7857142857142857,
+          "recall": 0.7857142857142857,
+          "f1": 0.7857142857142857,
+          "support": 14
+        },
+        {
+          "key": "nitrogen_deficiency",
+          "name": "Nitrogen Deficiency",
+          "precision": 0.5714285714285714,
+          "recall": 0.5714285714285714,
+          "f1": 0.5714285714285714,
+          "support": 7
+        },
+        {
+          "key": "potassium_deficiency",
+          "name": "Potassium Deficiency",
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 2
+        },
+        {
+          "key": "spotted_wilt_virus",
+          "name": "Spotted Wilt Virus",
+          "precision": 0.8048780487804879,
+          "recall": 0.8461538461538461,
+          "f1": 0.825,
+          "support": 78
+        }
+      ],
+      "confusion": [
+        [
+          0,
+          0,
+          1,
+          2,
+          0,
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          22,
+          0,
+          5,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          9,
+          0,
+          0,
+          0,
+          0,
+          6
+        ],
+        [
+          0,
+          4,
+          0,
+          129,
+          2,
+          1,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          11,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          1,
+          1,
+          1,
+          4,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          1
+        ],
+        [
+          4,
+          2,
+          3,
+          3,
+          0,
+          0,
+          0,
+          66
+        ]
+      ],
+      "selective": {
+        "threshold": 0.76,
+        "coverage": 0.7965517241379311,
+        "accuracy_kept": 0.922077922077922,
+        "test": {
+          "coverage": 0.7965517241379311,
+          "accuracy_kept": 0.922077922077922
+        }
+      },
+      "calibration": {
+        "temperature": 1.0,
+        "ece_after": 0.04463173738483056,
+        "reliability_after": [
+          {
+            "lo": 0.2,
+            "hi": 0.30000000000000004,
+            "count": 5,
+            "confidence": 0.2685204034586838,
+            "accuracy": 0.2
+          },
+          {
+            "lo": 0.30000000000000004,
+            "hi": 0.4,
+            "count": 22,
+            "confidence": 0.3586753040208,
+            "accuracy": 0.36363636363636365
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 42,
+            "confidence": 0.4619071218494273,
+            "accuracy": 0.5714285714285714
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6000000000000001,
+            "count": 64,
+            "confidence": 0.5485570258951397,
+            "accuracy": 0.515625
+          },
+          {
+            "lo": 0.6000000000000001,
+            "hi": 0.7000000000000001,
+            "count": 88,
+            "confidence": 0.6539329521779124,
+            "accuracy": 0.6363636363636364
+          },
+          {
+            "lo": 0.7000000000000001,
+            "hi": 0.8,
+            "count": 138,
+            "confidence": 0.7580149027912294,
+            "accuracy": 0.6884057971014492
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 526,
+            "confidence": 0.8647189237735035,
+            "accuracy": 0.8193916349809885
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 928,
+            "confidence": 0.945402541437353,
+            "accuracy": 0.9612068965517241
+          }
+        ],
+        "fitted_on": "out-of-fold predictions, cross-fitted (diagram: out-of-fold, before vs after)",
+        "reliability_before": [
+          {
+            "lo": 0.2,
+            "hi": 0.30000000000000004,
+            "count": 3,
+            "confidence": 0.28160264711451527,
+            "accuracy": 0.3333333333333333
+          },
+          {
+            "lo": 0.30000000000000004,
+            "hi": 0.4,
+            "count": 20,
+            "confidence": 0.368328543046008,
+            "accuracy": 0.35
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 44,
+            "confidence": 0.4530147916661862,
+            "accuracy": 0.5
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6000000000000001,
+            "count": 65,
+            "confidence": 0.5523720428776455,
+            "accuracy": 0.4307692307692308
+          },
+          {
+            "lo": 0.6000000000000001,
+            "hi": 0.7000000000000001,
+            "count": 61,
+            "confidence": 0.6463786062057587,
+            "accuracy": 0.639344262295082
+          },
+          {
+            "lo": 0.7000000000000001,
+            "hi": 0.8,
+            "count": 100,
+            "confidence": 0.7530590843984443,
+            "accuracy": 0.59
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 436,
+            "confidence": 0.8700357673143339,
+            "accuracy": 0.805045871559633
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 1084,
+            "confidence": 0.9175841700454221,
+            "accuracy": 0.9474169741697417
+          }
+        ],
+        "ece_before": 0.03231680311966726,
+        "method": "vector scaling"
+      },
+      "latency_ms": 176.07889998180326,
+      "flagged_unusual": 0.05862068965517241,
       "out_of_scope": null
     }
   ],
@@ -6656,6 +7293,101 @@
         0.007042253521126751
       ],
       "share_a_not_better_f1": 0.567
+    },
+    {
+      "task": "5class",
+      "a": "focused_5class",
+      "b": "balanced_5class",
+      "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
+      "b_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+      "final_round": true,
+      "f1_diff": 0.01255537770950399,
+      "f1_ci": [
+        -0.05460933222798869,
+        0.08879639031786649
+      ],
+      "accuracy_diff": 0.0037735849056603765,
+      "accuracy_ci": [
+        -0.02692567567567569,
+        0.03409090909090906
+      ],
+      "share_a_not_better_f1": 0.3515
+    },
+    {
+      "task": "5class",
+      "a": "focused_5class",
+      "b": "calibrated_5class",
+      "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
+      "b_name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
+      "final_round": true,
+      "f1_diff": 0.0074808647407308415,
+      "f1_ci": [
+        -0.02728819433747667,
+        0.06160679394826832
+      ],
+      "accuracy_diff": -0.01132075471698113,
+      "accuracy_ci": [
+        -0.036499692521590285,
+        0.011629038096099914
+      ],
+      "share_a_not_better_f1": 0.3995
+    },
+    {
+      "task": "5class",
+      "a": "focused_5class",
+      "b": "ensemble_5class",
+      "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
+      "b_name": "Ensemble ConvNeXt-T + EfficientNet-B0 (original 5-class default)",
+      "final_round": true,
+      "f1_diff": 0.002840198601116839,
+      "f1_ci": [
+        -0.05908399716008838,
+        0.06598058523423415
+      ],
+      "accuracy_diff": 0.0,
+      "accuracy_ci": [
+        -0.025643382352941193,
+        0.02602717792350645
+      ],
+      "share_a_not_better_f1": 0.4515
+    },
+    {
+      "task": "8class",
+      "a": "full_8class",
+      "b": "balanced_8class",
+      "a_name": "Tomato Care \u00b7 Full (8 conditions)",
+      "b_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+      "final_round": true,
+      "f1_diff": -0.01857928366322359,
+      "f1_ci": [
+        -0.07128189927620819,
+        0.02851376020573251
+      ],
+      "accuracy_diff": 0.0034482758620689724,
+      "accuracy_ci": [
+        -0.017183611802346295,
+        0.02439237591676617
+      ],
+      "share_a_not_better_f1": 0.755
+    },
+    {
+      "task": "8class",
+      "a": "full_8class",
+      "b": "convnext_tiny_v2_tta",
+      "a_name": "Tomato Care \u00b7 Full (8 conditions)",
+      "b_name": "ConvNeXt-Tiny + TTA (original 8-class default)",
+      "final_round": true,
+      "f1_diff": -0.020330505548697198,
+      "f1_ci": [
+        -0.06222333546454446,
+        0.011434332398160824
+      ],
+      "accuracy_diff": -0.017241379310344862,
+      "accuracy_ci": [
+        -0.04248539841468499,
+        0.006873444720938473
+      ],
+      "share_a_not_better_f1": 0.8905
     }
   ],
   "cv": {
@@ -8059,6 +8791,16 @@
         "full_cv": false
       },
       {
+        "task": "8class",
+        "recipe": "convnext_t_in1k_sampler",
+        "label": "ConvNeXt-Tiny, robust recipe, class-balanced sampling",
+        "f1_1": 0.6386846091537081,
+        "f1_8": 0.6084460363934092,
+        "acc_1": 0.864406779661017,
+        "acc_8": 0.8615819209039548,
+        "full_cv": true
+      },
+      {
         "task": "5class",
         "recipe": "convnext_t_in1k_base",
         "label": "ConvNeXt-Tiny (ImageNet-1k), original recipe",
@@ -8076,6 +8818,16 @@
         "f1_8": 0.8737437498785452,
         "acc_1": 0.911042944785276,
         "acc_8": 0.9202453987730062,
+        "full_cv": true
+      },
+      {
+        "task": "5class",
+        "recipe": "convnext_t_in1k_robust_oe",
+        "label": "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure",
+        "f1_1": 0.8457290640394088,
+        "f1_8": 0.8596462398450274,
+        "acc_1": 0.901840490797546,
+        "acc_8": 0.911042944785276,
         "full_cv": true
       }
     ],
@@ -8289,296 +9041,346 @@
   },
   "selective": {
     "5class": {
-      "model": "balanced_5class",
+      "model": "focused_5class",
       "curve": [
         {
+          "threshold": 0.3,
+          "coverage": 1.0,
+          "accuracy_kept": 0.909433962264151
+        },
+        {
+          "threshold": 0.31,
+          "coverage": 1.0,
+          "accuracy_kept": 0.909433962264151
+        },
+        {
+          "threshold": 0.32,
+          "coverage": 0.9962264150943396,
+          "accuracy_kept": 0.9090909090909091
+        },
+        {
+          "threshold": 0.33,
+          "coverage": 0.9962264150943396,
+          "accuracy_kept": 0.9090909090909091
+        },
+        {
+          "threshold": 0.34,
+          "coverage": 0.9962264150943396,
+          "accuracy_kept": 0.9090909090909091
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.9962264150943396,
+          "accuracy_kept": 0.9090909090909091
+        },
+        {
+          "threshold": 0.36,
+          "coverage": 0.9962264150943396,
+          "accuracy_kept": 0.9090909090909091
+        },
+        {
+          "threshold": 0.37,
+          "coverage": 0.9962264150943396,
+          "accuracy_kept": 0.9090909090909091
+        },
+        {
+          "threshold": 0.38,
+          "coverage": 0.9924528301886792,
+          "accuracy_kept": 0.908745247148289
+        },
+        {
+          "threshold": 0.39,
+          "coverage": 0.9924528301886792,
+          "accuracy_kept": 0.908745247148289
+        },
+        {
           "threshold": 0.4,
-          "coverage": 0.9547169811320755,
-          "accuracy_kept": 0.932806324110672
+          "coverage": 0.9886792452830189,
+          "accuracy_kept": 0.9083969465648855
         },
         {
           "threshold": 0.41,
-          "coverage": 0.9547169811320755,
-          "accuracy_kept": 0.932806324110672
+          "coverage": 0.9849056603773585,
+          "accuracy_kept": 0.9080459770114943
         },
         {
           "threshold": 0.42,
-          "coverage": 0.9547169811320755,
-          "accuracy_kept": 0.932806324110672
+          "coverage": 0.9811320754716981,
+          "accuracy_kept": 0.9115384615384615
         },
         {
           "threshold": 0.43,
-          "coverage": 0.9547169811320755,
-          "accuracy_kept": 0.932806324110672
+          "coverage": 0.9811320754716981,
+          "accuracy_kept": 0.9115384615384615
         },
         {
           "threshold": 0.44,
-          "coverage": 0.9509433962264151,
-          "accuracy_kept": 0.9365079365079365
+          "coverage": 0.9811320754716981,
+          "accuracy_kept": 0.9115384615384615
         },
         {
           "threshold": 0.45,
-          "coverage": 0.9509433962264151,
-          "accuracy_kept": 0.9365079365079365
+          "coverage": 0.9811320754716981,
+          "accuracy_kept": 0.9115384615384615
         },
         {
           "threshold": 0.46,
-          "coverage": 0.9509433962264151,
-          "accuracy_kept": 0.9365079365079365
+          "coverage": 0.9811320754716981,
+          "accuracy_kept": 0.9115384615384615
         },
         {
           "threshold": 0.47,
-          "coverage": 0.9509433962264151,
-          "accuracy_kept": 0.9365079365079365
+          "coverage": 0.9773584905660377,
+          "accuracy_kept": 0.915057915057915
         },
         {
           "threshold": 0.48,
-          "coverage": 0.9509433962264151,
-          "accuracy_kept": 0.9365079365079365
+          "coverage": 0.9735849056603774,
+          "accuracy_kept": 0.9186046511627907
         },
         {
           "threshold": 0.49,
-          "coverage": 0.9509433962264151,
-          "accuracy_kept": 0.9365079365079365
+          "coverage": 0.9622641509433962,
+          "accuracy_kept": 0.9215686274509803
         },
         {
           "threshold": 0.5,
-          "coverage": 0.9509433962264151,
-          "accuracy_kept": 0.9365079365079365
+          "coverage": 0.9547169811320755,
+          "accuracy_kept": 0.924901185770751
         },
         {
           "threshold": 0.51,
-          "coverage": 0.9509433962264151,
-          "accuracy_kept": 0.9365079365079365
+          "coverage": 0.9471698113207547,
+          "accuracy_kept": 0.9243027888446215
         },
         {
           "threshold": 0.52,
-          "coverage": 0.9471698113207547,
-          "accuracy_kept": 0.9402390438247012
+          "coverage": 0.939622641509434,
+          "accuracy_kept": 0.9317269076305221
         },
         {
           "threshold": 0.53,
-          "coverage": 0.9471698113207547,
-          "accuracy_kept": 0.9402390438247012
+          "coverage": 0.939622641509434,
+          "accuracy_kept": 0.9317269076305221
         },
         {
           "threshold": 0.54,
-          "coverage": 0.9471698113207547,
-          "accuracy_kept": 0.9402390438247012
+          "coverage": 0.939622641509434,
+          "accuracy_kept": 0.9317269076305221
         },
         {
           "threshold": 0.55,
-          "coverage": 0.9433962264150944,
-          "accuracy_kept": 0.94
+          "coverage": 0.939622641509434,
+          "accuracy_kept": 0.9317269076305221
         },
         {
           "threshold": 0.56,
-          "coverage": 0.939622641509434,
-          "accuracy_kept": 0.9397590361445783
+          "coverage": 0.9283018867924528,
+          "accuracy_kept": 0.9349593495934959
         },
         {
           "threshold": 0.57,
-          "coverage": 0.939622641509434,
-          "accuracy_kept": 0.9397590361445783
+          "coverage": 0.9283018867924528,
+          "accuracy_kept": 0.9349593495934959
         },
         {
           "threshold": 0.58,
-          "coverage": 0.939622641509434,
-          "accuracy_kept": 0.9397590361445783
+          "coverage": 0.9283018867924528,
+          "accuracy_kept": 0.9349593495934959
         },
         {
           "threshold": 0.59,
-          "coverage": 0.939622641509434,
-          "accuracy_kept": 0.9397590361445783
+          "coverage": 0.9283018867924528,
+          "accuracy_kept": 0.9349593495934959
         },
         {
           "threshold": 0.6,
-          "coverage": 0.9320754716981132,
-          "accuracy_kept": 0.9392712550607287
-        },
-        {
-          "threshold": 0.61,
-          "coverage": 0.9283018867924528,
-          "accuracy_kept": 0.9390243902439024
-        },
-        {
-          "threshold": 0.62,
-          "coverage": 0.9245283018867925,
-          "accuracy_kept": 0.9387755102040817
-        },
-        {
-          "threshold": 0.63,
-          "coverage": 0.9207547169811321,
-          "accuracy_kept": 0.9385245901639344
-        },
-        {
-          "threshold": 0.64,
           "coverage": 0.9169811320754717,
           "accuracy_kept": 0.9382716049382716
         },
         {
-          "threshold": 0.65,
+          "threshold": 0.61,
           "coverage": 0.9132075471698113,
-          "accuracy_kept": 0.9380165289256198
+          "accuracy_kept": 0.9421487603305785
         },
         {
-          "threshold": 0.66,
-          "coverage": 0.9056603773584906,
-          "accuracy_kept": 0.9375
+          "threshold": 0.62,
+          "coverage": 0.9132075471698113,
+          "accuracy_kept": 0.9421487603305785
         },
         {
-          "threshold": 0.67,
-          "coverage": 0.9056603773584906,
-          "accuracy_kept": 0.9375
+          "threshold": 0.63,
+          "coverage": 0.909433962264151,
+          "accuracy_kept": 0.941908713692946
         },
         {
-          "threshold": 0.68,
+          "threshold": 0.64,
           "coverage": 0.9018867924528302,
           "accuracy_kept": 0.9414225941422594
         },
         {
-          "threshold": 0.69,
+          "threshold": 0.65,
           "coverage": 0.8981132075471698,
           "accuracy_kept": 0.9453781512605042
         },
         {
+          "threshold": 0.66,
+          "coverage": 0.8981132075471698,
+          "accuracy_kept": 0.9453781512605042
+        },
+        {
+          "threshold": 0.67,
+          "coverage": 0.8981132075471698,
+          "accuracy_kept": 0.9453781512605042
+        },
+        {
+          "threshold": 0.68,
+          "coverage": 0.8905660377358491,
+          "accuracy_kept": 0.9491525423728814
+        },
+        {
+          "threshold": 0.69,
+          "coverage": 0.8905660377358491,
+          "accuracy_kept": 0.9491525423728814
+        },
+        {
           "threshold": 0.7,
-          "coverage": 0.8867924528301887,
-          "accuracy_kept": 0.948936170212766
-        },
-        {
-          "threshold": 0.71,
-          "coverage": 0.8867924528301887,
-          "accuracy_kept": 0.948936170212766
-        },
-        {
-          "threshold": 0.72,
-          "coverage": 0.8867924528301887,
-          "accuracy_kept": 0.948936170212766
-        },
-        {
-          "threshold": 0.73,
-          "coverage": 0.8867924528301887,
-          "accuracy_kept": 0.948936170212766
-        },
-        {
-          "threshold": 0.74,
-          "coverage": 0.8830188679245283,
-          "accuracy_kept": 0.9529914529914529
-        },
-        {
-          "threshold": 0.75,
           "coverage": 0.879245283018868,
           "accuracy_kept": 0.9570815450643777
         },
         {
-          "threshold": 0.76,
+          "threshold": 0.71,
+          "coverage": 0.8754716981132076,
+          "accuracy_kept": 0.9568965517241379
+        },
+        {
+          "threshold": 0.72,
           "coverage": 0.8716981132075472,
           "accuracy_kept": 0.961038961038961
         },
         {
-          "threshold": 0.77,
+          "threshold": 0.73,
           "coverage": 0.8679245283018868,
-          "accuracy_kept": 0.9652173913043478
+          "accuracy_kept": 0.9608695652173913
+        },
+        {
+          "threshold": 0.74,
+          "coverage": 0.8641509433962264,
+          "accuracy_kept": 0.9606986899563319
+        },
+        {
+          "threshold": 0.75,
+          "coverage": 0.8566037735849057,
+          "accuracy_kept": 0.960352422907489
+        },
+        {
+          "threshold": 0.76,
+          "coverage": 0.8452830188679246,
+          "accuracy_kept": 0.9642857142857143
+        },
+        {
+          "threshold": 0.77,
+          "coverage": 0.8452830188679246,
+          "accuracy_kept": 0.9642857142857143
         },
         {
           "threshold": 0.78,
-          "coverage": 0.8641509433962264,
-          "accuracy_kept": 0.9650655021834061
+          "coverage": 0.8415094339622642,
+          "accuracy_kept": 0.9641255605381166
         },
         {
           "threshold": 0.79,
-          "coverage": 0.8603773584905661,
-          "accuracy_kept": 0.9649122807017544
+          "coverage": 0.8264150943396227,
+          "accuracy_kept": 0.9680365296803652
         },
         {
           "threshold": 0.8,
-          "coverage": 0.8566037735849057,
-          "accuracy_kept": 0.9647577092511013
+          "coverage": 0.8188679245283019,
+          "accuracy_kept": 0.9769585253456221
         },
         {
           "threshold": 0.81,
-          "coverage": 0.8490566037735849,
-          "accuracy_kept": 0.9688888888888889
+          "coverage": 0.8188679245283019,
+          "accuracy_kept": 0.9769585253456221
         },
         {
           "threshold": 0.82,
-          "coverage": 0.8452830188679246,
-          "accuracy_kept": 0.9732142857142857
+          "coverage": 0.8150943396226416,
+          "accuracy_kept": 0.9768518518518519
         },
         {
           "threshold": 0.83,
-          "coverage": 0.8415094339622642,
-          "accuracy_kept": 0.9730941704035875
-        },
-        {
-          "threshold": 0.84,
-          "coverage": 0.8415094339622642,
-          "accuracy_kept": 0.9730941704035875
-        },
-        {
-          "threshold": 0.85,
-          "coverage": 0.8301886792452831,
-          "accuracy_kept": 0.9727272727272728
-        },
-        {
-          "threshold": 0.86,
-          "coverage": 0.8264150943396227,
-          "accuracy_kept": 0.9726027397260274
-        },
-        {
-          "threshold": 0.87,
-          "coverage": 0.8188679245283019,
-          "accuracy_kept": 0.9723502304147466
-        },
-        {
-          "threshold": 0.88,
           "coverage": 0.8075471698113208,
           "accuracy_kept": 0.9766355140186916
         },
         {
-          "threshold": 0.89,
+          "threshold": 0.84,
+          "coverage": 0.8,
+          "accuracy_kept": 0.9764150943396226
+        },
+        {
+          "threshold": 0.85,
+          "coverage": 0.7924528301886793,
+          "accuracy_kept": 0.9809523809523809
+        },
+        {
+          "threshold": 0.86,
           "coverage": 0.7849056603773585,
           "accuracy_kept": 0.9855769230769231
         },
         {
+          "threshold": 0.87,
+          "coverage": 0.7811320754716982,
+          "accuracy_kept": 0.9855072463768116
+        },
+        {
+          "threshold": 0.88,
+          "coverage": 0.7660377358490567,
+          "accuracy_kept": 0.9852216748768473
+        },
+        {
+          "threshold": 0.89,
+          "coverage": 0.7509433962264151,
+          "accuracy_kept": 0.9899497487437185
+        },
+        {
           "threshold": 0.9,
-          "coverage": 0.7773584905660378,
-          "accuracy_kept": 0.9902912621359223
+          "coverage": 0.7471698113207547,
+          "accuracy_kept": 0.98989898989899
         },
         {
           "threshold": 0.91,
-          "coverage": 0.7622641509433963,
-          "accuracy_kept": 0.9900990099009901
+          "coverage": 0.7245283018867924,
+          "accuracy_kept": 0.9895833333333334
         },
         {
           "threshold": 0.92,
-          "coverage": 0.7018867924528301,
-          "accuracy_kept": 0.989247311827957
+          "coverage": 0.6943396226415094,
+          "accuracy_kept": 0.9945652173913043
         },
         {
           "threshold": 0.93,
-          "coverage": 0.6188679245283019,
-          "accuracy_kept": 0.9939024390243902
+          "coverage": 0.6528301886792452,
+          "accuracy_kept": 0.9942196531791907
         },
         {
           "threshold": 0.94,
-          "coverage": 0.45660377358490567,
-          "accuracy_kept": 0.9917355371900827
+          "coverage": 0.6113207547169811,
+          "accuracy_kept": 0.9938271604938271
         },
         {
           "threshold": 0.95,
-          "coverage": 0.43018867924528303,
-          "accuracy_kept": 1.0
+          "coverage": 0.4641509433962264,
+          "accuracy_kept": 0.991869918699187
         },
         {
           "threshold": 0.96,
-          "coverage": 0.4,
+          "coverage": 0.39622641509433965,
           "accuracy_kept": 1.0
         },
         {
           "threshold": 0.97,
-          "coverage": 0.11320754716981132,
+          "coverage": 0.1471698113207547,
           "accuracy_kept": 1.0
         },
         {
@@ -8592,305 +9394,355 @@
           "accuracy_kept": null
         }
       ],
-      "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 95% (coverage >= 50%)",
+      "rule": "target 95% not reachable at >= 50% coverage: best accuracy at >= 50% coverage",
       "chosen": {
-        "threshold": 0.89,
-        "coverage": 0.7811320754716982,
-        "accuracy_kept": 0.9855072463768116
+        "threshold": 0.95,
+        "coverage": 0.4641509433962264,
+        "accuracy_kept": 0.991869918699187
       }
     },
     "8class": {
-      "model": "balanced_8class",
+      "model": "full_8class",
       "curve": [
         {
+          "threshold": 0.3,
+          "coverage": 0.996551724137931,
+          "accuracy_kept": 0.8304498269896193
+        },
+        {
+          "threshold": 0.31,
+          "coverage": 0.996551724137931,
+          "accuracy_kept": 0.8304498269896193
+        },
+        {
+          "threshold": 0.32,
+          "coverage": 0.996551724137931,
+          "accuracy_kept": 0.8304498269896193
+        },
+        {
+          "threshold": 0.33,
+          "coverage": 0.996551724137931,
+          "accuracy_kept": 0.8304498269896193
+        },
+        {
+          "threshold": 0.34,
+          "coverage": 0.993103448275862,
+          "accuracy_kept": 0.8298611111111112
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.993103448275862,
+          "accuracy_kept": 0.8298611111111112
+        },
+        {
+          "threshold": 0.36,
+          "coverage": 0.993103448275862,
+          "accuracy_kept": 0.8298611111111112
+        },
+        {
+          "threshold": 0.37,
+          "coverage": 0.993103448275862,
+          "accuracy_kept": 0.8298611111111112
+        },
+        {
+          "threshold": 0.38,
+          "coverage": 0.9896551724137931,
+          "accuracy_kept": 0.8327526132404182
+        },
+        {
+          "threshold": 0.39,
+          "coverage": 0.9896551724137931,
+          "accuracy_kept": 0.8327526132404182
+        },
+        {
           "threshold": 0.4,
-          "coverage": 0.9517241379310345,
-          "accuracy_kept": 0.8478260869565217
+          "coverage": 0.9827586206896551,
+          "accuracy_kept": 0.8385964912280702
         },
         {
           "threshold": 0.41,
-          "coverage": 0.9448275862068966,
-          "accuracy_kept": 0.8540145985401459
+          "coverage": 0.9827586206896551,
+          "accuracy_kept": 0.8385964912280702
         },
         {
           "threshold": 0.42,
-          "coverage": 0.9448275862068966,
-          "accuracy_kept": 0.8540145985401459
+          "coverage": 0.9827586206896551,
+          "accuracy_kept": 0.8385964912280702
         },
         {
           "threshold": 0.43,
-          "coverage": 0.9413793103448276,
-          "accuracy_kept": 0.8534798534798534
+          "coverage": 0.9793103448275862,
+          "accuracy_kept": 0.8415492957746479
         },
         {
           "threshold": 0.44,
-          "coverage": 0.9413793103448276,
-          "accuracy_kept": 0.8534798534798534
+          "coverage": 0.9793103448275862,
+          "accuracy_kept": 0.8415492957746479
         },
         {
           "threshold": 0.45,
-          "coverage": 0.9379310344827586,
-          "accuracy_kept": 0.8566176470588235
+          "coverage": 0.9724137931034482,
+          "accuracy_kept": 0.8475177304964538
         },
         {
           "threshold": 0.46,
-          "coverage": 0.9379310344827586,
-          "accuracy_kept": 0.8566176470588235
+          "coverage": 0.9724137931034482,
+          "accuracy_kept": 0.8475177304964538
         },
         {
           "threshold": 0.47,
-          "coverage": 0.9379310344827586,
-          "accuracy_kept": 0.8566176470588235
+          "coverage": 0.9655172413793104,
+          "accuracy_kept": 0.8535714285714285
         },
         {
           "threshold": 0.48,
-          "coverage": 0.9241379310344827,
-          "accuracy_kept": 0.8656716417910447
+          "coverage": 0.9620689655172414,
+          "accuracy_kept": 0.8530465949820788
         },
         {
           "threshold": 0.49,
-          "coverage": 0.9241379310344827,
-          "accuracy_kept": 0.8656716417910447
+          "coverage": 0.9586206896551724,
+          "accuracy_kept": 0.8525179856115108
         },
         {
           "threshold": 0.5,
-          "coverage": 0.9241379310344827,
-          "accuracy_kept": 0.8656716417910447
+          "coverage": 0.9551724137931035,
+          "accuracy_kept": 0.855595667870036
         },
         {
           "threshold": 0.51,
-          "coverage": 0.9206896551724137,
-          "accuracy_kept": 0.8651685393258427
+          "coverage": 0.9517241379310345,
+          "accuracy_kept": 0.8586956521739131
         },
         {
           "threshold": 0.52,
-          "coverage": 0.9206896551724137,
-          "accuracy_kept": 0.8651685393258427
+          "coverage": 0.9482758620689655,
+          "accuracy_kept": 0.8581818181818182
         },
         {
           "threshold": 0.53,
-          "coverage": 0.9206896551724137,
-          "accuracy_kept": 0.8651685393258427
+          "coverage": 0.9482758620689655,
+          "accuracy_kept": 0.8581818181818182
         },
         {
           "threshold": 0.54,
-          "coverage": 0.9206896551724137,
-          "accuracy_kept": 0.8651685393258427
+          "coverage": 0.9448275862068966,
+          "accuracy_kept": 0.8613138686131386
         },
         {
           "threshold": 0.55,
-          "coverage": 0.9172413793103448,
-          "accuracy_kept": 0.8646616541353384
+          "coverage": 0.9413793103448276,
+          "accuracy_kept": 0.8608058608058609
         },
         {
           "threshold": 0.56,
-          "coverage": 0.9172413793103448,
-          "accuracy_kept": 0.8646616541353384
+          "coverage": 0.9413793103448276,
+          "accuracy_kept": 0.8608058608058609
         },
         {
           "threshold": 0.57,
-          "coverage": 0.9172413793103448,
-          "accuracy_kept": 0.8646616541353384
+          "coverage": 0.9310344827586207,
+          "accuracy_kept": 0.8666666666666667
         },
         {
           "threshold": 0.58,
-          "coverage": 0.9137931034482759,
-          "accuracy_kept": 0.8641509433962264
+          "coverage": 0.9275862068965517,
+          "accuracy_kept": 0.8661710037174721
         },
         {
           "threshold": 0.59,
-          "coverage": 0.9137931034482759,
-          "accuracy_kept": 0.8641509433962264
+          "coverage": 0.9206896551724137,
+          "accuracy_kept": 0.8689138576779026
         },
         {
           "threshold": 0.6,
-          "coverage": 0.9103448275862069,
-          "accuracy_kept": 0.8674242424242424
+          "coverage": 0.9172413793103448,
+          "accuracy_kept": 0.8721804511278195
         },
         {
           "threshold": 0.61,
-          "coverage": 0.906896551724138,
-          "accuracy_kept": 0.870722433460076
+          "coverage": 0.9172413793103448,
+          "accuracy_kept": 0.8721804511278195
         },
         {
           "threshold": 0.62,
-          "coverage": 0.906896551724138,
-          "accuracy_kept": 0.870722433460076
+          "coverage": 0.9103448275862069,
+          "accuracy_kept": 0.8787878787878788
         },
         {
           "threshold": 0.63,
-          "coverage": 0.9,
-          "accuracy_kept": 0.8735632183908046
+          "coverage": 0.903448275862069,
+          "accuracy_kept": 0.8816793893129771
         },
         {
           "threshold": 0.64,
-          "coverage": 0.896551724137931,
-          "accuracy_kept": 0.8769230769230769
+          "coverage": 0.9,
+          "accuracy_kept": 0.8812260536398467
         },
         {
           "threshold": 0.65,
-          "coverage": 0.896551724137931,
-          "accuracy_kept": 0.8769230769230769
+          "coverage": 0.8896551724137931,
+          "accuracy_kept": 0.8837209302325582
         },
         {
           "threshold": 0.66,
           "coverage": 0.8896551724137931,
-          "accuracy_kept": 0.875968992248062
+          "accuracy_kept": 0.8837209302325582
         },
         {
           "threshold": 0.67,
-          "coverage": 0.8827586206896552,
-          "accuracy_kept": 0.87890625
+          "coverage": 0.8862068965517241,
+          "accuracy_kept": 0.8832684824902723
         },
         {
           "threshold": 0.68,
           "coverage": 0.8758620689655172,
-          "accuracy_kept": 0.8818897637795275
+          "accuracy_kept": 0.8858267716535433
         },
         {
           "threshold": 0.69,
-          "coverage": 0.8620689655172413,
-          "accuracy_kept": 0.884
+          "coverage": 0.8724137931034482,
+          "accuracy_kept": 0.8893280632411067
         },
         {
           "threshold": 0.7,
-          "coverage": 0.8551724137931035,
-          "accuracy_kept": 0.8911290322580645
+          "coverage": 0.8586206896551725,
+          "accuracy_kept": 0.891566265060241
         },
         {
           "threshold": 0.71,
-          "coverage": 0.8413793103448276,
-          "accuracy_kept": 0.8934426229508197
+          "coverage": 0.8482758620689655,
+          "accuracy_kept": 0.8983739837398373
         },
         {
           "threshold": 0.72,
-          "coverage": 0.8344827586206897,
-          "accuracy_kept": 0.8925619834710744
+          "coverage": 0.8413793103448276,
+          "accuracy_kept": 0.9016393442622951
         },
         {
           "threshold": 0.73,
-          "coverage": 0.8310344827586207,
-          "accuracy_kept": 0.8962655601659751
+          "coverage": 0.8275862068965517,
+          "accuracy_kept": 0.9125
         },
         {
           "threshold": 0.74,
-          "coverage": 0.8172413793103448,
-          "accuracy_kept": 0.8945147679324894
+          "coverage": 0.8241379310344827,
+          "accuracy_kept": 0.9121338912133892
         },
         {
           "threshold": 0.75,
-          "coverage": 0.7965517241379311,
-          "accuracy_kept": 0.8961038961038961
+          "coverage": 0.8172413793103448,
+          "accuracy_kept": 0.9156118143459916
         },
         {
           "threshold": 0.76,
-          "coverage": 0.7827586206896552,
-          "accuracy_kept": 0.8986784140969163
+          "coverage": 0.8068965517241379,
+          "accuracy_kept": 0.9145299145299145
         },
         {
           "threshold": 0.77,
-          "coverage": 0.7724137931034483,
-          "accuracy_kept": 0.9017857142857143
+          "coverage": 0.7896551724137931,
+          "accuracy_kept": 0.9213973799126638
         },
         {
           "threshold": 0.78,
-          "coverage": 0.7620689655172413,
-          "accuracy_kept": 0.9049773755656109
+          "coverage": 0.7793103448275862,
+          "accuracy_kept": 0.9292035398230089
         },
         {
           "threshold": 0.79,
-          "coverage": 0.7551724137931034,
-          "accuracy_kept": 0.91324200913242
+          "coverage": 0.7655172413793103,
+          "accuracy_kept": 0.9279279279279279
         },
         {
           "threshold": 0.8,
-          "coverage": 0.7379310344827587,
-          "accuracy_kept": 0.9252336448598131
+          "coverage": 0.7551724137931034,
+          "accuracy_kept": 0.9315068493150684
         },
         {
           "threshold": 0.81,
-          "coverage": 0.7275862068965517,
-          "accuracy_kept": 0.9289099526066351
+          "coverage": 0.7344827586206897,
+          "accuracy_kept": 0.9436619718309859
         },
         {
           "threshold": 0.82,
-          "coverage": 0.7034482758620689,
-          "accuracy_kept": 0.9362745098039216
+          "coverage": 0.7206896551724138,
+          "accuracy_kept": 0.9473684210526315
         },
         {
           "threshold": 0.83,
-          "coverage": 0.7,
-          "accuracy_kept": 0.9359605911330049
+          "coverage": 0.7068965517241379,
+          "accuracy_kept": 0.9560975609756097
         },
         {
           "threshold": 0.84,
-          "coverage": 0.6896551724137931,
-          "accuracy_kept": 0.945
+          "coverage": 0.6931034482758621,
+          "accuracy_kept": 0.9601990049751243
         },
         {
           "threshold": 0.85,
-          "coverage": 0.6724137931034483,
-          "accuracy_kept": 0.958974358974359
+          "coverage": 0.6655172413793103,
+          "accuracy_kept": 0.9637305699481865
         },
         {
           "threshold": 0.86,
-          "coverage": 0.6448275862068965,
-          "accuracy_kept": 0.9625668449197861
+          "coverage": 0.6482758620689655,
+          "accuracy_kept": 0.9680851063829787
         },
         {
           "threshold": 0.87,
-          "coverage": 0.6344827586206897,
-          "accuracy_kept": 0.967391304347826
+          "coverage": 0.6068965517241379,
+          "accuracy_kept": 0.9886363636363636
         },
         {
           "threshold": 0.88,
-          "coverage": 0.6275862068965518,
-          "accuracy_kept": 0.967032967032967
+          "coverage": 0.5724137931034483,
+          "accuracy_kept": 0.9879518072289156
         },
         {
           "threshold": 0.89,
-          "coverage": 0.603448275862069,
-          "accuracy_kept": 0.9657142857142857
+          "coverage": 0.506896551724138,
+          "accuracy_kept": 0.9931972789115646
         },
         {
           "threshold": 0.9,
-          "coverage": 0.5827586206896552,
-          "accuracy_kept": 0.9644970414201184
+          "coverage": 0.4413793103448276,
+          "accuracy_kept": 0.9921875
         },
         {
           "threshold": 0.91,
-          "coverage": 0.5482758620689655,
-          "accuracy_kept": 0.9748427672955975
+          "coverage": 0.4068965517241379,
+          "accuracy_kept": 0.9915254237288136
         },
         {
           "threshold": 0.92,
-          "coverage": 0.5137931034482759,
-          "accuracy_kept": 0.9798657718120806
+          "coverage": 0.39655172413793105,
+          "accuracy_kept": 0.991304347826087
         },
         {
           "threshold": 0.93,
-          "coverage": 0.46206896551724136,
-          "accuracy_kept": 0.9925373134328358
+          "coverage": 0.38620689655172413,
+          "accuracy_kept": 0.9910714285714286
         },
         {
           "threshold": 0.94,
-          "coverage": 0.3931034482758621,
-          "accuracy_kept": 0.9912280701754386
+          "coverage": 0.3586206896551724,
+          "accuracy_kept": 1.0
         },
         {
           "threshold": 0.95,
-          "coverage": 0.35517241379310344,
+          "coverage": 0.30344827586206896,
           "accuracy_kept": 1.0
         },
         {
           "threshold": 0.96,
-          "coverage": 0.3,
+          "coverage": 0.03103448275862069,
           "accuracy_kept": 1.0
         },
         {
           "threshold": 0.97,
-          "coverage": 0.04827586206896552,
-          "accuracy_kept": 1.0
+          "coverage": 0.0,
+          "accuracy_kept": null
         },
         {
           "threshold": 0.98,
@@ -8903,11 +9755,11 @@
           "accuracy_kept": null
         }
       ],
-      "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 90% (coverage >= 50%)",
+      "rule": "lowest calibrated confidence with out-of-fold accuracy on answered photos >= 90% (coverage of in-scope photos >= 50%)",
       "chosen": {
-        "threshold": 0.67,
-        "coverage": 0.8448275862068966,
-        "accuracy_kept": 0.889795918367347
+        "threshold": 0.76,
+        "coverage": 0.7965517241379311,
+        "accuracy_kept": 0.922077922077922
       }
     }
   },
@@ -9022,6 +9874,76 @@
           }
         }
       }
+    },
+    "final": {
+      "5class": {
+        "method": "knn",
+        "keep": 0.95,
+        "oof": {
+          "auroc_select": 0.9076910445310284,
+          "fpr95_select": 0.43833131801692865,
+          "auroc_probes_A": 0.9968561064087061,
+          "auroc_paper": 0.9680532043530834,
+          "auroc_out_of_scope": 0.8423338124462899,
+          "scale": 1.009358865441561,
+          "class_scales": [
+            0.932933437614686,
+            1.0512001153651682,
+            1.0071996412340471,
+            1.032997998476986,
+            0.9485895138401196
+          ],
+          "flagged_in_scope": 0.0501813784764208,
+          "flagged_in_scope_by_condition": {
+            "healthy": 0.08465608465608465,
+            "leaf_miner": 0.021468926553672316,
+            "magnesium_deficiency": 0.0970873786407767,
+            "nitrogen_deficiency": 0.2631578947368421,
+            "spotted_wilt_virus": 0.06378132118451026
+          },
+          "flagged_probes_A": 1.0,
+          "flagged_probes_B": 1.0,
+          "flagged_paper": 0.8,
+          "flagged_out_of_scope": 0.4591194968553459,
+          "out_of_scope_refused_with_gate": 0.8490566037735849
+        }
+      },
+      "8class": {
+        "method": "maha",
+        "keep": 0.95,
+        "oof": {
+          "auroc_select": 0.9663407377693092,
+          "fpr95_select": 0.11031439602868175,
+          "auroc_probes_A": 0.9887111601397316,
+          "auroc_paper": 0.964103695532267,
+          "auroc_out_of_scope": null,
+          "scale": 1.0017463773473367,
+          "class_scales": [
+            1.2172416594221347,
+            1.0325242148689686,
+            1.3213548666080157,
+            0.8022988703022267,
+            1.0341285918682548,
+            1.354740134149616,
+            1.0,
+            0.968274542410606
+          ],
+          "flagged_in_scope": 0.05184776613348042,
+          "flagged_in_scope_by_condition": {
+            "early_blight": 0.12962962962962962,
+            "healthy": 0.0582010582010582,
+            "late_blight": 0.11224489795918367,
+            "leaf_miner": 0.0327683615819209,
+            "magnesium_deficiency": 0.0970873786407767,
+            "nitrogen_deficiency": 0.10526315789473684,
+            "potassium_deficiency": 0.0,
+            "spotted_wilt_virus": 0.05011389521640091
+          },
+          "flagged_probes_A": 0.9333333333333333,
+          "flagged_probes_B": 1.0,
+          "flagged_paper": 0.7466666666666667
+        }
+      }
     }
   },
   "gradcam": {
@@ -9029,180 +9951,180 @@
       {
         "sample": "early_blight",
         "true_key": "early_blight",
-        "photo_id": "IMG20220323102220",
+        "photo_id": "IMG20220324175916",
         "input": "/gradcam/input/early_blight.png",
         "overlays": [
           {
-            "model": "balanced_5class",
-            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+            "model": "focused_5class",
+            "model_name": "Tomato Care \u00b7 Focused (5 conditions)",
             "pred_key": "spotted_wilt_virus",
-            "confidence": 0.9397451223430369,
+            "confidence": 0.938310814452254,
             "correct": false,
             "out_of_scope": true,
-            "overlay": "/gradcam/balanced_5class/early_blight_overlay.png",
-            "heatmap": "/gradcam/balanced_5class/early_blight_heat.png",
-            "on_leaf_share": 0.820316247868802
+            "overlay": "/gradcam/focused_5class/early_blight_overlay.png",
+            "heatmap": "/gradcam/focused_5class/early_blight_heat.png",
+            "on_leaf_share": 0.7789686828041265
           },
           {
-            "model": "balanced_8class",
-            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+            "model": "full_8class",
+            "model_name": "Tomato Care \u00b7 Full (8 conditions)",
             "pred_key": "spotted_wilt_virus",
-            "confidence": 0.9238233188576207,
+            "confidence": 0.8158096301595386,
             "correct": false,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_8class/early_blight_overlay.png",
-            "heatmap": "/gradcam/balanced_8class/early_blight_heat.png",
-            "on_leaf_share": 0.7332889139328065
+            "overlay": "/gradcam/full_8class/early_blight_overlay.png",
+            "heatmap": "/gradcam/full_8class/early_blight_heat.png",
+            "on_leaf_share": 0.8343222367309636
           }
         ]
       },
       {
         "sample": "healthy",
         "true_key": "healthy",
-        "photo_id": "IMG20220323103951",
+        "photo_id": "IMG20220325141803",
         "input": "/gradcam/input/healthy.png",
         "overlays": [
           {
-            "model": "balanced_5class",
-            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+            "model": "focused_5class",
+            "model_name": "Tomato Care \u00b7 Focused (5 conditions)",
             "pred_key": "healthy",
-            "confidence": 0.7883112222278726,
+            "confidence": 0.8573236761389798,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_5class/healthy_overlay.png",
-            "heatmap": "/gradcam/balanced_5class/healthy_heat.png",
-            "on_leaf_share": 0.7782084795793989
+            "overlay": "/gradcam/focused_5class/healthy_overlay.png",
+            "heatmap": "/gradcam/focused_5class/healthy_heat.png",
+            "on_leaf_share": 0.8018846066670586
           },
           {
-            "model": "balanced_8class",
-            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+            "model": "full_8class",
+            "model_name": "Tomato Care \u00b7 Full (8 conditions)",
             "pred_key": "healthy",
-            "confidence": 0.7004310565629901,
+            "confidence": 0.7951862391059821,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_8class/healthy_overlay.png",
-            "heatmap": "/gradcam/balanced_8class/healthy_heat.png",
-            "on_leaf_share": 0.6695378086398095
+            "overlay": "/gradcam/full_8class/healthy_overlay.png",
+            "heatmap": "/gradcam/full_8class/healthy_heat.png",
+            "on_leaf_share": 0.6382171198777571
           }
         ]
       },
       {
         "sample": "late_blight",
         "true_key": "late_blight",
-        "photo_id": "IMG20220323122907",
+        "photo_id": "IMG20220324121427",
         "input": "/gradcam/input/late_blight.png",
         "overlays": [
           {
-            "model": "balanced_5class",
-            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+            "model": "focused_5class",
+            "model_name": "Tomato Care \u00b7 Focused (5 conditions)",
             "pred_key": "spotted_wilt_virus",
-            "confidence": 0.9340509498589248,
+            "confidence": 0.8186162911173711,
             "correct": false,
             "out_of_scope": true,
-            "overlay": "/gradcam/balanced_5class/late_blight_overlay.png",
-            "heatmap": "/gradcam/balanced_5class/late_blight_heat.png",
-            "on_leaf_share": 0.3591414143567399
+            "overlay": "/gradcam/focused_5class/late_blight_overlay.png",
+            "heatmap": "/gradcam/focused_5class/late_blight_heat.png",
+            "on_leaf_share": 0.5894057216128781
           },
           {
-            "model": "balanced_8class",
-            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+            "model": "full_8class",
+            "model_name": "Tomato Care \u00b7 Full (8 conditions)",
             "pred_key": "late_blight",
-            "confidence": 0.8463460320776968,
+            "confidence": 0.48610424735925034,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_8class/late_blight_overlay.png",
-            "heatmap": "/gradcam/balanced_8class/late_blight_heat.png",
-            "on_leaf_share": 0.24832738095793291
+            "overlay": "/gradcam/full_8class/late_blight_overlay.png",
+            "heatmap": "/gradcam/full_8class/late_blight_heat.png",
+            "on_leaf_share": 0.6193934180173726
           }
         ]
       },
       {
         "sample": "leaf_miner",
         "true_key": "leaf_miner",
-        "photo_id": "IMG20220323094315",
+        "photo_id": "IMG20220325141452",
         "input": "/gradcam/input/leaf_miner.png",
         "overlays": [
           {
-            "model": "balanced_5class",
-            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+            "model": "focused_5class",
+            "model_name": "Tomato Care \u00b7 Focused (5 conditions)",
             "pred_key": "leaf_miner",
-            "confidence": 0.966188077811031,
+            "confidence": 0.970717680168549,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_5class/leaf_miner_overlay.png",
-            "heatmap": "/gradcam/balanced_5class/leaf_miner_heat.png",
-            "on_leaf_share": 0.6402783443375104
+            "overlay": "/gradcam/focused_5class/leaf_miner_overlay.png",
+            "heatmap": "/gradcam/focused_5class/leaf_miner_heat.png",
+            "on_leaf_share": 0.8818146835847899
           },
           {
-            "model": "balanced_8class",
-            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+            "model": "full_8class",
+            "model_name": "Tomato Care \u00b7 Full (8 conditions)",
             "pred_key": "leaf_miner",
-            "confidence": 0.9621068078628047,
+            "confidence": 0.9552615923877412,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_8class/leaf_miner_overlay.png",
-            "heatmap": "/gradcam/balanced_8class/leaf_miner_heat.png",
-            "on_leaf_share": 0.7031398101262613
+            "overlay": "/gradcam/full_8class/leaf_miner_overlay.png",
+            "heatmap": "/gradcam/full_8class/leaf_miner_heat.png",
+            "on_leaf_share": 0.8516033453722491
           }
         ]
       },
       {
         "sample": "magnesium_deficiency",
         "true_key": "magnesium_deficiency",
-        "photo_id": "IMG20220323183121",
+        "photo_id": "IMG20220323183119",
         "input": "/gradcam/input/magnesium_deficiency.png",
         "overlays": [
           {
-            "model": "balanced_5class",
-            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+            "model": "focused_5class",
+            "model_name": "Tomato Care \u00b7 Focused (5 conditions)",
             "pred_key": "magnesium_deficiency",
-            "confidence": 0.9390800767122942,
+            "confidence": 0.9337529414055695,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_5class/magnesium_deficiency_overlay.png",
-            "heatmap": "/gradcam/balanced_5class/magnesium_deficiency_heat.png",
-            "on_leaf_share": 0.7615910064926545
+            "overlay": "/gradcam/focused_5class/magnesium_deficiency_overlay.png",
+            "heatmap": "/gradcam/focused_5class/magnesium_deficiency_heat.png",
+            "on_leaf_share": 0.7577244628314379
           },
           {
-            "model": "balanced_8class",
-            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+            "model": "full_8class",
+            "model_name": "Tomato Care \u00b7 Full (8 conditions)",
             "pred_key": "magnesium_deficiency",
-            "confidence": 0.9584531919894453,
+            "confidence": 0.914692350176676,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_8class/magnesium_deficiency_overlay.png",
-            "heatmap": "/gradcam/balanced_8class/magnesium_deficiency_heat.png",
-            "on_leaf_share": 0.7814729210833007
+            "overlay": "/gradcam/full_8class/magnesium_deficiency_overlay.png",
+            "heatmap": "/gradcam/full_8class/magnesium_deficiency_heat.png",
+            "on_leaf_share": 0.8217371885169061
           }
         ]
       },
       {
         "sample": "nitrogen_deficiency",
         "true_key": "nitrogen_deficiency",
-        "photo_id": "IMG20220324110024",
+        "photo_id": "IMG20220324110207",
         "input": "/gradcam/input/nitrogen_deficiency.png",
         "overlays": [
           {
-            "model": "balanced_5class",
-            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+            "model": "focused_5class",
+            "model_name": "Tomato Care \u00b7 Focused (5 conditions)",
             "pred_key": "nitrogen_deficiency",
-            "confidence": 0.3600021932219143,
+            "confidence": 0.7476197588792651,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_5class/nitrogen_deficiency_overlay.png",
-            "heatmap": "/gradcam/balanced_5class/nitrogen_deficiency_heat.png",
-            "on_leaf_share": 0.40639102934526417
+            "overlay": "/gradcam/focused_5class/nitrogen_deficiency_overlay.png",
+            "heatmap": "/gradcam/focused_5class/nitrogen_deficiency_heat.png",
+            "on_leaf_share": 0.6073928330054094
           },
           {
-            "model": "balanced_8class",
-            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+            "model": "full_8class",
+            "model_name": "Tomato Care \u00b7 Full (8 conditions)",
             "pred_key": "nitrogen_deficiency",
-            "confidence": 0.25595066568428226,
+            "confidence": 0.5865142008788703,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_8class/nitrogen_deficiency_overlay.png",
-            "heatmap": "/gradcam/balanced_8class/nitrogen_deficiency_heat.png",
-            "on_leaf_share": 0.5147560779313816
+            "overlay": "/gradcam/full_8class/nitrogen_deficiency_overlay.png",
+            "heatmap": "/gradcam/full_8class/nitrogen_deficiency_heat.png",
+            "on_leaf_share": 0.7105416785095271
           }
         ]
       },
@@ -9213,97 +10135,97 @@
         "input": "/gradcam/input/potassium_deficiency.png",
         "overlays": [
           {
-            "model": "balanced_5class",
-            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
-            "pred_key": "magnesium_deficiency",
-            "confidence": 0.16768517880835015,
+            "model": "focused_5class",
+            "model_name": "Tomato Care \u00b7 Focused (5 conditions)",
+            "pred_key": "spotted_wilt_virus",
+            "confidence": 0.36531906794854374,
             "correct": false,
             "out_of_scope": true,
-            "overlay": "/gradcam/balanced_5class/potassium_deficiency_overlay.png",
-            "heatmap": "/gradcam/balanced_5class/potassium_deficiency_heat.png",
-            "on_leaf_share": 0.25843733074562203
+            "overlay": "/gradcam/focused_5class/potassium_deficiency_overlay.png",
+            "heatmap": "/gradcam/focused_5class/potassium_deficiency_heat.png",
+            "on_leaf_share": 0.4736101233649424
           },
           {
-            "model": "balanced_8class",
-            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
-            "pred_key": "late_blight",
-            "confidence": 0.1463900092816007,
+            "model": "full_8class",
+            "model_name": "Tomato Care \u00b7 Full (8 conditions)",
+            "pred_key": "spotted_wilt_virus",
+            "confidence": 0.4608523262997453,
             "correct": false,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_8class/potassium_deficiency_overlay.png",
-            "heatmap": "/gradcam/balanced_8class/potassium_deficiency_heat.png",
-            "on_leaf_share": 0.32627722139756865
+            "overlay": "/gradcam/full_8class/potassium_deficiency_overlay.png",
+            "heatmap": "/gradcam/full_8class/potassium_deficiency_heat.png",
+            "on_leaf_share": 0.5541300775914594
           }
         ]
       },
       {
         "sample": "spotted_wilt_virus",
         "true_key": "spotted_wilt_virus",
-        "photo_id": "IMG20220323094227",
+        "photo_id": "IMG20220323183223",
         "input": "/gradcam/input/spotted_wilt_virus.png",
         "overlays": [
           {
-            "model": "balanced_5class",
-            "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+            "model": "focused_5class",
+            "model_name": "Tomato Care \u00b7 Focused (5 conditions)",
             "pred_key": "spotted_wilt_virus",
-            "confidence": 0.9260796547760831,
+            "confidence": 0.9456525099585388,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_5class/spotted_wilt_virus_overlay.png",
-            "heatmap": "/gradcam/balanced_5class/spotted_wilt_virus_heat.png",
-            "on_leaf_share": 0.9131302707026789
+            "overlay": "/gradcam/focused_5class/spotted_wilt_virus_overlay.png",
+            "heatmap": "/gradcam/focused_5class/spotted_wilt_virus_heat.png",
+            "on_leaf_share": 0.669438474143669
           },
           {
-            "model": "balanced_8class",
-            "model_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+            "model": "full_8class",
+            "model_name": "Tomato Care \u00b7 Full (8 conditions)",
             "pred_key": "spotted_wilt_virus",
-            "confidence": 0.7512937907672758,
+            "confidence": 0.8969288520798796,
             "correct": true,
             "out_of_scope": false,
-            "overlay": "/gradcam/balanced_8class/spotted_wilt_virus_overlay.png",
-            "heatmap": "/gradcam/balanced_8class/spotted_wilt_virus_heat.png",
-            "on_leaf_share": 0.8826907875882961
+            "overlay": "/gradcam/full_8class/spotted_wilt_virus_overlay.png",
+            "heatmap": "/gradcam/full_8class/spotted_wilt_virus_heat.png",
+            "on_leaf_share": 0.8427524647684606
           }
         ]
       }
     ],
     "models": [
-      "balanced_5class",
-      "balanced_8class"
+      "focused_5class",
+      "full_8class"
     ],
-    "summary": "Mean share of Grad-CAM mass on the leaf (leaf mask from saturation thresholding): Tomato Care v2 \u00b7 focused \u00b7 balanced 62%; Tomato Care v2 \u00b7 full \u00b7 balanced 61%.",
+    "summary": "Mean share of Grad-CAM mass on the leaf (leaf mask from saturation thresholding): Tomato Care \u00b7 Focused (5 conditions) 70%; Tomato Care \u00b7 Full (8 conditions) 73%.",
     "on_leaf_share": {
-      "balanced_5class": 0.6171867654285839,
-      "balanced_8class": 0.6074363652071697
+      "focused_5class": 0.695029948501789,
+      "full_8class": 0.7340871911730869
     }
   },
   "hero": {
     "input": "/gradcam/input/leaf_miner.png",
-    "heatmap": "/gradcam/balanced_5class/leaf_miner_heat.png",
+    "heatmap": "/gradcam/focused_5class/leaf_miner_heat.png",
     "true_key": "leaf_miner",
     "pred_key": "leaf_miner",
-    "confidence": 0.966188077811031,
-    "model_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+    "confidence": 0.970717680168549,
+    "model_name": "Tomato Care \u00b7 Focused (5 conditions)",
     "probabilities": [
       {
         "key": "leaf_miner",
-        "p": 0.966188077811031
+        "p": 0.970717680168549
       },
       {
         "key": "spotted_wilt_virus",
-        "p": 0.012598049371123216
+        "p": 0.01108440588333661
       },
       {
         "key": "healthy",
-        "p": 0.010518372494934886
+        "p": 0.00830318581190515
       },
       {
         "key": "magnesium_deficiency",
-        "p": 0.006851870471486035
+        "p": 0.005694567372209361
       },
       {
         "key": "nitrogen_deficiency",
-        "p": 0.0038436298514248133
+        "p": 0.004200160763999896
       }
     ]
   },
@@ -9313,9 +10235,1930 @@
     "The test set is small (290 photos, 265 in the focused scope); differences of a few points are within noise \u2014 read the confidence intervals and paired tests.",
     "The same test photos were used to report the original study, so they are not perfectly fresh; no upgrade decision used them.",
     "Temperatures and thresholds were fitted on out-of-fold predictions of the fold models, which are also the deployed models; coverage on new photos can still differ.",
-    "The out-of-distribution check was tested on out-of-scope leaf conditions and 30 generic images, not on other crops or field scenes.",
+    "Early Blight (62 photos) and Potassium Deficiency (9 photos) stay hard for the full model: their recall is low even after the final round.",
+    "The focused model learned to refuse Early/Late Blight and Potassium from photos of those three conditions (outlier exposure); diseases it has never seen may still receive a diagnosis.",
+    "Out-of-dataset checks used PlantVillage leaves (another lab), everyday photos and synthetic stress tests; field photos with complex backgrounds were not available.",
     "Grad-CAM shows where the network looked, not why a leaf is diseased."
   ],
+  "final_round": {
+    "rules": "docs/AUDIT.md \u00a76 (fixed before training)",
+    "tasks": {
+      "5class": {
+        "arms": [
+          {
+            "arm": "A",
+            "recipe": "convnext_t_in1k_robust_oe",
+            "label": "class-weighted loss",
+            "oof": {
+              "accuracy": 0.9014510278113664,
+              "f1_macro": 0.852721358714635,
+              "f1_weighted": 0.9011271913726786,
+              "balanced_accuracy": 0.8331922658851317,
+              "nll": 0.3239347252754719,
+              "brier": 0.15475212470599803,
+              "ece": 0.02129105194308159,
+              "classwise_ece": 0.01687403504623941
+            },
+            "calibration": "vector",
+            "nll_temperature": 0.3455395784009897,
+            "nll_vector": 0.3239347252754719,
+            "tau": null,
+            "threshold": 0.95,
+            "coverage": 0.5350665054413543,
+            "accuracy_kept": 0.9482948294829483,
+            "out_of_scope_refusal": 0.8490566037735849,
+            "chosen": true
+          }
+        ],
+        "chosen": "A",
+        "why": "highest out-of-fold macro-F1 (0.8527)",
+        "gate": {
+          "method": "knn",
+          "auroc_select": 0.9076910445310284,
+          "auroc_probes_A": 0.9968561064087061,
+          "auroc_paper": 0.9680532043530834,
+          "auroc_out_of_scope": 0.8423338124462899,
+          "flagged_in_scope": 0.0501813784764208,
+          "flagged_in_scope_by_condition": {
+            "healthy": 0.08465608465608465,
+            "leaf_miner": 0.021468926553672316,
+            "magnesium_deficiency": 0.0970873786407767,
+            "nitrogen_deficiency": 0.2631578947368421,
+            "spotted_wilt_virus": 0.06378132118451026
+          },
+          "flagged_probes_A": 1.0,
+          "flagged_probes_B": 1.0,
+          "flagged_paper": 0.8,
+          "flagged_out_of_scope": 0.4591194968553459,
+          "out_of_scope_refused_with_gate": 0.8490566037735849
+        },
+        "reference": {
+          "recipe": "convnext_t_in1k_robust",
+          "label": "v2 networks without outlier exposure (reference only)",
+          "calibration": {
+            "chosen": "vector",
+            "nll_temperature": 0.32499768628296916,
+            "nll_vector": 0.3047552903378798,
+            "fitted_on_all_folds": {
+              "a": [
+                1.082199009598287,
+                0.7726997446039224,
+                1.2569224846549105,
+                1.391416976010145,
+                1.1872272472605148
+              ],
+              "b": [
+                -0.1253076702612246,
+                0.026794917526811356,
+                0.05257003356121752,
+                -0.036580377243182347,
+                0.08252220092645682
+              ]
+            }
+          },
+          "oof": {
+            "accuracy": 0.9141475211608222,
+            "precision_macro": 0.8972194702143674,
+            "recall_macro": 0.8756316250660827,
+            "f1_macro": 0.8856083257705578,
+            "f1_weighted": 0.9141032416607404,
+            "balanced_accuracy": 0.8756316250660827,
+            "nll": 0.3047552903378798,
+            "brier": 0.14047758608958963,
+            "ece": 0.0183058123223975,
+            "classwise_ece": 0.013129484075098645
+          },
+          "threshold": 0.94,
+          "operating_point": {
+            "threshold": 0.94,
+            "coverage": 0.5392986698911729,
+            "accuracy_kept": 0.9389978213507625,
+            "out_of_scope_answered": 0.16352201257861634
+          },
+          "out_of_scope_refusal": 0.8364779874213837
+        },
+        "test": [
+          {
+            "key": "focused_5class",
+            "name": "Tomato Care \u00b7 Focused (5 conditions)",
+            "final": true,
+            "accuracy": 0.909433962264151,
+            "f1_macro": 0.8382705543539497,
+            "f1_weighted": 0.908324299918731,
+            "balanced_accuracy": 0.8275062001680707,
+            "nll": 0.26267162591099574,
+            "brier": 0.132245625829812,
+            "ece": 0.048483359879887784,
+            "classwise_ece": 0.028523472059638382,
+            "accuracy_ci": [
+              0.8708367500341669,
+              0.9450560224089636
+            ],
+            "threshold": 0.95,
+            "coverage": 0.4641509433962264,
+            "accuracy_kept": 0.991869918699187,
+            "flagged_unusual": 0.06037735849056604,
+            "label_differs_from_tallest_bar": 0.0,
+            "out_of_scope": {
+              "photos": 25,
+              "answered": 0.0,
+              "uncertain": 0.52,
+              "unusual": 0.48,
+              "refused": 1.0,
+              "answered_correct": 0.0,
+              "answered_wrong": 0.0,
+              "accuracy_all": 0.0,
+              "accuracy_answered": null,
+              "confidence_mean": 0.7001710846412582
+            },
+            "per_condition": {
+              "early_blight": {
+                "photos": 8,
+                "answered": 0.0,
+                "uncertain": 0.625,
+                "unusual": 0.375,
+                "refused": 1.0,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.0,
+                "accuracy_answered": null
+              },
+              "healthy": {
+                "photos": 27,
+                "answered": 0.037037037037037035,
+                "uncertain": 0.8148148148148148,
+                "unusual": 0.14814814814814814,
+                "refused": 0.9629629629629629,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.037037037037037035,
+                "accuracy_all": 0.7407407407407407,
+                "accuracy_answered": 0.0
+              },
+              "late_blight": {
+                "photos": 15,
+                "answered": 0.0,
+                "uncertain": 0.4666666666666667,
+                "unusual": 0.5333333333333333,
+                "refused": 1.0,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.0,
+                "accuracy_answered": null
+              },
+              "leaf_miner": {
+                "photos": 139,
+                "answered": 0.8129496402877698,
+                "uncertain": 0.17985611510791366,
+                "unusual": 0.007194244604316547,
+                "refused": 0.18705035971223022,
+                "answered_correct": 0.8129496402877698,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.935251798561151,
+                "accuracy_answered": 1.0
+              },
+              "magnesium_deficiency": {
+                "photos": 14,
+                "answered": 0.0,
+                "uncertain": 0.9285714285714286,
+                "unusual": 0.07142857142857142,
+                "refused": 1.0,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.7857142857142857,
+                "accuracy_answered": null
+              },
+              "nitrogen_deficiency": {
+                "photos": 7,
+                "answered": 0.0,
+                "uncertain": 0.7142857142857143,
+                "unusual": 0.2857142857142857,
+                "refused": 1.0,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.7142857142857143,
+                "accuracy_answered": null
+              },
+              "potassium_deficiency": {
+                "photos": 2,
+                "answered": 0.0,
+                "uncertain": 0.5,
+                "unusual": 0.5,
+                "refused": 1.0,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.0,
+                "accuracy_answered": null
+              },
+              "spotted_wilt_virus": {
+                "photos": 78,
+                "answered": 0.11538461538461539,
+                "uncertain": 0.782051282051282,
+                "unusual": 0.10256410256410256,
+                "refused": 0.8846153846153846,
+                "answered_correct": 0.11538461538461539,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.9615384615384616,
+                "accuracy_answered": 1.0
+              }
+            }
+          },
+          {
+            "key": "balanced_5class",
+            "name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+            "final": false,
+            "accuracy": 0.9056603773584906,
+            "f1_macro": 0.8257151766444457,
+            "f1_weighted": 0.909554839794986,
+            "balanced_accuracy": 0.8807922160440146,
+            "nll": 0.24315042920042618,
+            "brier": 0.12404179995282424,
+            "ece": 0.06711748114276003,
+            "classwise_ece": 0.03838664828521992,
+            "accuracy_ci": [
+              0.8661710037174721,
+              0.940001872659176
+            ],
+            "threshold": 0.89,
+            "coverage": 0.7811320754716982,
+            "accuracy_kept": 0.9855072463768116,
+            "flagged_unusual": 0.07924528301886792,
+            "label_differs_from_tallest_bar": 0.04827586206896552,
+            "out_of_scope": {
+              "photos": 25,
+              "answered": 0.84,
+              "uncertain": 0.12,
+              "unusual": 0.04,
+              "refused": 0.16,
+              "answered_correct": 0.0,
+              "answered_wrong": 0.84,
+              "accuracy_all": 0.0,
+              "accuracy_answered": 0.0,
+              "confidence_mean": 0.8866355305259761
+            },
+            "per_condition": {
+              "early_blight": {
+                "photos": 8,
+                "answered": 0.875,
+                "uncertain": 0.125,
+                "unusual": 0.0,
+                "refused": 0.125,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.875,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "healthy": {
+                "photos": 27,
+                "answered": 0.2962962962962963,
+                "uncertain": 0.48148148148148145,
+                "unusual": 0.2222222222222222,
+                "refused": 0.7037037037037037,
+                "answered_correct": 0.25925925925925924,
+                "answered_wrong": 0.037037037037037035,
+                "accuracy_all": 0.9259259259259259,
+                "accuracy_answered": 0.875
+              },
+              "late_blight": {
+                "photos": 15,
+                "answered": 0.8666666666666667,
+                "uncertain": 0.13333333333333333,
+                "unusual": 0.0,
+                "refused": 0.13333333333333333,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.8666666666666667,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "leaf_miner": {
+                "photos": 139,
+                "answered": 0.841726618705036,
+                "uncertain": 0.09352517985611511,
+                "unusual": 0.06474820143884892,
+                "refused": 0.15827338129496402,
+                "answered_correct": 0.8345323741007195,
+                "answered_wrong": 0.007194244604316547,
+                "accuracy_all": 0.8992805755395683,
+                "accuracy_answered": 0.9914529914529915
+              },
+              "magnesium_deficiency": {
+                "photos": 14,
+                "answered": 0.6428571428571429,
+                "uncertain": 0.14285714285714285,
+                "unusual": 0.21428571428571427,
+                "refused": 0.35714285714285715,
+                "answered_correct": 0.6428571428571429,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.7857142857142857,
+                "accuracy_answered": 1.0
+              },
+              "nitrogen_deficiency": {
+                "photos": 7,
+                "answered": 0.5714285714285714,
+                "uncertain": 0.2857142857142857,
+                "unusual": 0.14285714285714285,
+                "refused": 0.42857142857142855,
+                "answered_correct": 0.42857142857142855,
+                "answered_wrong": 0.14285714285714285,
+                "accuracy_all": 0.8571428571428571,
+                "accuracy_answered": 0.75
+              },
+              "potassium_deficiency": {
+                "photos": 2,
+                "answered": 0.5,
+                "uncertain": 0.0,
+                "unusual": 0.5,
+                "refused": 0.5,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.5,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "spotted_wilt_virus": {
+                "photos": 78,
+                "answered": 0.8846153846153846,
+                "uncertain": 0.08974358974358974,
+                "unusual": 0.02564102564102564,
+                "refused": 0.11538461538461539,
+                "answered_correct": 0.8846153846153846,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.9358974358974359,
+                "accuracy_answered": 1.0
+              }
+            }
+          },
+          {
+            "key": "calibrated_5class",
+            "name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
+            "final": false,
+            "accuracy": 0.9207547169811321,
+            "f1_macro": 0.8307896896132189,
+            "f1_weighted": 0.9212338810119055,
+            "balanced_accuracy": 0.8357563033822026,
+            "nll": 0.24315042920042618,
+            "brier": 0.12404179995282424,
+            "ece": 0.06327238455505813,
+            "classwise_ece": 0.04108905782699766,
+            "accuracy_ci": [
+              0.8847583643122676,
+              0.9528996163682865
+            ],
+            "threshold": 0.89,
+            "coverage": 0.7811320754716982,
+            "accuracy_kept": 0.9855072463768116,
+            "flagged_unusual": 0.07924528301886792,
+            "label_differs_from_tallest_bar": 0.0,
+            "out_of_scope": {
+              "photos": 25,
+              "answered": 0.84,
+              "uncertain": 0.12,
+              "unusual": 0.04,
+              "refused": 0.16,
+              "answered_correct": 0.0,
+              "answered_wrong": 0.84,
+              "accuracy_all": 0.0,
+              "accuracy_answered": 0.0,
+              "confidence_mean": 0.8963854136710577
+            },
+            "per_condition": {
+              "early_blight": {
+                "photos": 8,
+                "answered": 0.875,
+                "uncertain": 0.125,
+                "unusual": 0.0,
+                "refused": 0.125,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.875,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "healthy": {
+                "photos": 27,
+                "answered": 0.2962962962962963,
+                "uncertain": 0.48148148148148145,
+                "unusual": 0.2222222222222222,
+                "refused": 0.7037037037037037,
+                "answered_correct": 0.25925925925925924,
+                "answered_wrong": 0.037037037037037035,
+                "accuracy_all": 0.8518518518518519,
+                "accuracy_answered": 0.875
+              },
+              "late_blight": {
+                "photos": 15,
+                "answered": 0.8666666666666667,
+                "uncertain": 0.13333333333333333,
+                "unusual": 0.0,
+                "refused": 0.13333333333333333,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.8666666666666667,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "leaf_miner": {
+                "photos": 139,
+                "answered": 0.841726618705036,
+                "uncertain": 0.09352517985611511,
+                "unusual": 0.06474820143884892,
+                "refused": 0.15827338129496402,
+                "answered_correct": 0.8345323741007195,
+                "answered_wrong": 0.007194244604316547,
+                "accuracy_all": 0.9496402877697842,
+                "accuracy_answered": 0.9914529914529915
+              },
+              "magnesium_deficiency": {
+                "photos": 14,
+                "answered": 0.6428571428571429,
+                "uncertain": 0.14285714285714285,
+                "unusual": 0.21428571428571427,
+                "refused": 0.35714285714285715,
+                "answered_correct": 0.6428571428571429,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.7142857142857143,
+                "accuracy_answered": 1.0
+              },
+              "nitrogen_deficiency": {
+                "photos": 7,
+                "answered": 0.5714285714285714,
+                "uncertain": 0.2857142857142857,
+                "unusual": 0.14285714285714285,
+                "refused": 0.42857142857142855,
+                "answered_correct": 0.42857142857142855,
+                "answered_wrong": 0.14285714285714285,
+                "accuracy_all": 0.7142857142857143,
+                "accuracy_answered": 0.75
+              },
+              "potassium_deficiency": {
+                "photos": 2,
+                "answered": 0.5,
+                "uncertain": 0.0,
+                "unusual": 0.5,
+                "refused": 0.5,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.5,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "spotted_wilt_virus": {
+                "photos": 78,
+                "answered": 0.8846153846153846,
+                "uncertain": 0.08974358974358974,
+                "unusual": 0.02564102564102564,
+                "refused": 0.11538461538461539,
+                "answered_correct": 0.8846153846153846,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.9487179487179487,
+                "accuracy_answered": 1.0
+              }
+            }
+          },
+          {
+            "key": "ensemble_5class",
+            "name": "Ensemble ConvNeXt-T + EfficientNet-B0 (original 5-class default)",
+            "final": false,
+            "accuracy": 0.909433962264151,
+            "f1_macro": 0.8354303557528329,
+            "f1_weighted": 0.9097497304478105,
+            "balanced_accuracy": 0.8559795387133515,
+            "nll": 0.2762290862239016,
+            "brier": 0.13999838760716132,
+            "ece": 0.039140529028896115,
+            "classwise_ece": 0.043113375165735525,
+            "accuracy_ci": [
+              0.8725868725868726,
+              0.9427535337996691
+            ],
+            "threshold": 0.77,
+            "coverage": 0.8490566037735849,
+            "accuracy_kept": 0.96,
+            "flagged_unusual": 0.0,
+            "label_differs_from_tallest_bar": 0.0,
+            "out_of_scope": {
+              "photos": 25,
+              "answered": 0.88,
+              "uncertain": 0.12,
+              "unusual": 0.0,
+              "refused": 0.12,
+              "answered_correct": 0.0,
+              "answered_wrong": 0.88,
+              "accuracy_all": 0.0,
+              "accuracy_answered": 0.0,
+              "confidence_mean": 0.894680740449281
+            },
+            "per_condition": {
+              "early_blight": {
+                "photos": 8,
+                "answered": 0.875,
+                "uncertain": 0.125,
+                "unusual": 0.0,
+                "refused": 0.125,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.875,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "healthy": {
+                "photos": 27,
+                "answered": 0.6296296296296297,
+                "uncertain": 0.37037037037037035,
+                "unusual": 0.0,
+                "refused": 0.37037037037037035,
+                "answered_correct": 0.5925925925925926,
+                "answered_wrong": 0.037037037037037035,
+                "accuracy_all": 0.8148148148148148,
+                "accuracy_answered": 0.9411764705882353
+              },
+              "late_blight": {
+                "photos": 15,
+                "answered": 0.8666666666666667,
+                "uncertain": 0.13333333333333333,
+                "unusual": 0.0,
+                "refused": 0.13333333333333333,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.8666666666666667,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "leaf_miner": {
+                "photos": 139,
+                "answered": 0.8705035971223022,
+                "uncertain": 0.12949640287769784,
+                "unusual": 0.0,
+                "refused": 0.12949640287769784,
+                "answered_correct": 0.8345323741007195,
+                "answered_wrong": 0.03597122302158273,
+                "accuracy_all": 0.9064748201438849,
+                "accuracy_answered": 0.9586776859504132
+              },
+              "magnesium_deficiency": {
+                "photos": 14,
+                "answered": 0.8571428571428571,
+                "uncertain": 0.14285714285714285,
+                "unusual": 0.0,
+                "refused": 0.14285714285714285,
+                "answered_correct": 0.6428571428571429,
+                "answered_wrong": 0.21428571428571427,
+                "accuracy_all": 0.7142857142857143,
+                "accuracy_answered": 0.75
+              },
+              "nitrogen_deficiency": {
+                "photos": 7,
+                "answered": 0.5714285714285714,
+                "uncertain": 0.42857142857142855,
+                "unusual": 0.0,
+                "refused": 0.42857142857142855,
+                "answered_correct": 0.5714285714285714,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.8571428571428571,
+                "accuracy_answered": 1.0
+              },
+              "potassium_deficiency": {
+                "photos": 2,
+                "answered": 1.0,
+                "uncertain": 0.0,
+                "unusual": 0.0,
+                "refused": 0.0,
+                "answered_correct": 0.0,
+                "answered_wrong": 1.0,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "spotted_wilt_virus": {
+                "photos": 78,
+                "answered": 0.9102564102564102,
+                "uncertain": 0.08974358974358974,
+                "unusual": 0.0,
+                "refused": 0.08974358974358974,
+                "answered_correct": 0.9102564102564102,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.9871794871794872,
+                "accuracy_answered": 1.0
+              }
+            }
+          }
+        ],
+        "comparisons": [
+          {
+            "task": "5class",
+            "a": "focused_5class",
+            "b": "balanced_5class",
+            "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
+            "b_name": "Tomato Care v2 \u00b7 focused \u00b7 balanced",
+            "final_round": true,
+            "f1_diff": 0.01255537770950399,
+            "f1_ci": [
+              -0.05460933222798869,
+              0.08879639031786649
+            ],
+            "accuracy_diff": 0.0037735849056603765,
+            "accuracy_ci": [
+              -0.02692567567567569,
+              0.03409090909090906
+            ],
+            "share_a_not_better_f1": 0.3515
+          },
+          {
+            "task": "5class",
+            "a": "focused_5class",
+            "b": "calibrated_5class",
+            "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
+            "b_name": "Tomato Care v2 \u00b7 focused \u00b7 calibrated",
+            "final_round": true,
+            "f1_diff": 0.0074808647407308415,
+            "f1_ci": [
+              -0.02728819433747667,
+              0.06160679394826832
+            ],
+            "accuracy_diff": -0.01132075471698113,
+            "accuracy_ci": [
+              -0.036499692521590285,
+              0.011629038096099914
+            ],
+            "share_a_not_better_f1": 0.3995
+          },
+          {
+            "task": "5class",
+            "a": "focused_5class",
+            "b": "ensemble_5class",
+            "a_name": "Tomato Care \u00b7 Focused (5 conditions)",
+            "b_name": "Ensemble ConvNeXt-T + EfficientNet-B0 (original 5-class default)",
+            "final_round": true,
+            "f1_diff": 0.002840198601116839,
+            "f1_ci": [
+              -0.05908399716008838,
+              0.06598058523423415
+            ],
+            "accuracy_diff": 0.0,
+            "accuracy_ci": [
+              -0.025643382352941193,
+              0.02602717792350645
+            ],
+            "share_a_not_better_f1": 0.4515
+          }
+        ],
+        "stress": {
+          "focused_5class": {
+            "blur_sigma2": {
+              "photos": 265,
+              "answered": 0.2188679245283019,
+              "uncertain": 0.5056603773584906,
+              "unusual": 0.27547169811320754,
+              "refused": 0.7811320754716982,
+              "answered_correct": 0.2188679245283019,
+              "answered_wrong": 0.0,
+              "accuracy_all": 0.7584905660377359,
+              "accuracy_answered": 1.0
+            },
+            "blur_sigma4": {
+              "photos": 265,
+              "answered": 0.0037735849056603774,
+              "uncertain": 0.09056603773584905,
+              "unusual": 0.9056603773584906,
+              "refused": 0.9962264150943396,
+              "answered_correct": 0.0,
+              "answered_wrong": 0.0037735849056603774,
+              "accuracy_all": 0.5811320754716981,
+              "accuracy_answered": 0.0
+            },
+            "dark_x0.35": {
+              "photos": 265,
+              "answered": 0.4339622641509434,
+              "uncertain": 0.4716981132075472,
+              "unusual": 0.09433962264150944,
+              "refused": 0.5660377358490566,
+              "answered_correct": 0.4339622641509434,
+              "answered_wrong": 0.0,
+              "accuracy_all": 0.9056603773584906,
+              "accuracy_answered": 1.0
+            },
+            "overexposed_x1.7": {
+              "photos": 265,
+              "answered": 0.47924528301886793,
+              "uncertain": 0.4528301886792453,
+              "unusual": 0.06792452830188679,
+              "refused": 0.5207547169811321,
+              "answered_correct": 0.47924528301886793,
+              "answered_wrong": 0.0,
+              "accuracy_all": 0.9018867924528302,
+              "accuracy_answered": 1.0
+            },
+            "jpeg_q15": {
+              "photos": 265,
+              "answered": 0.3169811320754717,
+              "uncertain": 0.41132075471698115,
+              "unusual": 0.27169811320754716,
+              "refused": 0.6830188679245283,
+              "answered_correct": 0.3169811320754717,
+              "answered_wrong": 0.0,
+              "accuracy_all": 0.8037735849056604,
+              "accuracy_answered": 1.0
+            },
+            "background_black": {
+              "photos": 265,
+              "answered": 0.44528301886792454,
+              "uncertain": 0.4679245283018868,
+              "unusual": 0.08679245283018867,
+              "refused": 0.5547169811320755,
+              "answered_correct": 0.44150943396226416,
+              "answered_wrong": 0.0037735849056603774,
+              "accuracy_all": 0.9132075471698113,
+              "accuracy_answered": 0.9915254237288136
+            },
+            "background_wood": {
+              "photos": 265,
+              "answered": 0.39622641509433965,
+              "uncertain": 0.41132075471698115,
+              "unusual": 0.19245283018867926,
+              "refused": 0.6037735849056604,
+              "answered_correct": 0.39622641509433965,
+              "answered_wrong": 0.0,
+              "accuracy_all": 0.8867924528301887,
+              "accuracy_answered": 1.0
+            },
+            "background_grass": {
+              "photos": 265,
+              "answered": 0.39622641509433965,
+              "uncertain": 0.4679245283018868,
+              "unusual": 0.13584905660377358,
+              "refused": 0.6037735849056604,
+              "answered_correct": 0.39622641509433965,
+              "answered_wrong": 0.0,
+              "accuracy_all": 0.8867924528301887,
+              "accuracy_answered": 1.0
+            },
+            "background_fabric": {
+              "photos": 265,
+              "answered": 0.35471698113207545,
+              "uncertain": 0.4679245283018868,
+              "unusual": 0.17735849056603772,
+              "refused": 0.6452830188679245,
+              "answered_correct": 0.35471698113207545,
+              "answered_wrong": 0.0,
+              "accuracy_all": 0.8867924528301887,
+              "accuracy_answered": 1.0
+            },
+            "four_leaves_same": {
+              "photos": 63,
+              "answered": 0.5873015873015873,
+              "uncertain": 0.3492063492063492,
+              "unusual": 0.06349206349206349,
+              "refused": 0.4126984126984127,
+              "answered_correct": 0.5873015873015873,
+              "answered_wrong": 0.0,
+              "accuracy_all": 0.9682539682539683,
+              "accuracy_answered": 1.0
+            },
+            "four_leaves_mixed": {
+              "photos": 40,
+              "answered": 0.1,
+              "uncertain": 0.6,
+              "unusual": 0.3,
+              "refused": 0.9
+            }
+          },
+          "balanced_5class": {
+            "blur_sigma2": {
+              "photos": 265,
+              "answered": 0.5471698113207547,
+              "uncertain": 0.04905660377358491,
+              "unusual": 0.4037735849056604,
+              "refused": 0.4528301886792453,
+              "answered_correct": 0.5169811320754717,
+              "answered_wrong": 0.03018867924528302,
+              "accuracy_all": 0.7433962264150943,
+              "accuracy_answered": 0.9448275862068966
+            },
+            "blur_sigma4": {
+              "photos": 265,
+              "answered": 0.06415094339622641,
+              "uncertain": 0.0,
+              "unusual": 0.9358490566037736,
+              "refused": 0.9358490566037736,
+              "answered_correct": 0.05660377358490566,
+              "answered_wrong": 0.007547169811320755,
+              "accuracy_all": 0.4716981132075472,
+              "accuracy_answered": 0.8823529411764706
+            },
+            "dark_x0.35": {
+              "photos": 265,
+              "answered": 0.7396226415094339,
+              "uncertain": 0.12075471698113208,
+              "unusual": 0.13962264150943396,
+              "refused": 0.26037735849056604,
+              "answered_correct": 0.7245283018867924,
+              "answered_wrong": 0.01509433962264151,
+              "accuracy_all": 0.879245283018868,
+              "accuracy_answered": 0.9795918367346939
+            },
+            "overexposed_x1.7": {
+              "photos": 265,
+              "answered": 0.7962264150943397,
+              "uncertain": 0.12830188679245283,
+              "unusual": 0.07547169811320754,
+              "refused": 0.2037735849056604,
+              "answered_correct": 0.7811320754716982,
+              "answered_wrong": 0.01509433962264151,
+              "accuracy_all": 0.9056603773584906,
+              "accuracy_answered": 0.981042654028436
+            },
+            "jpeg_q15": {
+              "photos": 265,
+              "answered": 0.5584905660377358,
+              "uncertain": 0.0830188679245283,
+              "unusual": 0.3584905660377358,
+              "refused": 0.44150943396226416,
+              "answered_correct": 0.5509433962264151,
+              "answered_wrong": 0.007547169811320755,
+              "accuracy_all": 0.8415094339622642,
+              "accuracy_answered": 0.9864864864864865
+            },
+            "background_black": {
+              "photos": 265,
+              "answered": 0.7622641509433963,
+              "uncertain": 0.11320754716981132,
+              "unusual": 0.12452830188679245,
+              "refused": 0.23773584905660378,
+              "answered_correct": 0.7471698113207547,
+              "answered_wrong": 0.01509433962264151,
+              "accuracy_all": 0.8981132075471698,
+              "accuracy_answered": 0.9801980198019802
+            },
+            "background_wood": {
+              "photos": 265,
+              "answered": 0.6641509433962264,
+              "uncertain": 0.045283018867924525,
+              "unusual": 0.29056603773584905,
+              "refused": 0.33584905660377357,
+              "answered_correct": 0.6566037735849056,
+              "answered_wrong": 0.007547169811320755,
+              "accuracy_all": 0.8943396226415095,
+              "accuracy_answered": 0.9886363636363636
+            },
+            "background_grass": {
+              "photos": 265,
+              "answered": 0.7245283018867924,
+              "uncertain": 0.06037735849056604,
+              "unusual": 0.21509433962264152,
+              "refused": 0.27547169811320754,
+              "answered_correct": 0.7169811320754716,
+              "answered_wrong": 0.007547169811320755,
+              "accuracy_all": 0.8943396226415095,
+              "accuracy_answered": 0.9895833333333334
+            },
+            "background_fabric": {
+              "photos": 265,
+              "answered": 0.7471698113207547,
+              "uncertain": 0.09433962264150944,
+              "unusual": 0.15849056603773584,
+              "refused": 0.2528301886792453,
+              "answered_correct": 0.7320754716981132,
+              "answered_wrong": 0.01509433962264151,
+              "accuracy_all": 0.879245283018868,
+              "accuracy_answered": 0.9797979797979798
+            },
+            "four_leaves_same": {
+              "photos": 63,
+              "answered": 0.7777777777777778,
+              "uncertain": 0.06349206349206349,
+              "unusual": 0.15873015873015872,
+              "refused": 0.2222222222222222,
+              "answered_correct": 0.7777777777777778,
+              "answered_wrong": 0.0,
+              "accuracy_all": 0.9365079365079365,
+              "accuracy_answered": 1.0
+            },
+            "four_leaves_mixed": {
+              "photos": 40,
+              "answered": 0.15,
+              "uncertain": 0.35,
+              "unusual": 0.5,
+              "refused": 0.85
+            }
+          }
+        },
+        "out_of_dataset": {
+          "focused_5class": {
+            "probes": {
+              "photos": 30,
+              "answered": 0.0,
+              "uncertain": 0.0,
+              "unusual": 1.0,
+              "refused": 1.0
+            },
+            "empty_paper": {
+              "photos": 60,
+              "answered": 0.0,
+              "uncertain": 0.06666666666666667,
+              "unusual": 0.9333333333333333,
+              "refused": 1.0
+            },
+            "other_crop": {
+              "photos": 96,
+              "answered": 0.03125,
+              "uncertain": 0.22916666666666666,
+              "unusual": 0.7395833333333334,
+              "refused": 0.96875
+            },
+            "tomato_unsupported": {
+              "photos": 56,
+              "answered": 0.0,
+              "uncertain": 0.375,
+              "unusual": 0.625,
+              "refused": 1.0
+            },
+            "tomato_known_shift": {
+              "early_blight": {
+                "photos": 12,
+                "answered": 0.0,
+                "uncertain": 0.6666666666666666,
+                "unusual": 0.3333333333333333,
+                "refused": 1.0,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.0,
+                "accuracy_answered": null
+              },
+              "healthy": {
+                "photos": 12,
+                "answered": 0.0,
+                "uncertain": 0.25,
+                "unusual": 0.75,
+                "refused": 1.0,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.4166666666666667,
+                "accuracy_answered": null
+              },
+              "late_blight": {
+                "photos": 12,
+                "answered": 0.0,
+                "uncertain": 0.16666666666666666,
+                "unusual": 0.8333333333333334,
+                "refused": 1.0,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.0,
+                "accuracy_answered": null
+              }
+            },
+            "everyday": {
+              "photos": 69,
+              "answered": 0.014492753623188406,
+              "uncertain": 0.014492753623188406,
+              "unusual": 0.9710144927536232,
+              "refused": 0.9855072463768116
+            }
+          },
+          "balanced_5class": {
+            "probes": {
+              "photos": 30,
+              "answered": 0.0,
+              "uncertain": 0.03333333333333333,
+              "unusual": 0.9666666666666667,
+              "refused": 1.0
+            },
+            "empty_paper": {
+              "photos": 60,
+              "answered": 0.0,
+              "uncertain": 0.11666666666666667,
+              "unusual": 0.8833333333333333,
+              "refused": 1.0
+            },
+            "other_crop": {
+              "photos": 96,
+              "answered": 0.13541666666666666,
+              "uncertain": 0.010416666666666666,
+              "unusual": 0.8541666666666666,
+              "refused": 0.8645833333333334
+            },
+            "tomato_unsupported": {
+              "photos": 56,
+              "answered": 0.03571428571428571,
+              "uncertain": 0.03571428571428571,
+              "unusual": 0.9285714285714286,
+              "refused": 0.9642857142857143
+            },
+            "tomato_known_shift": {
+              "early_blight": {
+                "photos": 12,
+                "answered": 0.3333333333333333,
+                "uncertain": 0.0,
+                "unusual": 0.6666666666666666,
+                "refused": 0.6666666666666666,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.3333333333333333,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "healthy": {
+                "photos": 12,
+                "answered": 0.0,
+                "uncertain": 0.0,
+                "unusual": 1.0,
+                "refused": 1.0,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.0,
+                "accuracy_all": 1.0,
+                "accuracy_answered": null
+              },
+              "late_blight": {
+                "photos": 12,
+                "answered": 0.08333333333333333,
+                "uncertain": 0.08333333333333333,
+                "unusual": 0.8333333333333334,
+                "refused": 0.9166666666666666,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.08333333333333333,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              }
+            },
+            "everyday": {
+              "photos": 69,
+              "answered": 0.0,
+              "uncertain": 0.0,
+              "unusual": 1.0,
+              "refused": 1.0
+            }
+          }
+        },
+        "latency": {
+          "focused_5class": {
+            "median_ms": 143.45940000202972,
+            "p90_ms": 154.33007001702208,
+            "threads": 8,
+            "runtime": "onnxruntime",
+            "measured": "2026-11-19 16:07"
+          },
+          "balanced_5class": {
+            "median_ms": 155.97490000072867,
+            "p90_ms": 170.37417998653837,
+            "threads": 8,
+            "runtime": "onnxruntime",
+            "measured": "2026-11-19 16:08"
+          }
+        }
+      },
+      "8class": {
+        "arms": [
+          {
+            "arm": "A",
+            "recipe": "convnext_t_in1k_robust",
+            "label": "class-weighted loss",
+            "oof": {
+              "accuracy": 0.851627137341423,
+              "f1_macro": 0.6164607867722058,
+              "f1_weighted": 0.844237457967336,
+              "balanced_accuracy": 0.6036052620432083,
+              "nll": 0.5123589222203813,
+              "brier": 0.2282691967320389,
+              "ece": 0.03874101235327312,
+              "classwise_ece": 0.024074904018687907
+            },
+            "calibration": "vector",
+            "nll_temperature": 0.5321559925043305,
+            "nll_vector": 0.5123589222203813,
+            "tau": null,
+            "threshold": 0.71,
+            "coverage": 0.8736900165471594,
+            "accuracy_kept": 0.9008838383838383,
+            "out_of_scope_refusal": null,
+            "chosen": false
+          },
+          {
+            "arm": "B",
+            "recipe": "convnext_t_in1k_sampler",
+            "label": "class-balanced sampling",
+            "oof": {
+              "accuracy": 0.8494208494208494,
+              "f1_macro": 0.6289568585799462,
+              "f1_weighted": 0.8446319624577554,
+              "balanced_accuracy": 0.62646157133269,
+              "nll": 0.5459190951974933,
+              "brier": 0.24110328156183097,
+              "ece": 0.04463173738483056,
+              "classwise_ece": 0.027089044678318713
+            },
+            "calibration": "vector",
+            "nll_temperature": 0.5836190493023625,
+            "nll_vector": 0.5459190951974933,
+            "tau": null,
+            "threshold": 0.76,
+            "coverage": 0.8411472697186982,
+            "accuracy_kept": 0.9029508196721312,
+            "out_of_scope_refusal": null,
+            "chosen": true
+          }
+        ],
+        "chosen": "B",
+        "why": "highest out-of-fold macro-F1 (0.6290)",
+        "gate": {
+          "method": "maha",
+          "auroc_select": 0.9663407377693092,
+          "auroc_probes_A": 0.9887111601397316,
+          "auroc_paper": 0.964103695532267,
+          "auroc_out_of_scope": null,
+          "flagged_in_scope": 0.05184776613348042,
+          "flagged_in_scope_by_condition": {
+            "early_blight": 0.12962962962962962,
+            "healthy": 0.0582010582010582,
+            "late_blight": 0.11224489795918367,
+            "leaf_miner": 0.0327683615819209,
+            "magnesium_deficiency": 0.0970873786407767,
+            "nitrogen_deficiency": 0.10526315789473684,
+            "potassium_deficiency": 0.0,
+            "spotted_wilt_virus": 0.05011389521640091
+          },
+          "flagged_probes_A": 0.9333333333333333,
+          "flagged_probes_B": 1.0,
+          "flagged_paper": 0.7466666666666667
+        },
+        "reference": null,
+        "test": [
+          {
+            "key": "full_8class",
+            "name": "Tomato Care \u00b7 Full (8 conditions)",
+            "final": true,
+            "accuracy": 0.8310344827586207,
+            "f1_macro": 0.5655326354679803,
+            "f1_weighted": 0.8218583319177849,
+            "balanced_accuracy": 0.5682711340085441,
+            "nll": 0.5020260506744852,
+            "brier": 0.2381221347588386,
+            "ece": 0.09012705121814667,
+            "classwise_ece": 0.035381574352485255,
+            "accuracy_ci": [
+              0.7839674168942462,
+              0.8767605633802817
+            ],
+            "threshold": 0.76,
+            "coverage": 0.7965517241379311,
+            "accuracy_kept": 0.922077922077922,
+            "flagged_unusual": 0.05862068965517241,
+            "label_differs_from_tallest_bar": 0.0,
+            "out_of_scope": null,
+            "per_condition": {
+              "early_blight": {
+                "photos": 8,
+                "answered": 0.5,
+                "uncertain": 0.375,
+                "unusual": 0.125,
+                "refused": 0.5,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.5,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "healthy": {
+                "photos": 27,
+                "answered": 0.5555555555555556,
+                "uncertain": 0.2962962962962963,
+                "unusual": 0.14814814814814814,
+                "refused": 0.4444444444444444,
+                "answered_correct": 0.5185185185185185,
+                "answered_wrong": 0.037037037037037035,
+                "accuracy_all": 0.8148148148148148,
+                "accuracy_answered": 0.9333333333333333
+              },
+              "late_blight": {
+                "photos": 15,
+                "answered": 0.6666666666666666,
+                "uncertain": 0.26666666666666666,
+                "unusual": 0.06666666666666667,
+                "refused": 0.3333333333333333,
+                "answered_correct": 0.4,
+                "answered_wrong": 0.26666666666666666,
+                "accuracy_all": 0.6,
+                "accuracy_answered": 0.6
+              },
+              "leaf_miner": {
+                "photos": 139,
+                "answered": 0.8992805755395683,
+                "uncertain": 0.06474820143884892,
+                "unusual": 0.03597122302158273,
+                "refused": 0.10071942446043165,
+                "answered_correct": 0.8705035971223022,
+                "answered_wrong": 0.02877697841726619,
+                "accuracy_all": 0.9280575539568345,
+                "accuracy_answered": 0.968
+              },
+              "magnesium_deficiency": {
+                "photos": 14,
+                "answered": 0.6428571428571429,
+                "uncertain": 0.14285714285714285,
+                "unusual": 0.21428571428571427,
+                "refused": 0.35714285714285715,
+                "answered_correct": 0.6428571428571429,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.7857142857142857,
+                "accuracy_answered": 1.0
+              },
+              "nitrogen_deficiency": {
+                "photos": 7,
+                "answered": 0.2857142857142857,
+                "uncertain": 0.5714285714285714,
+                "unusual": 0.14285714285714285,
+                "refused": 0.7142857142857143,
+                "answered_correct": 0.2857142857142857,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.5714285714285714,
+                "accuracy_answered": 1.0
+              },
+              "potassium_deficiency": {
+                "photos": 2,
+                "answered": 0.5,
+                "uncertain": 0.0,
+                "unusual": 0.5,
+                "refused": 0.5,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.5,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "spotted_wilt_virus": {
+                "photos": 78,
+                "answered": 0.8333333333333334,
+                "uncertain": 0.15384615384615385,
+                "unusual": 0.01282051282051282,
+                "refused": 0.16666666666666666,
+                "answered_correct": 0.782051282051282,
+                "answered_wrong": 0.05128205128205128,
+                "accuracy_all": 0.8461538461538461,
+                "accuracy_answered": 0.9384615384615385
+              }
+            }
+          },
+          {
+            "key": "balanced_8class",
+            "name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+            "final": false,
+            "accuracy": 0.8275862068965517,
+            "f1_macro": 0.5841119191312039,
+            "f1_weighted": 0.8269184432710331,
+            "balanced_accuracy": 0.6013525717887228,
+            "nll": 0.4960067589334488,
+            "brier": 0.2455779315726889,
+            "ece": 0.06541281950681088,
+            "classwise_ece": 0.02580964945027572,
+            "accuracy_ci": [
+              0.7801418439716312,
+              0.8725565999595715
+            ],
+            "threshold": 0.67,
+            "coverage": 0.8448275862068966,
+            "accuracy_kept": 0.889795918367347,
+            "flagged_unusual": 0.06206896551724138,
+            "label_differs_from_tallest_bar": 0.04827586206896552,
+            "out_of_scope": null,
+            "per_condition": {
+              "early_blight": {
+                "photos": 8,
+                "answered": 0.75,
+                "uncertain": 0.125,
+                "unusual": 0.125,
+                "refused": 0.25,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.75,
+                "accuracy_all": 0.125,
+                "accuracy_answered": 0.0
+              },
+              "healthy": {
+                "photos": 27,
+                "answered": 0.7777777777777778,
+                "uncertain": 0.1111111111111111,
+                "unusual": 0.1111111111111111,
+                "refused": 0.2222222222222222,
+                "answered_correct": 0.7037037037037037,
+                "answered_wrong": 0.07407407407407407,
+                "accuracy_all": 0.7777777777777778,
+                "accuracy_answered": 0.9047619047619048
+              },
+              "late_blight": {
+                "photos": 15,
+                "answered": 0.6666666666666666,
+                "uncertain": 0.3333333333333333,
+                "unusual": 0.0,
+                "refused": 0.3333333333333333,
+                "answered_correct": 0.3333333333333333,
+                "answered_wrong": 0.3333333333333333,
+                "accuracy_all": 0.6666666666666666,
+                "accuracy_answered": 0.5
+              },
+              "leaf_miner": {
+                "photos": 139,
+                "answered": 0.8920863309352518,
+                "uncertain": 0.050359712230215826,
+                "unusual": 0.05755395683453238,
+                "refused": 0.1079136690647482,
+                "answered_correct": 0.8705035971223022,
+                "answered_wrong": 0.02158273381294964,
+                "accuracy_all": 0.920863309352518,
+                "accuracy_answered": 0.9758064516129032
+              },
+              "magnesium_deficiency": {
+                "photos": 14,
+                "answered": 0.7142857142857143,
+                "uncertain": 0.21428571428571427,
+                "unusual": 0.07142857142857142,
+                "refused": 0.2857142857142857,
+                "answered_correct": 0.6428571428571429,
+                "answered_wrong": 0.07142857142857142,
+                "accuracy_all": 0.7857142857142857,
+                "accuracy_answered": 0.9
+              },
+              "nitrogen_deficiency": {
+                "photos": 7,
+                "answered": 0.8571428571428571,
+                "uncertain": 0.0,
+                "unusual": 0.14285714285714285,
+                "refused": 0.14285714285714285,
+                "answered_correct": 0.5714285714285714,
+                "answered_wrong": 0.2857142857142857,
+                "accuracy_all": 0.7142857142857143,
+                "accuracy_answered": 0.6666666666666666
+              },
+              "potassium_deficiency": {
+                "photos": 2,
+                "answered": 0.5,
+                "uncertain": 0.0,
+                "unusual": 0.5,
+                "refused": 0.5,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.5,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "spotted_wilt_virus": {
+                "photos": 78,
+                "answered": 0.8589743589743589,
+                "uncertain": 0.10256410256410256,
+                "unusual": 0.038461538461538464,
+                "refused": 0.14102564102564102,
+                "answered_correct": 0.7692307692307693,
+                "answered_wrong": 0.08974358974358974,
+                "accuracy_all": 0.8205128205128205,
+                "accuracy_answered": 0.8955223880597015
+              }
+            }
+          },
+          {
+            "key": "convnext_tiny_v2_tta",
+            "name": "ConvNeXt-Tiny + TTA (original 8-class default)",
+            "final": false,
+            "accuracy": 0.8482758620689655,
+            "f1_macro": 0.5858631410166775,
+            "f1_weighted": 0.8382864025659794,
+            "balanced_accuracy": 0.6036215350064271,
+            "nll": 0.504332094658128,
+            "brier": 0.23557402897673085,
+            "ece": 0.07370543861985442,
+            "classwise_ece": 0.04518376241783905,
+            "accuracy_ci": [
+              0.8013687290211376,
+              0.8928633004926109
+            ],
+            "threshold": 0.6,
+            "coverage": 0.9,
+            "accuracy_kept": 0.8773946360153256,
+            "flagged_unusual": 0.0,
+            "label_differs_from_tallest_bar": 0.0,
+            "out_of_scope": null,
+            "per_condition": {
+              "early_blight": {
+                "photos": 8,
+                "answered": 0.75,
+                "uncertain": 0.25,
+                "unusual": 0.0,
+                "refused": 0.25,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.75,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "healthy": {
+                "photos": 27,
+                "answered": 0.8518518518518519,
+                "uncertain": 0.14814814814814814,
+                "unusual": 0.0,
+                "refused": 0.14814814814814814,
+                "answered_correct": 0.8148148148148148,
+                "answered_wrong": 0.037037037037037035,
+                "accuracy_all": 0.9259259259259259,
+                "accuracy_answered": 0.9565217391304348
+              },
+              "late_blight": {
+                "photos": 15,
+                "answered": 0.8,
+                "uncertain": 0.2,
+                "unusual": 0.0,
+                "refused": 0.2,
+                "answered_correct": 0.3333333333333333,
+                "answered_wrong": 0.4666666666666667,
+                "accuracy_all": 0.5333333333333333,
+                "accuracy_answered": 0.4166666666666667
+              },
+              "leaf_miner": {
+                "photos": 139,
+                "answered": 0.9712230215827338,
+                "uncertain": 0.02877697841726619,
+                "unusual": 0.0,
+                "refused": 0.02877697841726619,
+                "answered_correct": 0.8992805755395683,
+                "answered_wrong": 0.07194244604316546,
+                "accuracy_all": 0.9136690647482014,
+                "accuracy_answered": 0.9259259259259259
+              },
+              "magnesium_deficiency": {
+                "photos": 14,
+                "answered": 0.7142857142857143,
+                "uncertain": 0.2857142857142857,
+                "unusual": 0.0,
+                "refused": 0.2857142857142857,
+                "answered_correct": 0.6428571428571429,
+                "answered_wrong": 0.07142857142857142,
+                "accuracy_all": 0.8571428571428571,
+                "accuracy_answered": 0.9
+              },
+              "nitrogen_deficiency": {
+                "photos": 7,
+                "answered": 0.5714285714285714,
+                "uncertain": 0.42857142857142855,
+                "unusual": 0.0,
+                "refused": 0.42857142857142855,
+                "answered_correct": 0.42857142857142855,
+                "answered_wrong": 0.14285714285714285,
+                "accuracy_all": 0.7142857142857143,
+                "accuracy_answered": 0.75
+              },
+              "potassium_deficiency": {
+                "photos": 2,
+                "answered": 0.5,
+                "uncertain": 0.5,
+                "unusual": 0.0,
+                "refused": 0.5,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.5,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "spotted_wilt_virus": {
+                "photos": 78,
+                "answered": 0.8974358974358975,
+                "uncertain": 0.10256410256410256,
+                "unusual": 0.0,
+                "refused": 0.10256410256410256,
+                "answered_correct": 0.8333333333333334,
+                "answered_wrong": 0.0641025641025641,
+                "accuracy_all": 0.8846153846153846,
+                "accuracy_answered": 0.9285714285714286
+              }
+            }
+          }
+        ],
+        "comparisons": [
+          {
+            "task": "8class",
+            "a": "full_8class",
+            "b": "balanced_8class",
+            "a_name": "Tomato Care \u00b7 Full (8 conditions)",
+            "b_name": "Tomato Care v2 \u00b7 full \u00b7 balanced",
+            "final_round": true,
+            "f1_diff": -0.01857928366322359,
+            "f1_ci": [
+              -0.07128189927620819,
+              0.02851376020573251
+            ],
+            "accuracy_diff": 0.0034482758620689724,
+            "accuracy_ci": [
+              -0.017183611802346295,
+              0.02439237591676617
+            ],
+            "share_a_not_better_f1": 0.755
+          },
+          {
+            "task": "8class",
+            "a": "full_8class",
+            "b": "convnext_tiny_v2_tta",
+            "a_name": "Tomato Care \u00b7 Full (8 conditions)",
+            "b_name": "ConvNeXt-Tiny + TTA (original 8-class default)",
+            "final_round": true,
+            "f1_diff": -0.020330505548697198,
+            "f1_ci": [
+              -0.06222333546454446,
+              0.011434332398160824
+            ],
+            "accuracy_diff": -0.017241379310344862,
+            "accuracy_ci": [
+              -0.04248539841468499,
+              0.006873444720938473
+            ],
+            "share_a_not_better_f1": 0.8905
+          }
+        ],
+        "stress": {
+          "full_8class": {
+            "blur_sigma2": {
+              "photos": 290,
+              "answered": 0.503448275862069,
+              "uncertain": 0.10344827586206896,
+              "unusual": 0.3931034482758621,
+              "refused": 0.496551724137931,
+              "answered_correct": 0.4241379310344828,
+              "answered_wrong": 0.07931034482758621,
+              "accuracy_all": 0.7068965517241379,
+              "accuracy_answered": 0.8424657534246576
+            },
+            "blur_sigma4": {
+              "photos": 290,
+              "answered": 0.04482758620689655,
+              "uncertain": 0.006896551724137931,
+              "unusual": 0.9482758620689655,
+              "refused": 0.9551724137931035,
+              "answered_correct": 0.03103448275862069,
+              "answered_wrong": 0.013793103448275862,
+              "accuracy_all": 0.4586206896551724,
+              "accuracy_answered": 0.6923076923076923
+            },
+            "dark_x0.35": {
+              "photos": 290,
+              "answered": 0.7448275862068966,
+              "uncertain": 0.1482758620689655,
+              "unusual": 0.10689655172413794,
+              "refused": 0.25517241379310346,
+              "answered_correct": 0.6862068965517242,
+              "answered_wrong": 0.05862068965517241,
+              "accuracy_all": 0.8344827586206897,
+              "accuracy_answered": 0.9212962962962963
+            },
+            "overexposed_x1.7": {
+              "photos": 290,
+              "answered": 0.7586206896551724,
+              "uncertain": 0.15862068965517243,
+              "unusual": 0.08275862068965517,
+              "refused": 0.2413793103448276,
+              "answered_correct": 0.696551724137931,
+              "answered_wrong": 0.06206896551724138,
+              "accuracy_all": 0.8206896551724138,
+              "accuracy_answered": 0.9181818181818182
+            },
+            "jpeg_q15": {
+              "photos": 290,
+              "answered": 0.4689655172413793,
+              "uncertain": 0.10689655172413794,
+              "unusual": 0.4241379310344828,
+              "refused": 0.5310344827586206,
+              "answered_correct": 0.4413793103448276,
+              "answered_wrong": 0.027586206896551724,
+              "accuracy_all": 0.7758620689655172,
+              "accuracy_answered": 0.9411764705882353
+            },
+            "background_black": {
+              "photos": 290,
+              "answered": 0.7103448275862069,
+              "uncertain": 0.15517241379310345,
+              "unusual": 0.13448275862068965,
+              "refused": 0.2896551724137931,
+              "answered_correct": 0.6586206896551724,
+              "answered_wrong": 0.05172413793103448,
+              "accuracy_all": 0.8379310344827586,
+              "accuracy_answered": 0.9271844660194175
+            },
+            "background_wood": {
+              "photos": 290,
+              "answered": 0.5517241379310345,
+              "uncertain": 0.04827586206896552,
+              "unusual": 0.4,
+              "refused": 0.4482758620689655,
+              "answered_correct": 0.5344827586206896,
+              "answered_wrong": 0.017241379310344827,
+              "accuracy_all": 0.803448275862069,
+              "accuracy_answered": 0.96875
+            },
+            "background_grass": {
+              "photos": 290,
+              "answered": 0.6448275862068965,
+              "uncertain": 0.0896551724137931,
+              "unusual": 0.2655172413793103,
+              "refused": 0.35517241379310344,
+              "answered_correct": 0.6137931034482759,
+              "answered_wrong": 0.03103448275862069,
+              "accuracy_all": 0.8137931034482758,
+              "accuracy_answered": 0.9518716577540107
+            },
+            "background_fabric": {
+              "photos": 290,
+              "answered": 0.6172413793103448,
+              "uncertain": 0.1206896551724138,
+              "unusual": 0.2620689655172414,
+              "refused": 0.38275862068965516,
+              "answered_correct": 0.5793103448275863,
+              "answered_wrong": 0.03793103448275862,
+              "accuracy_all": 0.8310344827586207,
+              "accuracy_answered": 0.9385474860335196
+            },
+            "four_leaves_same": {
+              "photos": 68,
+              "answered": 0.7647058823529411,
+              "uncertain": 0.014705882352941176,
+              "unusual": 0.22058823529411764,
+              "refused": 0.23529411764705882,
+              "answered_correct": 0.7352941176470589,
+              "answered_wrong": 0.029411764705882353,
+              "accuracy_all": 0.9264705882352942,
+              "accuracy_answered": 0.9615384615384616
+            },
+            "four_leaves_mixed": {
+              "photos": 40,
+              "answered": 0.45,
+              "uncertain": 0.075,
+              "unusual": 0.475,
+              "refused": 0.55
+            }
+          },
+          "balanced_8class": {
+            "blur_sigma2": {
+              "photos": 290,
+              "answered": 0.49310344827586206,
+              "uncertain": 0.06551724137931035,
+              "unusual": 0.4413793103448276,
+              "refused": 0.506896551724138,
+              "answered_correct": 0.38275862068965516,
+              "answered_wrong": 0.1103448275862069,
+              "accuracy_all": 0.6,
+              "accuracy_answered": 0.7762237762237763
+            },
+            "blur_sigma4": {
+              "photos": 290,
+              "answered": 0.08620689655172414,
+              "uncertain": 0.0,
+              "unusual": 0.9137931034482759,
+              "refused": 0.9137931034482759,
+              "answered_correct": 0.04482758620689655,
+              "answered_wrong": 0.041379310344827586,
+              "accuracy_all": 0.2206896551724138,
+              "accuracy_answered": 0.52
+            },
+            "dark_x0.35": {
+              "photos": 290,
+              "answered": 0.7862068965517242,
+              "uncertain": 0.11724137931034483,
+              "unusual": 0.09655172413793103,
+              "refused": 0.21379310344827587,
+              "answered_correct": 0.7103448275862069,
+              "answered_wrong": 0.07586206896551724,
+              "accuracy_all": 0.803448275862069,
+              "accuracy_answered": 0.9035087719298246
+            },
+            "overexposed_x1.7": {
+              "photos": 290,
+              "answered": 0.7965517241379311,
+              "uncertain": 0.12413793103448276,
+              "unusual": 0.07931034482758621,
+              "refused": 0.20344827586206896,
+              "answered_correct": 0.7172413793103448,
+              "answered_wrong": 0.07931034482758621,
+              "accuracy_all": 0.8275862068965517,
+              "accuracy_answered": 0.9004329004329005
+            },
+            "jpeg_q15": {
+              "photos": 290,
+              "answered": 0.46551724137931033,
+              "uncertain": 0.16551724137931034,
+              "unusual": 0.3689655172413793,
+              "refused": 0.5344827586206896,
+              "answered_correct": 0.4241379310344828,
+              "answered_wrong": 0.041379310344827586,
+              "accuracy_all": 0.6482758620689655,
+              "accuracy_answered": 0.9111111111111111
+            },
+            "background_black": {
+              "photos": 290,
+              "answered": 0.7620689655172413,
+              "uncertain": 0.13793103448275862,
+              "unusual": 0.1,
+              "refused": 0.23793103448275862,
+              "answered_correct": 0.6896551724137931,
+              "answered_wrong": 0.07241379310344828,
+              "accuracy_all": 0.8,
+              "accuracy_answered": 0.9049773755656109
+            },
+            "background_wood": {
+              "photos": 290,
+              "answered": 0.593103448275862,
+              "uncertain": 0.05172413793103448,
+              "unusual": 0.35517241379310344,
+              "refused": 0.4068965517241379,
+              "answered_correct": 0.5620689655172414,
+              "answered_wrong": 0.03103448275862069,
+              "accuracy_all": 0.8172413793103448,
+              "accuracy_answered": 0.9476744186046512
+            },
+            "background_grass": {
+              "photos": 290,
+              "answered": 0.6793103448275862,
+              "uncertain": 0.07586206896551724,
+              "unusual": 0.24482758620689654,
+              "refused": 0.32068965517241377,
+              "answered_correct": 0.6241379310344828,
+              "answered_wrong": 0.05517241379310345,
+              "accuracy_all": 0.8,
+              "accuracy_answered": 0.9187817258883249
+            },
+            "background_fabric": {
+              "photos": 290,
+              "answered": 0.6896551724137931,
+              "uncertain": 0.0896551724137931,
+              "unusual": 0.2206896551724138,
+              "refused": 0.3103448275862069,
+              "answered_correct": 0.6241379310344828,
+              "answered_wrong": 0.06551724137931035,
+              "accuracy_all": 0.7862068965517242,
+              "accuracy_answered": 0.905
+            },
+            "four_leaves_same": {
+              "photos": 68,
+              "answered": 0.7941176470588235,
+              "uncertain": 0.10294117647058823,
+              "unusual": 0.10294117647058823,
+              "refused": 0.20588235294117646,
+              "answered_correct": 0.7647058823529411,
+              "answered_wrong": 0.029411764705882353,
+              "accuracy_all": 0.9264705882352942,
+              "accuracy_answered": 0.9629629629629629
+            },
+            "four_leaves_mixed": {
+              "photos": 40,
+              "answered": 0.525,
+              "uncertain": 0.225,
+              "unusual": 0.25,
+              "refused": 0.475
+            }
+          }
+        },
+        "out_of_dataset": {
+          "full_8class": {
+            "probes": {
+              "photos": 30,
+              "answered": 0.0,
+              "uncertain": 0.1,
+              "unusual": 0.9,
+              "refused": 1.0
+            },
+            "empty_paper": {
+              "photos": 60,
+              "answered": 0.016666666666666666,
+              "uncertain": 0.18333333333333332,
+              "unusual": 0.8,
+              "refused": 0.9833333333333333
+            },
+            "other_crop": {
+              "photos": 96,
+              "answered": 0.0625,
+              "uncertain": 0.16666666666666666,
+              "unusual": 0.7708333333333334,
+              "refused": 0.9375
+            },
+            "tomato_unsupported": {
+              "photos": 56,
+              "answered": 0.07142857142857142,
+              "uncertain": 0.03571428571428571,
+              "unusual": 0.8928571428571429,
+              "refused": 0.9285714285714286
+            },
+            "tomato_known_shift": {
+              "early_blight": {
+                "photos": 12,
+                "answered": 0.16666666666666666,
+                "uncertain": 0.16666666666666666,
+                "unusual": 0.6666666666666666,
+                "refused": 0.8333333333333334,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.16666666666666666,
+                "accuracy_all": 0.0,
+                "accuracy_answered": 0.0
+              },
+              "healthy": {
+                "photos": 12,
+                "answered": 0.0,
+                "uncertain": 0.16666666666666666,
+                "unusual": 0.8333333333333334,
+                "refused": 1.0,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.0,
+                "accuracy_all": 1.0,
+                "accuracy_answered": null
+              },
+              "late_blight": {
+                "photos": 12,
+                "answered": 0.08333333333333333,
+                "uncertain": 0.25,
+                "unusual": 0.6666666666666666,
+                "refused": 0.9166666666666666,
+                "answered_correct": 0.08333333333333333,
+                "answered_wrong": 0.0,
+                "accuracy_all": 0.3333333333333333,
+                "accuracy_answered": 1.0
+              }
+            },
+            "everyday": {
+              "photos": 69,
+              "answered": 0.0,
+              "uncertain": 0.0,
+              "unusual": 1.0,
+              "refused": 1.0
+            }
+          },
+          "balanced_8class": {
+            "probes": {
+              "photos": 30,
+              "answered": 0.0,
+              "uncertain": 0.0,
+              "unusual": 1.0,
+              "refused": 1.0
+            },
+            "empty_paper": {
+              "photos": 60,
+              "answered": 0.05,
+              "uncertain": 0.0,
+              "unusual": 0.95,
+              "refused": 0.95
+            },
+            "other_crop": {
+              "photos": 96,
+              "answered": 0.09375,
+              "uncertain": 0.1875,
+              "unusual": 0.71875,
+              "refused": 0.90625
+            },
+            "tomato_unsupported": {
+              "photos": 56,
+              "answered": 0.08928571428571429,
+              "uncertain": 0.125,
+              "unusual": 0.7857142857142857,
+              "refused": 0.9107142857142857
+            },
+            "tomato_known_shift": {
+              "early_blight": {
+                "photos": 12,
+                "answered": 0.16666666666666666,
+                "uncertain": 0.16666666666666666,
+                "unusual": 0.6666666666666666,
+                "refused": 0.8333333333333334,
+                "answered_correct": 0.0,
+                "answered_wrong": 0.16666666666666666,
+                "accuracy_all": 0.3333333333333333,
+                "accuracy_answered": 0.0
+              },
+              "healthy": {
+                "photos": 12,
+                "answered": 0.08333333333333333,
+                "uncertain": 0.16666666666666666,
+                "unusual": 0.75,
+                "refused": 0.9166666666666666,
+                "answered_correct": 0.08333333333333333,
+                "answered_wrong": 0.0,
+                "accuracy_all": 1.0,
+                "accuracy_answered": 1.0
+              },
+              "late_blight": {
+                "photos": 12,
+                "answered": 0.16666666666666666,
+                "uncertain": 0.3333333333333333,
+                "unusual": 0.5,
+                "refused": 0.8333333333333334,
+                "answered_correct": 0.08333333333333333,
+                "answered_wrong": 0.08333333333333333,
+                "accuracy_all": 0.6666666666666666,
+                "accuracy_answered": 0.5
+              }
+            },
+            "everyday": {
+              "photos": 69,
+              "answered": 0.0,
+              "uncertain": 0.0,
+              "unusual": 1.0,
+              "refused": 1.0
+            }
+          }
+        },
+        "latency": {
+          "full_8class": {
+            "median_ms": 176.07889998180326,
+            "p90_ms": 210.01152002136223,
+            "threads": 8,
+            "runtime": "onnxruntime",
+            "measured": "2026-11-19 16:08"
+          },
+          "balanced_8class": {
+            "median_ms": 298.1576500023948,
+            "p90_ms": 334.8440700006904,
+            "threads": 8,
+            "runtime": "onnxruntime",
+            "measured": "2026-11-19 16:08"
+          }
+        }
+      }
+    },
+    "note": "Final pipelines fixed on out-of-fold data (scripts/36, rules in docs/AUDIT.md \u00a76) and scored here once on the test photos. The test photos had been used for reporting in earlier rounds (v1, v2, v2.1), never for a choice."
+  },
   "environment": {
     "python": "3.10.11",
     "torch": "2.7.0+cu128",

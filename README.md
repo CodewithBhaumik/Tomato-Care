@@ -48,8 +48,16 @@ and how sure it is:
 
 Every answer comes with the probability of each condition, a Grad-CAM heat map of where the networks looked, the
 symptoms and management of the condition, and — on request — the answers of the other Tomato Care models on the
-same photo. The apps serve one version-2 model per mode — **focused · balanced** (default) and **full · balanced**;
-the focused · calibrated variant and the original study's models appear only in the evaluation.
+same photo. The apps serve **one validated model per mode** (final round, `docs/FINAL_REPORT.md`):
+
+* **Focused · 5 conditions** — 5 ConvNeXt-Tiny networks, class-weighted loss, trained to be unsure on the three
+  conditions it does not cover (outlier exposure). Test: accuracy 90.9%, it answers
+  46% of photos at 99.2% accuracy and gives **no diagnosis**
+  to 100% of the Early Blight / Late Blight / Potassium test photos (before: 16%).
+* **Full · 8 conditions** — 5 ConvNeXt-Tiny networks, class-balanced sampling. Test: accuracy 83.1%,
+  answers 80% of photos at 92.2% accuracy.
+
+Both were chosen on cross-validation data only; earlier models appear only in the evaluation.
 
 Two front ends share one prediction engine (`backend/services/predictor.py`):
 
@@ -64,9 +72,9 @@ All models were scored by the same code on the same **290 held-out test photos**
 **once**, after every model choice had been fixed on cross-validation data. 95% confidence intervals come from 2,000
 bootstrap resamples of whole leaf groups. Full tables: [docs/RESULTS.md](docs/RESULTS.md).
 
-The app serves three version-2 models: two for the focused task and one for the full task. All three use the same
-fold networks, post-processed by rules fitted on out-of-fold data (per-class calibration; for *balanced*, also a
-class-prior correction against majority-class bias). Balanced accuracy is the mean per-condition recall, so a rare
+The table below is the v2.1 round (three variants, since replaced by the final round's one model per mode — see
+[docs/FINAL_REPORT.md](docs/FINAL_REPORT.md)). Those variants used the same fold networks, post-processed by rules
+fitted on out-of-fold data (per-class calibration; for *balanced*, also a class-prior correction). Balanced accuracy is the mean per-condition recall, so a rare
 condition counts as much as Leaf Miner. Per-class calibration error measures how far each condition's confidence
 is from its own accuracy (lower means more even confidence).
 

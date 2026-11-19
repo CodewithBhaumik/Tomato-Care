@@ -300,3 +300,15 @@ handling were checked against the independent direct path; no stale weights or r
   photographs).
 - **Rare in-scope conditions flagged "unusual".** On the focused model's test photos this happens to Healthy 22%,
   Magnesium 21% and Nitrogen 14% of the time, including the gallery's Nitrogen photo.
+
+## 9. Final round (approved retraining) — outcome
+
+Full numbers, generated from the result files: `docs/FINAL_REPORT.md`.
+
+- **Focused:** the outlier-exposure model gives **no diagnosis to 100%** of the unsupported test photos
+  (before: 16%). The price of the pre-registered threshold (0.95) is coverage: it answers
+  46% of supported photos (before 78%), at 99.2% accuracy.
+- **Full:** class-balanced sampling won out-of-fold. Test accuracy is 83.1% (before 82.8%), and it answers
+  80% at 92.2%. Early Blight and Potassium remain data-limited.
+- **Gallery** (most typical held-out photo per class, model-independent rule): the focused mode gives no wrong answer.
+  The full mode still answers the Early Blight photo as Spotted Wilt.

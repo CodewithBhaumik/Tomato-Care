@@ -4,22 +4,21 @@ Format after Mitchell et al., *Model Cards for Model Reporting* (2019). Numbers:
 
 ## Model details
 
-* **What**: image classifiers for single tomato leaves photographed on plain paper. Two served models (one per mode),
-  both version 2; the calibrated focused variant (`calibrated_5class`) is evaluated but not served:
-  * **Focused · balanced** (`balanced_5class`, default): Healthy,
-    Leaf Miner, Magnesium Deficiency, Nitrogen Deficiency, Spotted Wilt Virus — the classes with enough photographs
-    to be recognised reliably.
-  * **Full · balanced** (`balanced_8class`): the five above plus Early Blight, Late Blight and Potassium Deficiency.
-  * Both post-process the fold networks `upgrade_5class` / `upgrade_8class` with per-class calibration, and the
-    balanced ones also with a class-prior correction (`scripts/31_balance_models.py`, fitted on out-of-fold data).
-* **Architecture**: fold ensembles of ConvNeXt-Tiny (ImageNet-1k pretrained) fine-tuned at 256×256, one view per
-  network — the focused model is the 5 cross-validation networks of the robust recipe; the full model the 5 of the
-  original recipe plus the 5 of the robust recipe (members, temperatures and thresholds:
-  `experiments/deployment.json`). Probabilities are temperature-scaled per member and averaged.
+* **What**: image classifiers for single tomato leaves photographed on plain paper. Two served models, one per
+  mode, from the final round (`docs/FINAL_REPORT.md`, `scripts/36_final_pipeline.py`):
+  * **Focused** (`focused_5class`, default): Healthy, Leaf Miner, Magnesium Deficiency, Nitrogen Deficiency, Spotted
+    Wilt Virus. Class-weighted loss plus outlier exposure: trained to be unsure on Early Blight, Late Blight and
+    Potassium photos. Threshold 0.95.
+  * **Full** (`full_8class`): all eight conditions. Class-balanced sampling. Threshold 0.76.
+  * Both: per-class vector-scaling calibration and a per-condition "unusual image" limit, all fitted on cross-fitted
+    out-of-fold predictions; the answer is the most probable condition.
+* **Architecture**: 5-fold ensembles of ConvNeXt-Tiny (ImageNet-1k pretrained) fine-tuned at 256×256, one view per
+  network (members and thresholds: `experiments/deployment.json`). Probabilities are averaged over the 5 networks,
+  then calibrated.
 * **Outputs**: calibrated class probabilities; a decision — *Healthy*, *Diseased*, *Uncertain* (confidence below a
   threshold fitted on out-of-fold data) or *Unusual image* (feature-space distance to the training photos above a
   threshold fitted on out-of-fold data); Grad-CAM maps on request.
-* **Version**: 2.0 (upgrade of the original student project). Code: MIT licence.
+* **Version**: 3.0 (final round of the original student project). Code: MIT licence.
 
 ## Intended use
 

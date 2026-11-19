@@ -36,7 +36,11 @@ export default function ResultPanel({ result }) {
   const VERDICT = {
     correct: { tone: "leaf", icon: CheckCircle2, text: "matches true label" },
     wrong: { tone: "tomato", icon: XCircle, text: `wrong · true label: ${trueKey ? classMeta(trueKey).name : ""}` },
-    refused: { tone: "sun", icon: CircleHelp, text: `not answered · true label: ${trueKey ? classMeta(trueKey).name : ""}` },
+    refused: {
+      tone: "sun",
+      icon: CircleHelp,
+      text: trueKey === prediction.key ? "below the threshold · best guess is right" : `not answered · true label: ${trueKey ? classMeta(trueKey).name : ""}`,
+    },
     refused_outside: { tone: "leaf", icon: CheckCircle2, text: `correctly not diagnosed: ${trueKey ? classMeta(trueKey).name : ""} is not one of this model's conditions` },
   };
 

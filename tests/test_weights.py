@@ -17,7 +17,8 @@ def test_manifest_lists_every_deployed_file_with_size_hash_and_url():
     assert weights.model_paths(deployment) <= listed
     for f in manifest["files"]:
         assert f["bytes"] > 0 and len(f["sha256"]) == 64
-        assert f["url"].endswith(f"/{manifest['release']}/{f['asset']}")
+        # each file lives in the release it was first published in (unchanged files keep their earlier URL)
+        assert f["url"].endswith(f"/{f['asset']}") and "/releases/download/weights-v" in f["url"]
         assert manifest["repo"] in f["url"]
 
 
