@@ -21,7 +21,8 @@ import pandas as pd
 import torch
 
 from tomatoleaf.config import CLASS_KEYS, DATA_DIR, EXPERIMENTS_DIR, MODELS_DIR, SEED
-from tomatoleaf.data import load_images
+from tomatoleaf.crop import leaf_crop_batch
+from tomatoleaf.data import load_images as _load_images
 from tomatoleaf.evaluation import classification_metrics, expected_calibration_error, fit_temperature, softmax
 from tomatoleaf.models import build_model, count_parameters, normalisation
 from tomatoleaf.ood import FeatureDensity, energy_score
@@ -47,6 +48,14 @@ def task_frame(task: str) -> tuple[pd.DataFrame, pd.DataFrame, list]:
     inside = pool[pool.class_key.isin(keys)].copy()
     inside["y"] = inside.label.map(local)
     return inside.reset_index(drop=True), pool[~pool.class_key.isin(keys)].reset_index(drop=True), keys
+
+
+CROP = {"on": False}  # set per run from the recipe: the same leaf crop for every image the networks see
+
+
+def load_images(paths):
+    images = _load_images(paths)
+    return leaf_crop_batch(images) if CROP["on"] else images
 
 
 def save_weights(model, recipe, keys, path, extra=None):
@@ -182,6 +191,7 @@ def main():
     parser.add_argument("--full", action="store_true", help="train once on all train+val photos instead of CV")
     args = parser.parse_args()
     recipe = RECIPES[args.recipe]
+    CROP["on"] = recipe.crop == "leaf"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     torch.backends.cudnn.benchmark = True
     inside, outside, keys = task_frame(args.task)
@@ -197,6 +207,8 @@ def main():
         train_full(recipe, args.task, device, inside, keys, log)
         return
     _, probes, _ = far_ood_probes()
+    if CROP["on"]:
+        probes = leaf_crop_batch(probes)
     for fold in [int(f) for f in args.folds.split(",")]:
         run_fold(recipe, args.task, fold, device, inside, outside, keys, probes, log)
     if all((CV_DIR / args.task / recipe.name / f"fold{k}.npz").exists() for k in range(5)):

@@ -27,6 +27,7 @@ from PIL import Image
 
 from tomatoleaf import balance
 from tomatoleaf.config import CLASS_KEYS, CLASSES, EXPERIMENTS_DIR, IMAGENET_MEAN, IMAGENET_STD, MODELS_DIR
+from tomatoleaf.crop import leaf_crop, paste_back
 from tomatoleaf.features import extract_features, feature_vector
 from tomatoleaf.gradcam import GradCAM, heatmap_png, overlay
 from tomatoleaf.models import FeatureTap, build_model, gradcam_layer, gradcam_reshape, load_checkpoint
@@ -160,6 +161,7 @@ class TorchPredictor(Predictor):
         self.mean = tuple(ckpt.get("mean", IMAGENET_MEAN))
         self.std = tuple(ckpt.get("std", IMAGENET_STD))
         self.resize = ckpt.get("eval_resize", "resize")
+        self.crop = (ckpt.get("recipe") or {}).get("crop") == "leaf"  # leaf-centred crop, as in training
         self.tta_views = int(entry.get("tta_views") or 1)
         self.temperature = float(entry.get("temperature") or 1.0)
         self.density = FeatureDensity.from_dict(ckpt["density"]) if ckpt.get("density") else None
@@ -193,7 +195,12 @@ class TorchPredictor(Predictor):
             with self._shared.lock:
                 yield self._shared.bind(self._token, self._state)
 
-    def tensor(self, rgb: np.ndarray) -> torch.Tensor:
+    def tensor(self, rgb: np.ndarray, box_out: list | None = None) -> torch.Tensor:
+        """Model input; for leaf-crop models the leaf-centred crop first (its box is appended to `box_out`)."""
+        if self.crop:
+            rgb, box = leaf_crop(rgb)
+            if box_out is not None:
+                box_out.append(box)
         return preprocess_for_cnn(rgb, self.size, self.mean, self.std, self.resize).to(self.device)
 
     def forward(self, rgb: np.ndarray):
@@ -229,15 +236,21 @@ class TorchPredictor(Predictor):
 
         The hook is attached only for this call (and serialised with the model lock) so predictions are unaffected.
         """
+        heat = self.gradcam(rgb, class_index)
+        return {"method": "Grad-CAM", "class_index": class_index, "overlay": png_data_url(overlay(rgb, heat)),
+                "heatmap": png_data_url(heatmap_png(heat, rgb.shape[0]))}
+
+    def gradcam(self, rgb: np.ndarray, class_index: int) -> np.ndarray:
+        """Grad-CAM heat map in the frame of `rgb` (a leaf-crop model's map is placed back where the crop was)."""
+        boxes = []
         with self._net() as model:
             cam = GradCAM(model, gradcam_layer(model, self.arch), gradcam_reshape(model, self.arch))
             try:
-                heat, _, _ = cam(self.tensor(rgb), class_index=class_index)
+                heat, _, _ = cam(self.tensor(rgb, boxes), class_index=class_index)
             finally:
                 cam.close()
                 model.zero_grad(set_to_none=True)
-        return {"method": "Grad-CAM", "class_index": class_index, "overlay": png_data_url(overlay(rgb, heat)),
-                "heatmap": png_data_url(heatmap_png(heat, rgb.shape[0]))}
+        return paste_back(heat, boxes[0] if boxes else None, rgb.shape)
 
     @property
     def calibration(self):

@@ -46,6 +46,7 @@ class Recipe:
     sampling: str = "uniform"  # "uniform" (shuffle) or "class_balanced" (each class drawn equally often)
     outlier_weight: float = 0.0  # > 0: outlier exposure with out-of-scope photos (focused task only)
     outlier_batch: int = 8
+    crop: str = "none"  # "leaf": leaf-centred crop before everything else (tomatoleaf.crop)
     ema_decay: float | None = None
     model_kwargs: dict = field(default_factory=dict)
 
@@ -76,6 +77,12 @@ RECIPES = {r.name: r for r in [
     # ---- final round: imbalance arms (B, C) and outlier exposure (focused task) ----
     Recipe("convnext_t_in1k_sampler", "convnext_tiny", "ConvNeXt-Tiny, robust recipe, class-balanced sampling",
            class_weighting="none", sampling="class_balanced", ema_decay=0.998),
+    # last round: leaf-centred crop (tomatoleaf.crop); focused with stronger outlier exposure (weight 1.0)
+    Recipe("convnext_t_in1k_robust_oe_crop", "convnext_tiny",
+           "ConvNeXt-Tiny, leaf crop, class-weighted loss + outlier exposure (weight 1.0)", outlier_weight=1.0,
+           crop="leaf", ema_decay=0.998),
+    Recipe("convnext_t_in1k_sampler_crop", "convnext_tiny", "ConvNeXt-Tiny, leaf crop, class-balanced sampling",
+           class_weighting="none", sampling="class_balanced", crop="leaf", ema_decay=0.998),
     Recipe("convnext_t_in1k_robust_oe", "convnext_tiny",
            "ConvNeXt-Tiny, robust recipe, class-weighted loss + outlier exposure", outlier_weight=0.5, ema_decay=0.998),
 ]}

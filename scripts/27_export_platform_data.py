@@ -25,8 +25,7 @@ from backend.services.predictor import ModelRegistry  # noqa: E402
 from tomatoleaf.config import CLASS_KEYS, EXPERIMENTS_DIR, RESULTS_DIR  # noqa: E402
 from tomatoleaf.data import load_splits  # noqa: E402
 from tomatoleaf.features import leaf_mask  # noqa: E402
-from tomatoleaf.gradcam import GradCAM, heatmap_png, overlay  # noqa: E402
-from tomatoleaf.models import gradcam_layer, gradcam_reshape  # noqa: E402
+from tomatoleaf.gradcam import heatmap_png, overlay  # noqa: E402
 from tomatoleaf.preprocessing import load_canonical_array  # noqa: E402
 from tomatoleaf.recipes import RECIPES  # noqa: E402
 from tomatoleaf.utils import load_json, save_json  # noqa: E402
@@ -58,14 +57,8 @@ def png(arr: np.ndarray, path: Path) -> str:
 
 
 def gradcam_for(predictor, rgb, class_index):
-    target = getattr(predictor, "members", [predictor])[0]
-    cam = GradCAM(target.model, gradcam_layer(target.model, target.arch), gradcam_reshape(target.model, target.arch))
-    try:
-        heat, _, _ = cam(target.tensor(rgb), class_index=class_index)
-    finally:
-        cam.close()
-        target.model.zero_grad(set_to_none=True)
-    return heat
+    """Grad-CAM of the first network, in the frame of `rgb` (leaf-crop models: placed back where the crop was)."""
+    return getattr(predictor, "members", [predictor])[0].gradcam(rgb, class_index)
 
 
 def build_gallery(defaults, previous, bench_models):
