@@ -147,6 +147,30 @@ def open_image(source, manage_colour: bool = True) -> Image.Image:
     return img.convert("RGB")
 
 
+def strip_jpeg_metadata(data: bytes, keep_app=(0xE0, 0xE2)) -> bytes:
+    """Remove APPn / COM metadata segments from a JPEG without re-encoding it (lossless: the compressed pixel data,
+    tables and, by default, the JFIF header and the ICC colour profile (APP2) are kept byte for byte).
+
+    The dataset files carry ~240 KB of phone debug data (APP4); copying a photo for the website this way keeps its
+    Display P3 profile, so the upload path treats it exactly like the dataset file (no re-encode, no colour shift)."""
+    if data[:2] != b"\xff\xd8":
+        raise ValueError("not a JPEG file")
+    out, i = bytearray(b"\xff\xd8"), 2
+    while i < len(data):
+        if data[i] != 0xFF:
+            raise ValueError("corrupt JPEG segment structure")
+        marker = data[i + 1]
+        if marker == 0xDA:  # start of scan: copy the rest (entropy-coded data, EOI) unchanged
+            out += data[i:]
+            return bytes(out)
+        length = int.from_bytes(data[i + 2:i + 4], "big")
+        segment = data[i:i + 2 + length]
+        if not ((0xE0 <= marker <= 0xEF or marker == 0xFE) and marker not in keep_app):
+            out += segment
+        i += 2 + length
+    raise ValueError("no image data in JPEG")
+
+
 def jpeg_roundtrip(img: Image.Image, quality: int = DATASET_JPEG_QUALITY,
                    subsampling: int = DATASET_JPEG_SUBSAMPLING) -> Image.Image:
     """Encode and decode as JPEG, like the dataset authors' final save (quality 90, 4:2:0)."""

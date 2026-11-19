@@ -126,7 +126,7 @@ export default function DiagnosePage() {
                 <CardHeader
                   icon={FlaskConical}
                   title="Second opinion"
-                  subtitle="Run every Tomato Care model — focused balanced, focused calibrated and full — on this photo"
+                  subtitle="Run both Tomato Care models — focused (5 conditions) and full (8 conditions) — on this photo"
                   action={
                     <Button variant="secondary" size="sm" onClick={() => runCompare()} loading={compareStatus === "running"} disabled={!online}>
                       {comparison ? "Run again" : "Ask all models"}

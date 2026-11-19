@@ -80,3 +80,6 @@ experiments/queue*.txt
 experiments/results/final_benchmark_dryrun.json
 .onnx_cache/
 .streamlit/secrets.toml
+
+# Out-of-dataset evaluation photos (PlantVillage, Lorem Picsum): downloaded by scripts/37, not redistributed
+data/external_ood/

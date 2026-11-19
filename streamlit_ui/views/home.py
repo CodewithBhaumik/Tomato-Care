@@ -66,19 +66,29 @@ def render() -> None:
               delta=f"[{core.pct(ci8[0])} – {core.pct(ci8[1])}]", delta_color="off", border=True,
               help="Includes the three hard classes (Early Blight, Late Blight, Potassium Deficiency), which have "
                    f"few training photos; macro-F1 {new8['test']['f1_macro']:.3f}.")
-    ood = data["ood"]["test"]
-    c4.metric("Non-leaf photos caught", core.pct(ood["flagged_far"], 0),
-              delta=f"{core.pct(ood['flagged_in'], 0)} of normal photos flagged too", delta_color="off", border=True,
-              help="Held-out non-leaf probe images (photos, textures, drawings) answered with 'Unusual image' "
-                   "instead of a diagnosis — and the price: normal leaf photos sent there as well.")
+    fr5 = ((data.get("final_round") or {}).get("tasks") or {}).get("5class") or {}
+    od = (fr5.get("out_of_dataset") or {}).get(new5["key"]) or {}
+    if "everyday" in od:  # final round: real unrelated photos (scripts/37-38)
+        c4.metric("Unrelated photos refused", core.pct(od["everyday"]["refused"], 0),
+                  delta=f"{core.pct(new5.get('flagged_unusual') or 0, 0)} of genuine leaf photos flagged too",
+                  delta_color="off", border=True,
+                  help="Everyday photos (Lorem Picsum) answered with 'Unusual image' or 'not sure' instead of a "
+                       "diagnosis — and the price: genuine test leaf photos sent there as well.")
+    else:
+        ood = data["ood"]["test"]
+        c4.metric("Non-leaf photos caught", core.pct(ood["flagged_far"], 0),
+                  delta=f"{core.pct(ood['flagged_in'], 0)} of normal photos flagged too", delta_color="off",
+                  border=True,
+                  help="Held-out non-leaf probe images (photos, textures, drawings) answered with 'Unusual image' "
+                       "instead of a diagnosis — and the price: normal leaf photos sent there as well.")
     bal = new5["test"].get("balanced_accuracy")
-    st.caption((f"Focused model (bias-corrected): balanced accuracy {core.pct(bal)} — the mean of the per-condition "
+    st.caption((f"Focused model: balanced accuracy {core.pct(bal)} — the mean of the per-condition "
                 "recalls, so rare conditions count as much as common ones. " if bal else "")
                + "How these models were chosen, how they compare with the original study's models and where they fail: "
                  "see the Model lab and How it works.")
 
     st.space("medium")
-    theme.section("What is inside", kicker="Tomato Care v2")
+    theme.section("What is inside", kicker="Tomato Care")
     rows = [
         [("tune", "Sees uploads the way it was trained",
           "The dataset photos are whole 3:4 phone frames squashed to 256×256 in Display P3 colour. Every upload goes "
@@ -87,13 +97,14 @@ def render() -> None:
           "Five-fold cross-validation on 1,813 photos, leaf groups never split, and a selection rule fixed before "
           "the test photos were scored."),
          ("groups", "Fair to rare conditions",
-          "A class-prior correction stops frequent conditions (Leaf Miner) out-voting rare ones, and per-class "
-          "calibration makes every condition's confidence mean the same thing.")],
+          "One imbalance correction per model — class-weighted loss, balanced sampling or a logit adjustment, "
+          "compared by cross-validation — never two stacked, and calibrated confidence for every condition.")],
         [("help", "Says “not sure”",
-          "Temperature-scaled confidence and a threshold chosen on out-of-fold data: below it, no diagnosis."),
+          "Calibrated confidence and one threshold per model, chosen on cross-validation data: below it, no "
+          "diagnosis. The focused model also learned to be unsure about the conditions it does not cover."),
          ("image_not_supported", "Flags unusual photos",
-          "Feature-space distance to the training photos catches non-leaf images. Unknown leaf conditions are "
-          "harder: most are not flagged."),
+          "Feature-space distance to the training photos, with a limit per condition so rare conditions are not "
+          "flagged more often. Tested on other crops, everyday photos and stress tests (Model lab)."),
          ("visibility", "Shows where it looked",
           "Grad-CAM heat maps for every diagnosis, so you can check the model looked at the leaf.")],
     ]

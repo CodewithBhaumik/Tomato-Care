@@ -80,12 +80,12 @@ def _calibration(models: list[dict], task: str):
     new, old = core.task_defaults(task)
     a, b = st.columns(2, gap="large")
     with a:
-        st.markdown("**Reliability of the version-2 model** (out-of-fold photos)")
+        st.markdown("**Reliability of the served model** (out-of-fold photos)")
         cal = new["calibration"]
         series = {}
         if cal.get("reliability_before"):
-            series["Before temperature scaling"] = cal["reliability_before"]
-        series["After temperature scaling"] = cal["reliability_after"]
+            series[f"Before {cal.get('method', 'temperature scaling')}"] = cal["reliability_before"]
+        series[f"After {cal.get('method', 'temperature scaling')}"] = cal["reliability_after"]
         st.altair_chart(charts.reliability(series), width="stretch")
         if cal.get("ece_before") is not None:
             st.caption(f"Expected calibration error {cal['ece_before']:.3f} → {cal['ece_after']:.3f} on out-of-fold "
@@ -118,10 +118,82 @@ def _bias(models: list[dict], task: str):
                                 "Per-class calibration error": st.column_config.NumberColumn(
                                     format="%.3f", help="How far each condition's average confidence is from its own "
                                                         "accuracy (lower = more even confidence)")})
-    st.caption("Balanced and calibrated variants: the same networks with per-class calibration (and, for balanced, a "
+    st.caption("Earlier balanced / calibrated variants (v2.1, no longer served): the same networks with per-class "
+               "calibration (and, for balanced, a class-prior correction on top of a class-weighted loss). The final "
+               "round replaced them with one validated pipeline per mode (tab Final pipeline). "
+               "Balanced and calibrated variants: the same networks with per-class calibration (and, for balanced, a "
                "class-prior correction), fitted on out-of-fold data before the test photos were scored. A GAN was "
                "not used to synthesise rare-class photos: with 9 Potassium and 45 Nitrogen photographs it would "
                "copy them rather than add new information, and generated images would need their own validation.")
+
+
+STRESS_LABEL = {"blur_sigma2": "Blur (σ 2)", "blur_sigma4": "Strong blur (σ 4)", "dark_x0.35": "Very dark",
+                "overexposed_x1.7": "Over-exposed", "jpeg_q15": "Heavy JPEG (q15)", "background_black": "Black background",
+                "background_wood": "Wood background", "background_grass": "Grass background",
+                "background_fabric": "Fabric background", "four_leaves_same": "4 leaves, same condition",
+                "four_leaves_mixed": "4 leaves, mixed conditions"}
+OOD_LABEL = {"other_crop": "Other crops (PlantVillage)", "tomato_unsupported": "Tomato diseases not in the dataset",
+             "everyday": "Everyday photos", "probes": "Synthetic non-leaf images", "empty_paper": "Empty paper"}
+PCT = st.column_config.NumberColumn(format="percent")
+
+
+def _final_round(task: str):
+    fr = ((core.platform().get("final_round") or {}).get("tasks") or {}).get(task)
+    if not fr:
+        st.info("Final-round results are not available in this build.")
+        return
+    st.markdown("**1 · Imbalance arms** — out-of-fold, cross-fitted; the rules were fixed before training")
+    rows = [{"Arm": ("★ " if a["chosen"] else "") + f"{a['arm']} · {a['label']}", "Macro-F1": a["oof"]["f1_macro"],
+             "Accuracy": a["oof"]["accuracy"], "NLL": a["oof"]["nll"], "ECE": a["oof"]["ece"],
+             "Calibration": a["calibration"], "Threshold": a["threshold"], "Answered": a["coverage"],
+             "Accuracy when answering": a["accuracy_kept"],
+             **({"Unsupported conditions refused": a["out_of_scope_refusal"]} if task == "5class" else {})}
+            for a in fr["arms"]]
+    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
+                 column_config={"Macro-F1": PCT, "Accuracy": PCT, "Answered": PCT, "Accuracy when answering": PCT,
+                                "Unsupported conditions refused": PCT,
+                                "NLL": st.column_config.NumberColumn(format="%.3f"),
+                                "ECE": st.column_config.NumberColumn(format="%.3f"),
+                                "Threshold": st.column_config.NumberColumn(format="%.2f")})
+    st.caption(f"Chosen: arm {fr['chosen']} — {fr['why']}. Unusual-image check: {fr['gate']['method']} feature "
+               f"distance, out-of-fold AUROC {fr['gate']['auroc_select']:.3f}.")
+    if not fr.get("test"):
+        return
+    st.markdown("**2 · Before vs after** — held-out test photos")
+    rows = [{"Model": ("★ " if r["final"] else "") + r["name"], "Accuracy": r["accuracy"], "Macro-F1": r["f1_macro"],
+             "Weighted F1": r["f1_weighted"], "ECE": r["ece"], "Brier": r["brier"], "Threshold": r["threshold"],
+             "Answered": r["coverage"], "Accuracy when answering": r["accuracy_kept"],
+             **({"Unsupported: confident wrong answer": (r.get("out_of_scope") or {}).get("answered_wrong")}
+                if task == "5class" else {})} for r in fr["test"]]
+    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
+                 column_config={"Accuracy": PCT, "Macro-F1": PCT, "Weighted F1": PCT, "Answered": PCT,
+                                "Accuracy when answering": PCT, "Unsupported: confident wrong answer": PCT,
+                                "ECE": st.column_config.NumberColumn(format="%.3f"),
+                                "Brier": st.column_config.NumberColumn(format="%.3f"),
+                                "Threshold": st.column_config.NumberColumn(format="%.2f")})
+    final_key = next(r["key"] for r in fr["test"] if r["final"])
+    before_key = next(r["key"] for r in fr["test"] if not r["final"])
+    a, b = st.columns(2, gap="large")
+    with a:
+        st.markdown("**3 · Stress tests** — test photos changed on purpose")
+        s_f, s_b = fr["stress"][final_key], fr["stress"][before_key]
+        rows = [{"Condition": STRESS_LABEL.get(n, n),
+                 "Before: wrong answer": s_b[n].get("answered_wrong", s_b[n]["answered"]),
+                 "Final: right answer": s_f[n].get("answered_correct"),
+                 "Final: wrong answer": s_f[n].get("answered_wrong", s_f[n]["answered"]),
+                 "Final: refused": s_f[n]["refused"]} for n in s_f]
+        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
+                     column_config={k: PCT for k in rows[0] if k != "Condition"})
+        st.caption("Mixed-condition collages have no single right answer: any answer counts as wrong.")
+    with b:
+        st.markdown("**4 · Out-of-dataset images** — share refused (higher is better)")
+        o_f, o_b = fr["out_of_dataset"][final_key], fr["out_of_dataset"][before_key]
+        rows = [{"Images": OOD_LABEL[n], "Photos": o_f[n]["photos"], "Before": o_b[n]["refused"], "Final": o_f[n]["refused"]}
+                for n in OOD_LABEL if n in o_f]
+        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
+                     column_config={"Before": PCT, "Final": PCT})
+    if (core.platform().get("final_round") or {}).get("note"):
+        st.caption(core.platform()["final_round"]["note"])
 
 
 def _robustness(task: str):
@@ -183,19 +255,23 @@ def render() -> None:
     comp = core.headline_comparison(task)
     n = data["tasks"][task]["test_photos"]
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Version 2 · accuracy", core.pct(new["test"]["accuracy"]),
+    c1.metric("Served model · accuracy", core.pct(new["test"]["accuracy"]),
               delta=f"{core.pts(new['test']['accuracy'] - old['test']['accuracy'])} vs baseline", border=True)
-    c2.metric("Version 2 · macro-F1", f"{new['test']['f1_macro']:.3f}",
+    c2.metric("Served model · macro-F1", f"{new['test']['f1_macro']:.3f}",
               delta=f"{new['test']['f1_macro'] - old['test']['f1_macro']:+.3f} vs baseline", border=True)
     c3.metric("Baseline · accuracy", core.pct(old["test"]["accuracy"]), delta=old["name"].split(" (original")[0],
               delta_color="off", border=True, help="The original study's model for this task (not served by the app).")
     c4.metric("Test photos", f"{n}", delta="scored once", delta_color="off", border=True)
     if comp:
-        st.info(f"**Paired comparison (v2 − baseline, bootstrap over leaf groups):** accuracy {core.pts(comp['accuracy_diff'])} "
+        st.info(f"**Paired comparison (served model − original study's model, bootstrap over leaf groups):** accuracy {core.pts(comp['accuracy_diff'])} "
                 f"[95% CI {core.pts(comp['accuracy_ci'][0])}, {core.pts(comp['accuracy_ci'][1])}], macro-F1 "
                 f"{comp['f1_diff']:+.3f} [{comp['f1_ci'][0]:+.3f}, {comp['f1_ci'][1]:+.3f}]. {_verdict(comp)}",
                 icon=":material/balance:")
-    tabs = st.tabs(["Leaderboard", "Per condition", "Confusion", "Calibration", "Robustness", "Speed", "Cross-validation"])
+    tabs = st.tabs(["Leaderboard", "Final pipeline", "Per condition", "Confusion", "Calibration", "Robustness", "Speed",
+                    "Cross-validation"])
+    with tabs[1]:
+        _final_round(task)
+    tabs = [tabs[0]] + list(tabs[2:])  # the remaining tabs keep their original indices below
     with tabs[0]:
         _leaderboard(models)
         st.altair_chart(charts.metric_with_ci(models, "f1_macro", "Macro-F1 (test, 95% CI)"), width="stretch")

@@ -91,8 +91,16 @@ def run_fold(recipe, task, fold, device, inside, outside, keys, probes, log):
         m.train()
         return {"val_f1": met["f1_macro"], "val_acc": met["accuracy"]}
 
+    X_oe = None
+    if recipe.outlier_weight > 0:  # outlier exposure: the TRAINING folds' out-of-scope photos only
+        oe = outside[outside.fold != fold]
+        if not len(oe):
+            raise ValueError(f"{recipe.name}: outlier exposure needs out-of-scope photos (focused task only)")
+        X_oe = load_images(oe.path)
+        log(f"fold {fold}: outlier exposure with {len(oe)} out-of-scope training photos")
     log(f"fold {fold}: {len(tr)} train / {len(he)} held-out photos | {recipe.label}")
-    model, info = fit_recipe(model, recipe, X_tr, y_tr, device=device, seed=SEED + fold, monitor=monitor, log=log)
+    model, info = fit_recipe(model, recipe, X_tr, y_tr, device=device, seed=SEED + fold, monitor=monitor, log=log,
+                             outliers=X_oe)
 
     _, f_tr = infer(model, X_tr, device, size=recipe.input_size, mean=mean, std=std, resize=recipe.eval_resize,
                     features=True)
@@ -111,7 +119,8 @@ def run_fold(recipe, task, fold, device, inside, outside, keys, probes, log):
     save_weights(model, recipe, keys, out_dir / f"fold{fold}.pt", {"fold": fold, "task": task})
     met1 = classification_metrics(y_he, held["logits1"].argmax(1), range(len(keys)))
     met8 = classification_metrics(y_he, held["logits8"].argmax(1), range(len(keys)))
-    save_json({"fold": fold, "train_photos": len(tr), "held_photos": len(he), "train_seconds": info["train_seconds"],
+    save_json({"fold": fold, "train_photos": len(tr), "held_photos": len(he),
+               "outlier_photos": 0 if X_oe is None else len(X_oe), "train_seconds": info["train_seconds"],
                "held_1view": met1, "held_tta8": met8, "history": info["history"],
                "peak_gpu_memory_mb": torch.cuda.max_memory_allocated() / 2**20 if device.type == "cuda" else None},
               out_dir / f"fold{fold}.json")

@@ -147,6 +147,48 @@ The variants were scored once on the test set (`scripts/32_evaluate_variants.py`
 them next to the uncorrected networks and the original study. A GAN was not used for minority-class augmentation: with
 9 Potassium and 45 Nitrogen photographs it cannot learn new variation, only reproduce the few training leaves.
 
+**Superseded by §6c.** The v2.1 variants combined a class-weighted training loss with a class-prior correction, i.e.
+they compensated for imbalance twice. Their answer (the argmax of p / prior^τ) could also differ from the tallest bar of
+the probabilities they displayed.
+
+## 6c. Final round: one validated pipeline per model
+
+An audit (`docs/AUDIT.md`) traced wrong answers on the app's example images to the models, not the pipeline: the
+focused model gave confident wrong diagnoses to Early/Late Blight and Potassium photos, the full model rarely
+recognised Early Blight or Potassium, the refusal rules were biased against rare in-scope conditions, and the
+imbalance was compensated twice. The rules below were written down in `docs/AUDIT.md` §6 **before** any training of
+this round; every choice uses cross-fitted out-of-fold (OOF) predictions of the grouped 5-fold CV, never test photos.
+
+1. **Imbalance — one mechanism per arm** (same backbone, augmentation, epochs and folds; `src/tomatoleaf/recipes.py`):
+   A class-weighted cross-entropy (inverse frequency); B class-balanced sampling with plain cross-entropy; C plain
+   cross-entropy plus a post-hoc logit adjustment (τ · log prior subtracted from the logits; τ chosen on 4 folds by
+   macro-F1 and applied to the 5th). No arm combines a training-time and a post-hoc correction.
+2. **Focused model: outlier exposure** (Hendrycks et al., ICLR 2019). In every focused arm, the training folds'
+   Early Blight, Late Blight and Potassium photos are trained towards a uniform output over the five classes (weight
+   0.5, 8 outlier photos per step, fixed in advance). The model keeps exactly five outputs; it learns to be unsure on
+   look-alike conditions it does not cover. The held-out folds' photos of these conditions measure refusal OOF.
+3. **Selection**: highest OOF macro-F1 (argmax of the final calibrated probabilities); within 0.01, the lower OOF
+   NLL. Focused model: eligible only if the operating threshold refuses ≥ 80% of the OOF out-of-scope photos.
+4. **Calibration** (probability reliability, not accuracy): temperature scaling vs per-class vector scaling, both
+   cross-fitted; the lower OOF NLL wins (within 0.005: temperature scaling). The answer is the argmax of the final
+   calibrated probabilities, so it is always the tallest bar. Reported: Brier, ECE (15 bins), class-wise ECE, NLL,
+   reliability diagrams (OOF and test).
+5. **One threshold per model**: the lowest calibrated confidence whose OOF accuracy on answered photos is ≥ 95%
+   (focused) / ≥ 90% (full) with ≥ 50% of in-scope photos answered; for the focused model an answered out-of-scope
+   photo counts as an error.
+6. **Unusual-image gate**: kNN vs Mahalanobis feature distance on the selected networks, chosen by OOF AUROC against
+   synthetic non-leaf probes, leaf-free paper and (focused) OOF out-of-scope photos. Limits keep 95% of OOF genuine
+   photos **per answered condition** (shrunk towards the global limit for conditions with few photos), so rare
+   conditions are not flagged more often than common ones.
+7. **Evaluation** (`scripts/38_final_test.py`): the test photos are scored once with the final pipelines and, for
+   paired comparisons, with the models they replace; stress tests built from test photos (blur, dark, over-exposed,
+   heavy JPEG, four leaves in one frame, unusual backgrounds); out-of-dataset photos (PlantVillage leaves of other
+   crops and of tomato diseases outside the dataset, tomato photos from another lab, everyday photos; downloaded by
+   `scripts/37`, evaluation only); synthetic non-leaf probes and empty paper.
+
+Scripts: `21_train_cv.py` (arms), `36_final_pipeline.py` (selection, calibration, threshold, gate),
+`37_fetch_external_ood.py`, `38_final_test.py`; audits `34_audit_examples.py`, `35_audit_behaviour.py`.
+
 ## 7. Final evaluation
 
 All models — classical ML, the original networks and the upgrade — are scored by the **same predictor code that the

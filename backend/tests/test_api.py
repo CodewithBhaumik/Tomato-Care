@@ -120,6 +120,25 @@ def test_default_prediction_is_a_calibrated_distribution(client, test_photo):
     assert body["image"]["format"] == "JPEG" and body["image"]["colour"] == "Display P3 (unchanged)"
 
 
+def test_one_validated_model_per_mode_answers_the_tallest_bar(client):
+    """Final round: one served model per task, and its answer is always the most probable class (no separate
+    decision rule that could disagree with the probability chart). Checked on every gallery photo."""
+    from pathlib import Path
+
+    info = client.get("/api/models").json()
+    by_task = {}
+    for m in info["models"]:
+        by_task.setdefault(m["task"], []).append(m["key"])
+    assert all(len(v) == 1 for v in by_task.values()), by_task
+    gallery = Path(__file__).resolve().parents[2] / "frontend" / "public" / "test-samples"
+    for f in sorted(gallery.glob("*.jpg")):
+        for key in info["defaults_by_task"].values():
+            body = post(client, f.read_bytes(), f"?model={key}").json()
+            top = max(body["probabilities"], key=lambda p: p["probability"])
+            assert body["prediction"]["key"] == top["key"], (f.name, key)
+            assert body["prediction"]["confidence"] == pytest.approx(top["probability"])
+
+
 def test_eight_class_default_returns_all_classes(client, test_photo):
     _, data = test_photo
     key = client.get("/api/models").json()["defaults_by_task"]["8class"]
