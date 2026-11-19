@@ -276,10 +276,16 @@ stopped after 2 of 25 folds; that work is kept, unserved, on the local branch `f
 3. **Balanced/Calibrated choice.** Each mode now serves one model, the validated default: `balanced_5class` and
    `balanced_8class`. `calibrated_5class` stays in the benchmark. Balancing and calibration are unchanged inside the
    models.
+4. **Deployed Streamlit app kept the old model list after an update.** `core.deployment()`, `platform()`, the model
+   registry and the prediction caches were cached without any key on the data files. After a `git push`, the
+   running app reloaded the code but kept serving the old `deployment.json`: the live page still offered
+   Balanced/Calibrated, and v2.1 had needed a forced restart. They are now keyed on the files' modification time and
+   size (`streamlit_ui/core.py`). The weights "ready" flag is also reset when the deployment changes. A regression
+   test was added.
 
 **Checked and correct** (§3, plus): calibration is applied exactly once and in the fitted order (per-network
 temperature → mean → per-class vector scaling; the prior correction only picks the answer); softmax and probability
-handling were checked against the independent direct path; no stale weights or responses besides bug 2.
+handling were checked against the independent direct path; no stale weights or responses besides bugs 2 and 4.
 
 **Not fixed — model behaviour (needs approval to change):**
 
@@ -294,9 +300,3 @@ handling were checked against the independent direct path; no stale weights or r
   photographs).
 - **Rare in-scope conditions flagged "unusual".** On the focused model's test photos this happens to Healthy 22%,
   Magnesium 21% and Nitrogen 14% of the time, including the gallery's Nitrogen photo.
-4. **Deployed Streamlit app kept the old model list after an update.** `core.deployment()`, `platform()`, the model
-   registry and the prediction caches were cached without any key on the data files. After a `git push`, the
-   running app reloaded the code but kept serving the old `deployment.json`: the live page still offered
-   Balanced/Calibrated, and v2.1 had needed a forced restart. They are now keyed on the files' modification time and
-   size (`streamlit_ui/core.py`). The weights "ready" flag is also reset when the deployment changes. A regression
-   test was added.
