@@ -107,6 +107,7 @@ class Predictor:
         # per-class calibration + class-prior correction fitted on out-of-fold data (tomatoleaf.balance, scripts/31)
         self.adjust = entry.get("adjust")
         self.variant = entry.get("variant")
+        self.pipeline = entry.get("pipeline")  # final round: summary of the validated pipeline (scripts/36)
 
     def calibrate(self, probs: np.ndarray) -> np.ndarray:
         """Per-class calibration (if the entry has one): every condition's confidence matches its own accuracy."""
@@ -161,6 +162,9 @@ class TorchPredictor(Predictor):
         self.resize = ckpt.get("eval_resize", "resize")
         self.tta_views = int(entry.get("tta_views") or 1)
         self.temperature = float(entry.get("temperature") or 1.0)
+        # post-hoc logit adjustment (tau * log prior, scripts/36), subtracted BEFORE calibration so the answer stays
+        # the most probable class
+        self.logit_offset = np.asarray(entry["logit_offset"], dtype=np.float64) if entry.get("logit_offset") else None
         self.density = FeatureDensity.from_dict(ckpt["density"]) if ckpt.get("density") else None
         self.ood_method = (entry.get("ood_method") or "knn")  # "knn" or "maha" on this model's features
         self.ood_threshold = entry.get("ood_threshold")
@@ -221,6 +225,8 @@ class TorchPredictor(Predictor):
 
     def analyse(self, rgb: np.ndarray):
         logits, feats = self.forward(rgb)
+        if self.logit_offset is not None:
+            logits = np.asarray(logits, dtype=np.float64) - self.logit_offset
         return self.calibrate(_softmax(logits, self.temperature)), self.ood_ratio(feats)
 
     def explain(self, rgb: np.ndarray, class_index: int) -> dict:
@@ -259,7 +265,7 @@ class EnsemblePredictor(Predictor):
             spec = {**m, "key": m["key"], "name": m.get("name", m["key"]), "family": entry["family"],
                     "kind": "transfer", "feature_set": entry["feature_set"], "class_keys": entry.get("class_keys")}
             ident = (m["path"], int(m.get("tta_views") or 1), m.get("temperature"), m.get("ood_method"),
-                     m.get("ood_threshold"))
+                     m.get("ood_threshold"), tuple(m.get("logit_offset") or ()))
             if ident not in cache:
                 cache[ident] = TorchPredictor(spec, device)
             self.members.append(cache[ident])
@@ -287,6 +293,11 @@ class EnsemblePredictor(Predictor):
     def calibration(self):
         out = {"method": "temperature_scaling (per member)", "temperature": None,
                "member_temperatures": [m.temperature for m in self.members]}
+        if self.pipeline:  # final round (scripts/36): one validated pipeline per model
+            cal = "per-class vector scaling" if (self.adjust or {}).get("calibration") else "temperature scaling"
+            out.update({"method": cal + (" after a logit adjustment" if self.pipeline.get("logit_adjustment_tau")
+                                         else ""), "pipeline": self.pipeline})
+            return out
         if self.adjust:
             out.update({"method": "temperature scaling per member + per-class calibration"
                         + (" + class-prior correction" if self.adjust.get("tau") else ""),

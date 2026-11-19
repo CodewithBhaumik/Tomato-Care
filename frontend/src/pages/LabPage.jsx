@@ -4,6 +4,7 @@ import { FoldStrip, LatencyScatter, PerClassChart, RobustnessChart } from "../co
 import ConfusionMatrix from "../components/charts/ConfusionMatrix.jsx";
 import CompareTable from "../components/diagnose/CompareTable.jsx";
 import SampleGallery from "../components/diagnose/SampleGallery.jsx";
+import FinalPipeline from "../components/lab/FinalPipeline.jsx";
 import UploadPanel from "../components/diagnose/UploadPanel.jsx";
 import { useDocumentTitle } from "../components/layout/chrome.jsx";
 import { Badge, Button, Callout, Card, CardHeader, ErrorState, InfoTip, PageHeader, Segmented, Skeleton } from "../components/ui/primitives.jsx";
@@ -199,6 +200,8 @@ export default function LabPage() {
             />
             <Leaderboard models={models} sort={sort} setSort={setSort} selected={selected} toggle={toggle} highlight={def?.key} />
           </Card>
+
+          <FinalPipeline final={analytics.final_round} task={task} />
 
           {chosen.length > 0 && (
             <>

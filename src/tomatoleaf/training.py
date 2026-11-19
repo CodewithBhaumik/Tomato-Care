@@ -159,16 +159,37 @@ def train(model, train_loader, val_loader, *, device, criterion, epochs: int, lr
 # Upgrade round: fixed-epoch fine-tuning (no early stopping) with layer-wise LR decay, EMA and bf16 autocast.
 # =====================================================================================================================
 def class_weights(labels, num_classes: int, mode: str = "balanced") -> torch.Tensor:
+    if mode == "none":
+        return torch.ones(num_classes, dtype=torch.float32)
     w = balanced_class_weights(labels, num_classes)
     return w.sqrt() if mode == "sqrt" else w
 
 
-def _gpu_loader(images, labels, transform, batch_size, seed, device, drop_last=True):
+def _gpu_loader(images, labels, transform, batch_size, seed, device, drop_last=True, sampling: str = "uniform"):
+    """Shuffled loader; sampling="class_balanced" draws every class equally often (with replacement, N per epoch)."""
     generator = torch.Generator().manual_seed(seed)
     on_gpu = torch.device(device).type == "cuda"
     dataset = LeafDataset(images, labels, transform, device=device if on_gpu else None)
+    if sampling == "class_balanced":
+        labels = np.asarray(labels)
+        per_sample = 1.0 / np.bincount(labels)[labels]
+        sampler = torch.utils.data.WeightedRandomSampler(torch.as_tensor(per_sample, dtype=torch.double),
+                                                         num_samples=len(labels), replacement=True,
+                                                         generator=generator)
+        return DataLoader(dataset, batch_size=batch_size, sampler=sampler, num_workers=0, drop_last=drop_last)
     return DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=0, generator=generator,
                       drop_last=drop_last)
+
+
+def uniform_target_loss(logits: torch.Tensor) -> torch.Tensor:
+    """Outlier exposure (Hendrycks et al. 2019): cross-entropy between the uniform distribution and the softmax,
+    -1/K * sum_c log p_c, averaged over the outlier photos. Minimal when the model is maximally unsure."""
+    return -torch.log_softmax(logits.float(), dim=1).mean(dim=1).mean()
+
+
+def _cycle(loader):
+    while True:
+        yield from loader
 
 
 def _optimizer(model, recipe, lr: float):
@@ -191,13 +212,16 @@ def final_out_features(model) -> int:
     return final_linear(model).out_features
 
 
-def fit_recipe(model, recipe, images, labels, *, device, seed: int = 42, monitor=None, log=print):
+def fit_recipe(model, recipe, images, labels, *, device, seed: int = 42, monitor=None, log=print, outliers=None,
+               monitor_every: int = 5):
     """Train `model` with `recipe` on uint8 images (N x 256 x 256 x 3). Returns (model with final weights, info).
 
     Stage 1 trains only the new classification head (backbone frozen and in eval mode); stage 2 fine-tunes every
     layer for exactly `recipe.epochs` epochs (warm-up then cosine decay, per step). With `ema_decay`, the returned
     weights are the exponential moving average of stage 2. `monitor(model) -> dict` (optional) is only logged,
-    never used to pick an epoch.
+    never used to pick an epoch (every `monitor_every` epochs and at the end, to save time).
+    `outliers` (uint8 images): with recipe.outlier_weight > 0, every step adds recipe.outlier_batch of them, trained
+    towards a uniform output (outlier exposure).
     """
     from .models import normalisation, set_backbone_trainable
     from .preprocessing import train_transform, train_transform_robust
@@ -208,22 +232,39 @@ def fit_recipe(model, recipe, images, labels, *, device, seed: int = 42, monitor
         tf = train_transform(recipe.input_size, mean, std)
     else:  # "robust" (mild) or "heavy"
         tf = train_transform_robust(recipe.input_size, mean, std, strength="heavy" if recipe.aug == "heavy" else "mild")
-    loader = _gpu_loader(images, labels, tf, recipe.batch, seed, device)
+    loader = _gpu_loader(images, labels, tf, recipe.batch, seed, device, sampling=recipe.sampling)
     criterion = WeightedSmoothedCE(class_weights(labels, final_out_features(model), recipe.class_weighting).to(device),
                                    smoothing=recipe.label_smoothing)
+    oe_stream = None
+    if recipe.outlier_weight > 0:
+        if outliers is None or not len(outliers):
+            raise ValueError(f"recipe {recipe.name} needs outlier photos (outlier exposure)")
+        oe_stream = _cycle(_gpu_loader(outliers, np.zeros(len(outliers), dtype=int), tf, recipe.outlier_batch,
+                                       seed + 1, device))
     autocast = dict(device_type=device.type, dtype=torch.bfloat16, enabled=device.type == "cuda")
     clip = None if recipe.aug == "base" else 1.0
     history, start = [], time.perf_counter()
+    last_epoch = recipe.head_epochs + recipe.epochs
 
     def run_epoch(opt, sched, stage, epoch, ema=None, step0=0, head_only=False):
         model.eval() if head_only else model.train()
-        tot, correct, seen, step = 0.0, 0, 0, step0
+        tot, correct, seen, step, oe_tot = 0.0, 0, 0, step0, 0.0
         t0 = time.perf_counter()
         for x, y in loader:
             x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
+            n_in = len(x)
+            if oe_stream is not None:
+                x = torch.cat([x, next(oe_stream)[0].to(device, non_blocking=True)])
             with torch.autocast(**autocast):
                 logits = model(x)
+            oe_loss = None
+            if oe_stream is not None:
+                oe_loss = uniform_target_loss(logits[n_in:])
+                logits = logits[:n_in]
             loss = criterion(logits.float(), y)
+            if oe_loss is not None:
+                loss = loss + recipe.outlier_weight * oe_loss
+                oe_tot += oe_loss.item() * n_in
             opt.zero_grad(set_to_none=True)
             loss.backward()
             if clip:
@@ -239,11 +280,14 @@ def fit_recipe(model, recipe, images, labels, *, device, seed: int = 42, monitor
             seen += len(y)
         row = {"epoch": epoch, "stage": stage, "train_loss": tot / seen, "train_acc": correct / seen,
                "lr": opt.param_groups[-1]["lr"], "seconds": time.perf_counter() - t0}
-        if monitor is not None:
+        if oe_stream is not None:
+            row["outlier_loss"] = oe_tot / seen
+        if monitor is not None and (epoch % monitor_every == 0 or epoch == last_epoch):
             row.update(monitor(ema.module if ema is not None else model))
         history.append(row)
         extra = " | ".join(f"{k} {v:.3f}" for k, v in row.items() if k.startswith("val_"))
         log(f"[{stage}] epoch {epoch:3d} | loss {row['train_loss']:.4f} acc {row['train_acc']:.3f}"
+            + (f" | outlier loss {row['outlier_loss']:.4f}" if "outlier_loss" in row else "")
             + (f" | {extra}" if extra else "") + f" | lr {row['lr']:.1e} | {row['seconds']:.1f}s")
         return step
 

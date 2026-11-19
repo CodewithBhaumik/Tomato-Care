@@ -101,7 +101,7 @@ export default function ResultPanel({ result }) {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         <Card>
-          <CardHeader title="Class probabilities" subtitle="Calibrated (temperature-scaled) — the vertical tick marks the threshold" />
+          <CardHeader title="Class probabilities" subtitle="Calibrated on out-of-fold data — the answer is the tallest bar; the vertical tick marks the threshold" />
           <div className="p-5">
             <ProbabilityBars probabilities={probabilities} threshold={thr} trueKey={trueKey} />
           </div>

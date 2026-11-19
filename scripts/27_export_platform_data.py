@@ -106,6 +106,54 @@ def build_gallery(defaults, previous, bench_models):
     return {"items": items, "models": models, "summary": summary, "on_leaf_share": shares}, hero
 
 
+def final_round_block(final_pipe, final_round, final_keys):
+    """What the apps show about the final round: the compared arms (out-of-fold), the chosen pipeline, and the
+    before/after comparison on the test photos with stress and out-of-dataset checks."""
+    if not final_pipe:
+        return None
+    out = {"rules": "docs/AUDIT.md §6 (fixed before training)", "tasks": {}}
+    keep = ("accuracy", "f1_macro", "f1_weighted", "balanced_accuracy", "nll", "brier", "ece", "classwise_ece")
+    for t, fp in final_pipe.items():
+        arms = [{"arm": a["arm"], "recipe": a["recipe"], "label": a["label"], "oof": {k: a["oof"][k] for k in keep},
+                 "calibration": a["calibration"]["chosen"], "nll_temperature": a["calibration"]["nll_temperature"],
+                 "nll_vector": a["calibration"]["nll_vector"], "tau": (a.get("tau") or {}).get("deployed"),
+                 "threshold": a["threshold"], "coverage": a["operating_point"]["coverage"],
+                 "accuracy_kept": a["operating_point"]["accuracy_kept"],
+                 "out_of_scope_refusal": a.get("out_of_scope_refusal"), "chosen": a["arm"] == fp["chosen"]["arm"]}
+                for a in fp["arms"].values()]
+        gate = fp["unusual_gate"]
+        task = {"arms": arms, "chosen": fp["chosen"]["arm"], "why": fp["chosen"]["why"],
+                "gate": {"method": gate["method"],
+                         **{k: v for k, v in gate["evaluation_oof"][gate["method"]].items()
+                            if k.startswith(("auroc", "flagged", "out_of_scope"))}},
+                "reference": fp.get("reference") or None}
+        if final_round:
+            before = {"5class": ["balanced_5class", "calibrated_5class", "ensemble_5class"],
+                      "8class": ["balanced_8class", "convnext_tiny_v2_tta"]}[t]
+            rows = []
+            for key in [final_keys[t]] + before:
+                r = final_round["models"].get(key)
+                if r is None:
+                    continue
+                rows.append({"key": key, "name": r["name"], "final": key == final_keys[t],
+                             **{k: r["test"][k] for k in keep if k in r["test"]},
+                             "accuracy_ci": r["test"].get("accuracy_ci"), "threshold": r["threshold"],
+                             "coverage": r["selective"]["coverage"], "accuracy_kept": r["selective"]["accuracy_kept"],
+                             "flagged_unusual": r["flagged_unusual"],
+                             "label_differs_from_tallest_bar": r.get("label_differs_from_tallest_bar"),
+                             "out_of_scope": r.get("out_of_scope"), "per_condition": r.get("per_condition")})
+            task["test"] = rows
+            task["comparisons"] = [c for c in final_round["comparisons"] if c["task"] == t]
+            pair = [final_keys[t], before[0]]
+            task["stress"] = {k: final_round["stress"].get(k) for k in pair}
+            task["out_of_dataset"] = {k: final_round["out_of_dataset"].get(k) for k in pair}
+            task["latency"] = {k: final_round["latency"].get(k) for k in pair}
+        out["tasks"][t] = task
+    if final_round:
+        out["note"] = final_round["note"]
+    return out
+
+
 def curves_for(task, recipe):
     rows = []
     for k in range(5):
@@ -138,6 +186,12 @@ def main():
         bal = RESULTS_DIR / f"balance_{t}.json"
         if bal.exists():
             variant_oof.update({k: v["oof"] for k, v in load_json(bal)["variants"].items()})
+    # final round (scripts/36 + 38): one validated pipeline per task
+    FINAL_KEYS = {"5class": "focused_5class", "8class": "full_8class"}
+    final_pipe = {t: load_json(RESULTS_DIR / f"final_pipeline_{t}.json") for t in ("5class", "8class")
+                  if (RESULTS_DIR / f"final_pipeline_{t}.json").exists()}
+    final_round = load_json(RESULTS_DIR / "final_round.json") if (RESULTS_DIR / "final_round.json").exists() else None
+    final_oof = {FINAL_KEYS[t]: fp["arms"][fp["chosen"]["arm"]]["oof"] for t, fp in final_pipe.items()}
     old = load_json(EXPERIMENTS_DIR / "analytics.json")
     final8 = load_json(RESULTS_DIR / "final_results.json")
     five = load_json(RESULTS_DIR / "five_class_results.json")
@@ -182,6 +236,8 @@ def main():
             cv = sel[r["task"]]["chosen"]["oof"]
         elif r["key"] in variant_oof:
             cv = variant_oof[r["key"]]
+        elif r["key"] in final_oof:
+            cv = final_oof[r["key"]]
         elif recipes and len(recipes) == 1:
             view = str(m.get("tta_views", 1))
             cv = rec_oof.get((r["task"], recipes[0], view))
@@ -194,7 +250,7 @@ def main():
             "recipe": recipes[0] if recipes and len(recipes) == 1 else None, "recipes": recipes,
             "deployed": r["key"] in {e["key"] for e in deployment["models"]},
             "is_default": r["key"] in served.values(), "description": m.get("description") or m.get("feature_set"),
-            "variant": m.get("variant"), "base_model": m.get("base_model"),
+            "variant": m.get("variant"), "base_model": m.get("base_model"), "pipeline": m.get("pipeline"),
             "cv": {k: cv[k] for k in ("f1_macro", "accuracy")} if cv else None,
             "val": {k: legacy_val[r["key"]][k] for k in ("f1_macro", "accuracy")} if r["key"] in legacy_val else None,
             "test": r["test"], "per_class": r["per_class"], "confusion": r["confusion"],
@@ -211,6 +267,17 @@ def main():
                                  "reliability_after": sel[t]["chosen"]["reliability_oof"],
                                  "ece_before": sel[t]["chosen"]["oof"]["ece_raw"], "ece_after": sel[t]["chosen"]["oof"]["ece"],
                                  "fitted_on": "out-of-fold predictions (diagram: out-of-fold, before vs after)"})
+
+    for t, fp in final_pipe.items():  # OOF reliability before / after calibration for the final pipelines
+        d = next((m for m in models if m["key"] == FINAL_KEYS[t]), None)
+        if d is not None:
+            arm = fp["arms"][fp["chosen"]["arm"]]
+            d["calibration"].update({"reliability_before": fp["chosen"]["reliability_oof_raw"],
+                                     "reliability_after": fp["chosen"]["reliability_oof"],
+                                     "ece_before": arm["uncalibrated"]["ece"], "ece_after": arm["oof"]["ece"],
+                                     "method": arm["calibration"]["chosen"] + " scaling",
+                                     "fitted_on": "out-of-fold predictions, cross-fitted (diagram: out-of-fold, "
+                                                  "before vs after)"})
 
     # ---- cross-validation recipes
     recipes_out = []
@@ -264,7 +331,9 @@ def main():
     for t in ("5class", "8class"):
         rc = bench.get("risk_coverage_variants", {}).get(served[t]) or bench["risk_coverage"][t]
         d = next(m for m in models if m["key"] == rc["model"])
-        selective[t] = {"model": rc["model"], "curve": rc["curve"], "rule": sel[t]["selective"]["rule"],
+        rule = (final_pipe[t]["arms"][final_pipe[t]["chosen"]["arm"]]["threshold_rule"]
+                if served[t] == FINAL_KEYS[t] and t in final_pipe else sel[t]["selective"]["rule"])
+        selective[t] = {"model": rc["model"], "curve": rc["curve"], "rule": rule,
                         "chosen": {"threshold": d["selective"]["threshold"], "coverage": d["selective"]["coverage"],
                                    "accuracy_kept": d["selective"]["accuracy_kept"]}}
 
@@ -275,13 +344,21 @@ def main():
            "test": {"flagged_in": bench["ood"]["5class"]["flagged_in"], "flagged_near": bench["ood"]["5class"].get("flagged_near"),
                     "flagged_far": bench["ood"]["5class"]["flagged_far_B"], "by_task": bench["ood"]}}
 
+    if final_pipe:
+        ood["final"] = {t: {"method": fp["unusual_gate"]["method"], "keep": fp["unusual_gate"]["keep"],
+                            "oof": {k: v for k, v in
+                                    fp["unusual_gate"]["evaluation_oof"][fp["unusual_gate"]["method"]].items()
+                                    if k != "member_thresholds"}} for t, fp in final_pipe.items()}
+
     limitations = [
         "One phone model, two districts of Rajasthan, single leaves on paper: accuracy on field photos, other cameras or regions is unknown.",
         "Potassium Deficiency has 9 photographs in total (2 in the test set) and Nitrogen Deficiency 45: their per-class scores are very uncertain.",
         "The test set is small (290 photos, 265 in the focused scope); differences of a few points are within noise — read the confidence intervals and paired tests.",
         "The same test photos were used to report the original study, so they are not perfectly fresh; no upgrade decision used them.",
         "Temperatures and thresholds were fitted on out-of-fold predictions of the fold models, which are also the deployed models; coverage on new photos can still differ.",
-        "The out-of-distribution check was tested on out-of-scope leaf conditions and 30 generic images, not on other crops or field scenes.",
+        "Early Blight (62 photos) and Potassium Deficiency (9 photos) stay hard for the full model: their recall is low even after the final round.",
+        "The focused model learned to refuse Early/Late Blight and Potassium from photos of those three conditions (outlier exposure); diseases it has never seen may still receive a diagnosis.",
+        "Out-of-dataset checks used PlantVillage leaves (another lab), everyday photos and synthetic stress tests; field photos with complex backgrounds were not available.",
         "Grad-CAM shows where the network looked, not why a leaf is diseased.",
     ]
     env = {"python": platform.python_version(), "torch": torch.__version__,
@@ -299,6 +376,7 @@ def main():
                   "chosen": {t: sel[t]["chosen"]["key"] for t in sel}},
            "audit": {"preprocessing": pre, "robustness": robustness, "dihedral": {k: v.get("dihedral_views") for k, v in audit["models"].items() if v.get("dihedral_views")}},
            "selective": selective, "ood": ood, "gradcam": gallery, "hero": hero, "limitations": limitations,
+           "final_round": final_round_block(final_pipe, final_round, FINAL_KEYS),
            "environment": env}
     save_json(doc, EXPERIMENTS_DIR / "platform.json")
     (FRONT / "data").mkdir(parents=True, exist_ok=True)

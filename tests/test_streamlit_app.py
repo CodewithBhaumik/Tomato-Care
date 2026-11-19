@@ -36,7 +36,7 @@ def _offline(monkeypatch):
     monkeypatch.setenv("TOMATO_DOWNLOAD_WEIGHTS", "0")
 
 
-@pytest.mark.parametrize("view, metric", [("home", "Focused · accuracy"), ("lab", "Version 2 · accuracy"),
+@pytest.mark.parametrize("view, metric", [("home", "Focused · accuracy"), ("lab", "Served model · accuracy"),
                                           ("library", None), ("method", "Non-leaf images flagged"),
                                           ("diagnose", None)])
 def test_page_renders_without_exception(view, metric):

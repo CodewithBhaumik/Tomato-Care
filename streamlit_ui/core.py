@@ -195,6 +195,18 @@ def short_name(entry: dict) -> str:
     return f"{TASK_LABEL[entry['task']].split(' · ')[0]} · {variant} · {n} ConvNeXt-T networks".replace(" ·  ·", " ·")
 
 
+def model_help(entry: dict) -> str:
+    """One line on how the served model was built (final round), or the older variant help."""
+    p = entry.get("pipeline")
+    if not p:
+        return VARIANT_HELP.get(entry.get("variant"), "")
+    return (f"{p['imbalance'][0].upper() + p['imbalance'][1:]}"
+            + (" + outlier exposure (learned to be unsure on the 3 conditions it does not cover)"
+               if p.get("outlier_exposure") else "")
+            + f"; {p['calibration']} scaling; answers at ≥ {pct(p['threshold'], 0)} confidence. "
+              "All chosen on cross-validation data before the test photos were scored.")
+
+
 # ---------------------------------------------------------------------------------------------------- inference
 def canonical(image_bytes: bytes):
     """(256x256 RGB array as the models see it, details of the conversion)."""

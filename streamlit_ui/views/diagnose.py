@@ -69,7 +69,7 @@ def _model_panel():
             entry = core.model_entry(pick)
         else:
             entry = options[0]
-        st.caption(core.VARIANT_HELP.get(entry.get("variant"), ""))
+        st.caption(core.model_help(entry))
         acc = (entry.get("test_metrics") or {}).get("accuracy")
         st.html(theme.chip(core.short_name(entry), "g")
                 + (theme.chip(f"{100 * acc:.1f}% on held-out test photos", "c") if acc is not None else ""))

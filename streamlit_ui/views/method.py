@@ -81,19 +81,25 @@ def render() -> None:
         st.altair_chart(charts.reliability(series), width="stretch")
     with b:
         st.markdown(
-            "Networks are often over-confident. **Temperature scaling** (one number per model, fitted on out-of-fold "
-            "predictions) makes a stated 80% mean about 80% right. The **answer threshold** is the lowest confidence "
+            "Networks are often over-confident. **Calibration** (temperature scaling, or per-class vector scaling when "
+            "it fits better, fitted on out-of-fold predictions) makes a stated 80% mean about 80% right. The **answer threshold** is the lowest confidence "
             "at which out-of-fold accuracy on answered photos reaches the target — 95% for the focused task, 90% for "
             "all eight conditions. Below it, the app says **“not sure”**.")
 
-    theme.section("4b · Class bias and even confidence", kicker="Fairness to rare conditions")
+    theme.section("4b · One validated pipeline per model", kicker="Fairness to rare conditions")
     st.markdown(
-        "Leaf Miner makes up over half of the photographs, Potassium Deficiency 0.4%. Training already weights each "
-        "class by its rarity; on top of that the served models apply two corrections fitted on out-of-fold data: "
-        "**per-class calibration** (vector scaling), so a stated 90% means about 90% right for every condition, and "
-        "a **class-prior correction** (logit adjustment, Menon et al. 2021), so frequent conditions cannot out-vote "
-        "rare ones. The confidence shown stays the calibrated probability of the answer. Numbers: Model lab → "
-        "Calibration. A GAN was not used: from 9 Potassium photographs it would reproduce those photos, not add "
+        "Leaf Miner makes up over half of the photographs, Potassium Deficiency 0.4%. Each model handles this with "
+        "**exactly one** imbalance correction, chosen by cross-validation among three: a **class-weighted loss**, "
+        "**class-balanced sampling**, or plain training plus a **logit adjustment** (Menon et al. 2021) — never two "
+        "stacked on top of each other. Then the probabilities are **calibrated** (temperature or per-class vector "
+        "scaling, whichever fits the out-of-fold data better), so a stated 90% means about 90% right; the answer is "
+        "always the most probable condition, i.e. the tallest bar. One answer threshold per model is chosen on the "
+        "same out-of-fold data.\n\n"
+        "The focused model covers five conditions. During training it also saw the training folds' Early Blight, "
+        "Late Blight and Potassium photos with the target **“equally likely to be any of the five”** (outlier "
+        "exposure, Hendrycks et al. 2019), so such photos get a low confidence and the answer “not sure” instead of "
+        "a confident wrong diagnosis. Every rule was written down before training; numbers: Model lab → Final "
+        "pipeline. A GAN was not used: from 9 Potassium photographs it would reproduce those photos, not add "
         "information.")
 
     theme.section("5 · Recognising unusual photos", kicker="Out-of-distribution")
