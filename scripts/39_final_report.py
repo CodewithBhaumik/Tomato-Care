@@ -13,6 +13,7 @@ from tomatoleaf.config import CLASSES, RESULTS_DIR  # noqa: E402
 from tomatoleaf.utils import load_json  # noqa: E402
 
 NAME = {c["key"]: c["name"] for c in CLASSES}
+FIVE = ["healthy", "leaf_miner", "magnesium_deficiency", "nitrogen_deficiency", "spotted_wilt_virus"]
 FINAL = {"5class": "focused_5class", "8class": "full_8class"}
 BEFORE = {"5class": "balanced_5class", "8class": "balanced_8class"}
 TASK = {"5class": "Focused model (5 conditions)", "8class": "Full model (8 conditions)"}
@@ -39,14 +40,42 @@ def table(head, rows):
     return "\n".join(out)
 
 
+def _cell(true, model_classes, pred, conf, status):
+    answered = status in ("Healthy", "Diseased")
+    if answered:
+        return f"{NAME[pred]} {p(conf)} — " + ("✓" if pred == true else "✗ wrong")
+    verdict = "refused (correct: not one of its conditions)" if true not in model_classes else "refused"
+    return f"{status} (best guess {NAME[pred]} {p(conf)}) — {verdict}"
+
+
 def gallery_rows(path, models):
+    """Gallery outcomes of the served models, from scripts/34 (HTTP API)."""
     rows = [r for r in load_json(path)["rows"] if r["set"] == "gallery" and r["model"] in models]
     out = {}
     for r in rows:
-        txt = (f"{NAME[r['predicted']]} {p(r['confidence'])}" if r["outcome"] in ("correct", "WRONG")
-               else f"{r['status']} (label {NAME[r['predicted']]} {p(r['confidence'])})")
-        mark = {"correct": "✓", "WRONG": "✗ wrong"}.get(r["outcome"], "refused")
-        out.setdefault(r["true"], {})[r["model"]] = f"{txt} — {mark}"
+        classes = FIVE if r["model"].endswith("5class") else list(NAME)
+        out.setdefault(r["true"], {})[r["model"]] = _cell(r["true"], classes, r["predicted"], r["confidence"],
+                                                          r["status"])
+    return out
+
+
+def gallery_rows_direct(keys):
+    """The previously served models on the CURRENT gallery files (same photos as the final models), through the same
+    upload preprocessing and predictor code as the API (direct inference equals the API to 1e-6, docs/AUDIT.md §8)."""
+    sys.path[:0] = [str(ROOT)]
+    from backend.services.predictor import ModelRegistry
+    from tomatoleaf.config import EXPERIMENTS_DIR
+    from tomatoleaf.preprocessing import prepare_upload
+
+    reg = ModelRegistry(EXPERIMENTS_DIR / "benchmark_models.json", device="cpu", lazy=True)
+    manifest = load_json(ROOT / "frontend" / "public" / "test-samples" / "manifest.json")
+    out = {}
+    for s in manifest["samples"]:
+        rgb, _ = prepare_upload((ROOT / "frontend" / "public" / s["file"].lstrip("/")).read_bytes())
+        for key in keys:
+            r = reg.predict(rgb, key)
+            out.setdefault(s["key"], {})[key] = _cell(s["key"], r["classes"], r["prediction"]["key"],
+                                                      r["prediction"]["confidence"], r["prediction"]["status"])
     return out
 
 
@@ -85,7 +114,7 @@ def main():
     L += ["## 2. Example-image verification (Diagnose gallery, through `POST /api/predict`)", "",
           "One held-out test photo per condition (first test photo of each class, not chosen by correctness). "
           "“Refused” = Uncertain or Unusual image (no diagnosis).", ""]
-    before = gallery_rows(RESULTS_DIR / "audit_examples_before.json", set(BEFORE.values()))
+    before = gallery_rows_direct(list(BEFORE.values()))
     after = gallery_rows(RESULTS_DIR / "audit_examples.json", set(FINAL.values()))
     rows = [[NAME[k], before.get(k, {}).get(BEFORE["5class"], "—"), after.get(k, {}).get(FINAL["5class"], "—"),
              before.get(k, {}).get(BEFORE["8class"], "—"), after.get(k, {}).get(FINAL["8class"], "—")]
@@ -244,7 +273,7 @@ def main():
           "a repeated look, not a first one.",
           "- **Small test set.** Differences of a few points are within the bootstrap intervals; read the paired "
           "comparisons, not single numbers.", ""]
-    out = ROOT / "docs" / "FINAL_REPORT.md"
+    out = Path(sys.argv[sys.argv.index("--out") + 1]) if "--out" in sys.argv else ROOT / "docs" / "FINAL_REPORT.md"
     out.write_text("\n".join(L), encoding="utf-8")
     print("wrote", out)
 
